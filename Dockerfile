@@ -14,23 +14,14 @@ RUN mvn clean package -DskipTests
 # Estágio de produção
 FROM openjdk:17-jre-slim
 
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Criar usuário não-root para segurança
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+# Instalar curl para health check
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Definir diretório de trabalho
 WORKDIR /app
 
 # Copiar o JAR compilado do estágio anterior
 COPY --from=build /app/target/people-flow-api-*.jar app.jar
-
-# Mudar propriedade dos arquivos para o usuário appuser
-RUN chown -R appuser:appuser /app
-USER appuser
 
 # Expor porta
 EXPOSE 8080

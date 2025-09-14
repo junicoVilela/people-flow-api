@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL para produção
+  postgres:
+    image: postgres:15-alpine
+    container_name: people-flow-postgres
+    environment:
+      POSTGRES_DB: PEOPLE_FLOW_RH
+      POSTGRES_USER: peopleflow
+      POSTGRES_PASSWORD: peopleflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - people-flow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peopleflow -d PEOPLE_FLOW_RH"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Aplicação Spring Boot para produção
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: people-flow-api
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres:5432/PEOPLE_FLOW_RH
+      DATABASE_USERNAME: peopleflow
+      DATABASE_PASSWORD: peopleflow
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - people-flow-network
+    restart: unless-stopped
+
+volumes:
+  postgres_prod_data:
+
+networks:
+  people-flow-network:
+    driver: bridge
