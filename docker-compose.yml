@@ -1,6 +1,27 @@
 version: '3.8'
 
 services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: people-flow-postgres
+    environment:
+      POSTGRES_DB: peopleflow
+      POSTGRES_USER: peopleflow
+      POSTGRES_PASSWORD: peopleflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/db/migration:/docker-entrypoint-initdb.d
+    networks:
+      - people-flow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peopleflow -d peopleflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Aplicação Spring Boot
   app:
     build:
@@ -8,13 +29,43 @@ services:
       dockerfile: Dockerfile
     container_name: people-flow-api
     environment:
+      # Configurações do banco de dados
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/peopleflow
+      SPRING_DATASOURCE_USERNAME: peopleflow
+      SPRING_DATASOURCE_PASSWORD: peopleflow
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      
+      # Configurações do Flyway
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres:5432/peopleflow
+      SPRING_FLYWAY_USER: peopleflow
+      SPRING_FLYWAY_PASSWORD: peopleflow123
+      SPRING_FLYWAY_SCHEMAS: app
+      
+      # Configurações da aplicação
       SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8080
+      
+      # Configurações de logging
+      LOGGING_LEVEL_COM_PEOPLEFLOW: DEBUG
+      
+      # Configurações do Actuator
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
     ports:
       - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - people-flow-network
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+volumes:
+  postgres_data:
 networks:
   people-flow-network:
     driver: bridge
