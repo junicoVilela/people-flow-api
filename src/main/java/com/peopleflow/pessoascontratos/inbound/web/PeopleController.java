@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/people")
+@RequestMapping("/people")
 public class PeopleController {
 
     private static final Logger log = LoggerFactory.getLogger(PeopleController.class);
@@ -77,4 +77,4 @@ public class PeopleController {
         useCase.delete(id);
         return ResponseEntity.noContent().build();
     }
-} 
+}

@@ -1,5 +1,5 @@
 # Multi-stage build para otimizar o tamanho da imagem
-FROM maven:3.9.6-openjdk-17-slim AS build
+FROM maven:3.9.6-openjdk-21-slim AS build
 
 # Definir diretório de trabalho
 WORKDIR /app
@@ -12,7 +12,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Estágio de produção
-FROM openjdk:17-jre-slim
+FROM openjdk:21-jre-slim
 
 # Instalar curl para health check
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
