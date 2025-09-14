@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Banco de dados PostgreSQL para produção
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: people-flow-postgres
     environment:
       POSTGRES_DB: PEOPLE_FLOW_RH

@@ -4,18 +4,18 @@ API REST para gerenciamento de pessoas usando arquitetura hexagonal.
 
 ## Tecnologias
 
-- Java 17
+- Java 21
 - Spring Boot 3.2.0
 - Spring Security + OAuth2 JWT
 - Spring Data JPA
-- PostgreSQL (desenvolvimento e produção)
+- PostgreSQL 16 (desenvolvimento e produção)
 - Flyway (migrações de banco)
 - Docker & Docker Compose
 
 ## Ambientes
 
 ### Desenvolvimento (dev)
-- PostgreSQL local (porta 5432)
+- PostgreSQL 16 local (porta 5432)
 - Database: PEOPLE_FLOW_RH_DEV
 - App local (porta 8080)
 - Logging detalhado
@@ -23,7 +23,7 @@ API REST para gerenciamento de pessoas usando arquitetura hexagonal.
 - Compressão habilitada
 
 ### Produção (prod)
-- PostgreSQL local (porta 5433)
+- PostgreSQL 16 local (porta 5433)
 - Database: PEOPLE_FLOW_RH
 - App local (porta 8081)
 - Logging otimizado
@@ -67,7 +67,8 @@ docker-compose -f docker-compose.prod.yml up --build
 - `DATABASE_USERNAME`: Usuário do banco
 - `DATABASE_PASSWORD`: Senha do banco
 - `SERVER_PORT`: Porta da aplicação
-- `JWT_ISSUER_URI`: URI do provedor JWT
+- `KEYCLOAK_ISSUER_URI`: URI do Keycloak
+- `KEYCLOAK_CLIENT_SECRET`: Secret do client Keycloak
 
 ### Profiles Spring
 - `dev`: Ambiente de desenvolvimento
@@ -81,6 +82,7 @@ docker-compose -f docker-compose.prod.yml up --build
 - Database: PEOPLE_FLOW_RH_DEV
 - Usuário: peopleflow
 - Senha: peopleflow123
+- Versão: PostgreSQL 16
 
 ### Produção
 - Host: localhost (local) / postgres (Docker)
@@ -88,6 +90,7 @@ docker-compose -f docker-compose.prod.yml up --build
 - Database: PEOPLE_FLOW_RH
 - Usuário: peopleflow
 - Senha: peopleflow123
+- Versão: PostgreSQL 16
 
 ## Comandos Docker
 
