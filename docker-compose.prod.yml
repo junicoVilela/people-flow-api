@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_prod_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - people-flow-network
     healthcheck:
@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_prod_data:
+  postgres_data:
 
 networks:
   people-flow-network:

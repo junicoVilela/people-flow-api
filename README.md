@@ -20,6 +20,7 @@ API REST para gerenciamento de pessoas usando arquitetura hexagonal.
 - App local (porta 8080)
 - Logging detalhado
 - Actuator com todos os endpoints
+- Compressão habilitada
 
 ### Produção (prod)
 - PostgreSQL local (porta 5433)
@@ -28,6 +29,7 @@ API REST para gerenciamento de pessoas usando arquitetura hexagonal.
 - Logging otimizado
 - Actuator limitado
 - Configurações de performance
+- Compressão habilitada
 
 ## Como executar
 
@@ -49,12 +51,12 @@ docker-compose -f docker-compose.prod.yml up --build
 ## Acessos
 
 ### Desenvolvimento
-- API: http://localhost:8080/api/people
+- API: http://localhost:8080/people
 - Actuator: http://localhost:8080/actuator
 - PostgreSQL: localhost:5432 (PEOPLE_FLOW_RH_DEV)
 
 ### Produção
-- API: http://localhost:8081/api/people
+- API: http://localhost:8081/people
 - Actuator: http://localhost:8081/actuator/health
 - PostgreSQL: localhost:5433 (PEOPLE_FLOW_RH)
 
