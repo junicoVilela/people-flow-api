@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev  # Altere para 'prod' quando necessário
   datasource:
     username: ${DATABASE_USERNAME:peopleflow}
     password: ${DATABASE_PASSWORD:peopleflow}

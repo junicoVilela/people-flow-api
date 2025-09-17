@@ -1,41 +1,39 @@
 spring:
+  server:
+    port: 8080
+    servlet:
+      compression:
+        enabled: true
+          
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/PEOPLE_FLOW_RH_DEV}
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
+    url: jdbc:postgresql://localhost:5432/PEOPLE_FLOW_RH
+    username: peopleflow
+    password: peopleflow
+    driver-class-name: org.postgresql.Driver
+  
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    connection-timeout: 20000
+    idle-timeout: 300000
+    max-lifetime: 1200000
   
   jpa:
-    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        jdbc:
-          batch_size: 10
+        default_schema: "PEOPLE_FLOW_RH"
   
   flyway:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/PEOPLE_FLOW_RH_DEV}
-
-server:
-  port: ${SERVER_PORT:8080}
-  compression:
-    enabled: true
-    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    enabled: false
 
 logging:
   level:
     com.peopleflow: DEBUG
     org.springframework.security: DEBUG
-    org.flywaydb: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
-# Configurações específicas de desenvolvimento
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
