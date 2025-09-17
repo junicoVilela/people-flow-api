@@ -12,9 +12,9 @@ public class WebConfig {
     public FilterRegistrationBean<TenantFilter> tenantFilter() {
         FilterRegistrationBean<TenantFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new TenantFilter());
-        registration.addUrlPatterns("/api/*");
+        registration.addUrlPatterns("/*");
         registration.setName("tenantFilter");
         registration.setOrder(1);
         return registration;
     }
-} 
+}
