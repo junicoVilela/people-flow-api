@@ -1,8 +1,5 @@
 # Multi-stage build para otimizar o tamanho da imagem
-FROM eclipse-temurin:21-jdk-alpine AS build
-
-# Instalar Maven
-RUN apk add --no-cache maven
+FROM maven:3.9.6-openjdk-17-slim AS build
 
 # Definir diretório de trabalho
 WORKDIR /app
@@ -18,20 +15,22 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Estágio de produção
-FROM eclipse-temurin:21-jre-alpine
+FROM openjdk:17-jre-slim
 
 # Instalar curl para health check
-RUN apk add --no-cache curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Criar usuário não-root para segurança
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # Definir diretório de trabalho
 WORKDIR /app
 
 # Copiar o JAR compilado do estágio anterior
-COPY --from=build /app/target/people-flow-api*.jar app.jar
+COPY --from=build /app/target/people-flow-api-*.jar app.jar
+
+# Mudar propriedade do arquivo para o usuário não-root
+RUN chown appuser:appgroup app.jar
 
 # Mudar para usuário não-root
 USER appuser
@@ -39,12 +38,9 @@ USER appuser
 # Expor porta
 EXPOSE 8080
 
-# Variáveis de ambiente JVM otimizadas para containers
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
-
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Comando para executar a aplicação
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,10 +1,4 @@
 spring:
-  server:
-    port: 8080
-    servlet:
-      compression:
-        enabled: true
-          
   datasource:
     url: jdbc:postgresql://localhost:5432/PEOPLE_FLOW_RH
     username: peopleflow
@@ -29,7 +23,9 @@ spring:
         default_schema: "PEOPLE_FLOW_RH"
   
   flyway:
-    enabled: false
+    enabled: true
+    validate-on-migrate: true
+    clean-disabled: false
 
 logging:
   level:

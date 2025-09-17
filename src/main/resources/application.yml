@@ -1,37 +1,8 @@
 spring:
   profiles:
-    active: dev  # Altere para 'prod' quando necessário
-  datasource:
-    username: ${DATABASE_USERNAME:peopleflow}
-    password: ${DATABASE_PASSWORD:peopleflow}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-  
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        order_inserts: true
-        order_updates: true
-  
-  flyway:
-    user: ${DATABASE_USERNAME:peopleflow}
-    password: ${DATABASE_PASSWORD:peopleflow}
-    baseline-on-migrate: true
-    validate-on-migrate: true
-    locations: classpath:db/migration
-
-logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/auth/realms/peopleflow}
+    active: dev
+  server:
+    port: 8080
+    servlet:
+      compression:
+        enabled: true
