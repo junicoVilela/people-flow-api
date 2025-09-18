@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/PEOPLE_FLOW_RH
+    url: jdbc:postgresql://postgres:5432/people_flow_rh
     username: peopleflow
     password: peopleflow
     driver-class-name: org.postgresql.Driver
@@ -13,7 +13,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
-        default_schema: "PEOPLE_FLOW_RH"
+        default_schema: "people_flow_rh"
   
   flyway:
     enabled: true
@@ -29,5 +29,3 @@ logging:
     root: WARN
   file:
     name: /var/log/people-flow-api/application.log
-    max-size: 100MB
-    max-history: 30

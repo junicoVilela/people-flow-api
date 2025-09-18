@@ -89,11 +89,11 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.22.3</version>
                 <configuration>
-                    <url>jdbc:postgresql://localhost:5432/PEOPLE_FLOW_RH</url>
+                    <url>jdbc:postgresql://localhost:5432/people_flow_rh</url>
                     <user>peopleflow</user>
                     <password>peopleflow</password>
                     <schemas>
-                        <schema>PEOPLE_FLOW_RH</schema>
+                        <schema>people_flow_rh</schema>
                     </schemas>
                     <locations>
                         <location>classpath:db/migration</location>

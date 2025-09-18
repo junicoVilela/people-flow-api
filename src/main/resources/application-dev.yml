@@ -1,16 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/PEOPLE_FLOW_RH
+    url: jdbc:postgresql://localhost:5432/people_flow_rh
     username: peopleflow
     password: peopleflow
     driver-class-name: org.postgresql.Driver
-  
-  hikari:
-    maximum-pool-size: 10
-    minimum-idle: 5
-    connection-timeout: 20000
-    idle-timeout: 300000
-    max-lifetime: 1200000
   
   jpa:
     hibernate:
@@ -20,16 +13,20 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        default_schema: "PEOPLE_FLOW_RH"
-  
+        default_schema: "people_flow_rh"
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+
   flyway:
     enabled: true
     validate-on-migrate: true
-    clean-disabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    schemas: people_flow_rh
+    default-schema: people_flow_rh
 
 logging:
   level:
     com.peopleflow: DEBUG
     org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.flywaydb: DEBUG
