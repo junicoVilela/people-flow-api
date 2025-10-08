@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class ResourceNotFoundException extends BusinessException {
     
-    public ResourceNotFoundException(String resource, UUID id) {
+    public ResourceNotFoundException(String resource, Long id) {
         super("RESOURCE_NOT_FOUND", String.format("%s com ID %s não encontrado", resource, id));
     }
     
