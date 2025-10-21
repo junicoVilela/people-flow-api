@@ -1,9 +1,15 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
+import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFiltros;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFiltrosRequest;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorPageResponse;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ColaboradorWebMapper {
@@ -32,15 +38,54 @@ public class ColaboradorWebMapper {
         response.setDepartamentoId(colaborador.getDepartamentoId());
         response.setCentroCustoId(colaborador.getCentroCustoId());
         response.setNome(colaborador.getNome());
-        response.setCpf(colaborador.getCpf());
+        response.setCpf(colaborador.getCpf() != null ? colaborador.getCpf().getValor() : null);
         response.setMatricula(colaborador.getMatricula());
-        response.setEmail(colaborador.getEmail());
+        response.setEmail(colaborador.getEmail() != null ? colaborador.getEmail().getValor() : null);
         response.setDataAdmissao(colaborador.getDataAdmissao());
         response.setDataDemissao(colaborador.getDataDemissao());
-        response.setStatus(colaborador.getStatus());
-        response.setCriadoEm(colaborador.getCriadoEm());
-        response.setAtualizadoEm(colaborador.getAtualizadoEm());
+        response.setStatus(colaborador.getStatus() != null ? colaborador.getStatus().getValor() : null);
 
         return response;
     }
-} 
+
+    public ColaboradorPageResponse toPageResponse(Page<Colaborador> page) {
+        if (page == null) return null;
+
+        List<ColaboradorResponse> content = page.getContent()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new ColaboradorPageResponse(
+            content,
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages(),
+            page.isFirst(),
+            page.isLast(),
+            page.hasNext(),
+            page.hasPrevious()
+        );
+    }
+
+    public ColaboradorFiltros toDomain(ColaboradorFiltrosRequest request) {
+        if (request == null) return null;
+
+        return ColaboradorFiltros.builder()
+            .nome(request.getNome())
+            .cpf(request.getCpf())
+            .email(request.getEmail())
+            .matricula(request.getMatricula())
+            .status(request.getStatus())
+            .clienteId(request.getClienteId())
+            .empresaId(request.getEmpresaId())
+            .departamentoId(request.getDepartamentoId())
+            .centroCustoId(request.getCentroCustoId())
+            .dataAdmissaoInicio(request.getDataAdmissaoInicio())
+            .dataAdmissaoFim(request.getDataAdmissaoFim())
+            .dataDemissaoInicio(request.getDataDemissaoInicio())
+            .dataDemissaoFim(request.getDataDemissaoFim())
+            .build();
+    }
+}
