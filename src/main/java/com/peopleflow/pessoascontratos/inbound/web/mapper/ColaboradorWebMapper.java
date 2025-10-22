@@ -1,91 +1,50 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFiltros;
-import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFiltrosRequest;
-import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorPageResponse;
+import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
+@Mapper(componentModel = "spring")
+public interface ColaboradorWebMapper {
 
-@Component
-public class ColaboradorWebMapper {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "clienteId", ignore = true)
+    @Mapping(target = "empresaId", ignore = true)
+    @Mapping(target = "departamentoId", ignore = true)
+    @Mapping(target = "centroCustoId", ignore = true)
+    @Mapping(target = "dataDemissao", ignore = true)
+    Colaborador toDomain(ColaboradorRequest request);
 
-    public Colaborador toDomain(ColaboradorRequest request) {
-        if (request == null) return null;
+    @Mapping(target = "cpf", source = "cpf", qualifiedByName = "cpfToString")
+    @Mapping(target = "email", source = "email", qualifiedByName = "emailToString")
+    @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
+    ColaboradorResponse toResponse(Colaborador colaborador);
 
-        Colaborador colaborador = new Colaborador();
-        colaborador.setNome(request.getNome());
-        colaborador.setCpf(request.getCpf());
-        colaborador.setMatricula(request.getMatricula());
-        colaborador.setEmail(request.getEmail());
-        colaborador.setDataAdmissao(request.getDataAdmissao());
-        colaborador.setStatus(request.getStatus());
+    ColaboradorFilter toDomain(ColaboradorFilterRequest request);
 
-        return colaborador;
-    }
-
-    public ColaboradorResponse toResponse(Colaborador colaborador) {
-        if (colaborador == null) return null;
-
-        ColaboradorResponse response = new ColaboradorResponse();
-        response.setId(colaborador.getId());
-        response.setClienteId(colaborador.getClienteId());
-        response.setEmpresaId(colaborador.getEmpresaId());
-        response.setDepartamentoId(colaborador.getDepartamentoId());
-        response.setCentroCustoId(colaborador.getCentroCustoId());
-        response.setNome(colaborador.getNome());
-        response.setCpf(colaborador.getCpf() != null ? colaborador.getCpf().getValor() : null);
-        response.setMatricula(colaborador.getMatricula());
-        response.setEmail(colaborador.getEmail() != null ? colaborador.getEmail().getValor() : null);
-        response.setDataAdmissao(colaborador.getDataAdmissao());
-        response.setDataDemissao(colaborador.getDataDemissao());
-        response.setStatus(colaborador.getStatus() != null ? colaborador.getStatus().getValor() : null);
-
-        return response;
-    }
-
-    public ColaboradorPageResponse toPageResponse(Page<Colaborador> page) {
+    default Page<ColaboradorResponse> toPageResponse(Page<Colaborador> page) {
         if (page == null) return null;
-
-        List<ColaboradorResponse> content = page.getContent()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-
-        return new ColaboradorPageResponse(
-            content,
-            page.getNumber(),
-            page.getSize(),
-            page.getTotalElements(),
-            page.getTotalPages(),
-            page.isFirst(),
-            page.isLast(),
-            page.hasNext(),
-            page.hasPrevious()
-        );
+        return page.map(this::toResponse);
     }
 
-    public ColaboradorFiltros toDomain(ColaboradorFiltrosRequest request) {
-        if (request == null) return null;
+    @Named("cpfToString")
+    default String cpfToString(com.peopleflow.pessoascontratos.core.valueobject.Cpf cpf) {
+        return cpf != null ? cpf.getValor() : null;
+    }
 
-        return ColaboradorFiltros.builder()
-            .nome(request.getNome())
-            .cpf(request.getCpf())
-            .email(request.getEmail())
-            .matricula(request.getMatricula())
-            .status(request.getStatus())
-            .clienteId(request.getClienteId())
-            .empresaId(request.getEmpresaId())
-            .departamentoId(request.getDepartamentoId())
-            .centroCustoId(request.getCentroCustoId())
-            .dataAdmissaoInicio(request.getDataAdmissaoInicio())
-            .dataAdmissaoFim(request.getDataAdmissaoFim())
-            .dataDemissaoInicio(request.getDataDemissaoInicio())
-            .dataDemissaoFim(request.getDataDemissaoFim())
-            .build();
+    @Named("emailToString")
+    default String emailToString(com.peopleflow.pessoascontratos.core.valueobject.Email email) {
+        return email != null ? email.getValor() : null;
+    }
+
+    @Named("statusToString")
+    default String statusToString(com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador status) {
+        return status != null ? status.getValor() : null;
     }
 }

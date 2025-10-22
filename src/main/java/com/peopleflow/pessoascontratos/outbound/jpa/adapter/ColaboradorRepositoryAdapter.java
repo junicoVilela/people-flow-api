@@ -1,7 +1,7 @@
 package com.peopleflow.pessoascontratos.outbound.jpa.adapter;
 
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFiltros;
+import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ColaboradorEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.ColaboradorJpaMapper;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
@@ -39,13 +38,15 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
     }
 
     @Override
-    public Page<Colaborador> listarTodos(Pageable pageable) {
-        return repository.findAll(pageable)
-                .map(mapper::toDomain);
+    public List<Colaborador> listarTodos() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
-    public Page<Colaborador> buscarPorFiltros(ColaboradorFiltros filtros, Pageable pageable) {
+    public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
         return repository.findAll(pageable)
                 .map(mapper::toDomain);
     }

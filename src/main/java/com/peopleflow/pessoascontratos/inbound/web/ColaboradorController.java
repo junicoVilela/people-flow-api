@@ -2,23 +2,20 @@ package com.peopleflow.pessoascontratos.inbound.web;
 
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFiltros;
-import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFiltrosRequest;
-import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorPageResponse;
+import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ColaboradorWebMapper;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/colaboradores")
@@ -48,58 +45,23 @@ public class ColaboradorController {
     }
 
     @GetMapping
-    public ResponseEntity<ColaboradorPageResponse> listarTodos(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "nome") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir) {
+    public ResponseEntity<List<ColaboradorResponse>> listarTodos() {
         
-        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
-            Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Colaborador> colaboradores = colaboradorUseCase.listarTodos(pageable);
-        
-        ColaboradorPageResponse response = mapper.toPageResponse(colaboradores);
+        List<Colaborador> colaboradores = colaboradorUseCase.listarTodos();
+        List<ColaboradorResponse> response = colaboradores.stream()
+                .map(mapper::toResponse)
+                .toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<ColaboradorPageResponse> buscarPorFiltros(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "nome") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
-            @RequestParam(required = false) String nome,
-            @RequestParam(required = false) String cpf,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String matricula,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long clienteId,
-            @RequestParam(required = false) Long empresaId,
-            @RequestParam(required = false) Long departamentoId,
-            @RequestParam(required = false) Long centroCustoId) {
+    public ResponseEntity<Page<ColaboradorResponse>> buscarPorFiltros(
+            @ModelAttribute ColaboradorFilterRequest filtrosRequest,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         
-        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
-            Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        
-        Pageable pageable = PageRequest.of(page, size, sort);
-        
-        ColaboradorFiltros filtros = ColaboradorFiltros.builder()
-            .nome(nome)
-            .cpf(cpf)
-            .email(email)
-            .matricula(matricula)
-            .status(status)
-            .clienteId(clienteId)
-            .empresaId(empresaId)
-            .departamentoId(departamentoId)
-            .centroCustoId(centroCustoId)
-            .build();
-        
+        ColaboradorFilter filtros = mapper.toDomain(filtrosRequest);
         Page<Colaborador> colaboradores = colaboradorUseCase.buscarPorFiltros(filtros, pageable);
-        
-        ColaboradorPageResponse response = mapper.toPageResponse(colaboradores);
+        Page<ColaboradorResponse> response = mapper.toPageResponse(colaboradores);
         return ResponseEntity.ok(response);
     }
 

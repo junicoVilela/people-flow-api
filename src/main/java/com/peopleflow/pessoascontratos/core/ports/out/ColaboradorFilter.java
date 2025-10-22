@@ -1,12 +1,17 @@
-package com.peopleflow.pessoascontratos.inbound.web.dto;
+package com.peopleflow.pessoascontratos.core.ports.out;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Data
-public class ColaboradorFiltrosRequest {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ColaboradorFilter {
     private String nome;
     private String cpf;
     private String email;
@@ -20,5 +25,4 @@ public class ColaboradorFiltrosRequest {
     private LocalDate dataAdmissaoFim;
     private LocalDate dataDemissaoInicio;
     private LocalDate dataDemissaoFim;
-
 }

@@ -5,53 +5,50 @@ import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ColaboradorEntity;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-@Component
-public class ColaboradorJpaMapper {
+@Mapper(componentModel = "spring")
+public interface ColaboradorJpaMapper {
 
-    public Colaborador toDomain(ColaboradorEntity entity) {
-        if (entity == null) return null;
+    @Mapping(target = "cpf", source = "cpf", qualifiedByName = "stringToCpf")
+    @Mapping(target = "email", source = "email", qualifiedByName = "stringToEmail")
+    @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
+    Colaborador toDomain(ColaboradorEntity entity);
 
-        Colaborador colaborador = new Colaborador();
-        colaborador.setId(entity.getId());
-        colaborador.setClienteId(entity.getClienteId());
-        colaborador.setEmpresaId(entity.getEmpresaId());
-        colaborador.setDepartamentoId(entity.getDepartamentoId());
-        colaborador.setCentroCustoId(entity.getCentroCustoId());
-        colaborador.setNome(entity.getNome());
-        colaborador.setCpf(entity.getCpf() != null ? new Cpf(entity.getCpf()) : null);
-        colaborador.setMatricula(entity.getMatricula());
-        colaborador.setEmail(entity.getEmail() != null ? new Email(entity.getEmail()) : null);
-        colaborador.setDataAdmissao(entity.getDataAdmissao());
-        colaborador.setDataDemissao(entity.getDataDemissao());
-        colaborador.setStatus(entity.getStatus() != null ? StatusColaborador.of(entity.getStatus()) : null);
+    @Mapping(target = "cpf", source = "cpf", qualifiedByName = "cpfToString")
+    @Mapping(target = "email", source = "email", qualifiedByName = "emailToString")
+    @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
+    ColaboradorEntity toEntity(Colaborador colaborador);
 
-        return colaborador;
+    @Named("stringToCpf")
+    default Cpf stringToCpf(String cpf) {
+        return cpf != null ? new Cpf(cpf) : null;
     }
 
-    public ColaboradorEntity toEntity(Colaborador colaborador) {
-        if (colaborador == null) return null;
+    @Named("stringToEmail")
+    default Email stringToEmail(String email) {
+        return email != null ? new Email(email) : null;
+    }
 
-        ColaboradorEntity entity = new ColaboradorEntity();
-        
-        // Só seta o ID se não for null (para updates)
-        if (colaborador.getId() != null) {
-            entity.setId(colaborador.getId());
-        }
-        
-        entity.setClienteId(colaborador.getClienteId());
-        entity.setEmpresaId(colaborador.getEmpresaId());
-        entity.setDepartamentoId(colaborador.getDepartamentoId());
-        entity.setCentroCustoId(colaborador.getCentroCustoId());
-        entity.setNome(colaborador.getNome());
-        entity.setCpf(colaborador.getCpf() != null ? colaborador.getCpf().getValor() : null);
-        entity.setMatricula(colaborador.getMatricula());
-        entity.setEmail(colaborador.getEmail() != null ? colaborador.getEmail().getValor() : null);
-        entity.setDataAdmissao(colaborador.getDataAdmissao());
-        entity.setDataDemissao(colaborador.getDataDemissao());
-        entity.setStatus(colaborador.getStatus() != null ? colaborador.getStatus().getValor() : null);
+    @Named("stringToStatus")
+    default StatusColaborador stringToStatus(String status) {
+        return status != null ? StatusColaborador.of(status) : null;
+    }
 
-        return entity;
+    @Named("cpfToString")
+    default String cpfToString(Cpf cpf) {
+        return cpf != null ? cpf.getValor() : null;
+    }
+
+    @Named("emailToString")
+    default String emailToString(Email email) {
+        return email != null ? email.getValor() : null;
+    }
+
+    @Named("statusToString")
+    default String statusToString(StatusColaborador status) {
+        return status != null ? status.getValor() : null;
     }
 }

@@ -4,7 +4,7 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.pessoascontratos.core.domain.ColaboradorDomainService;
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFiltros;
+import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ColaboradorService implements ColaboradorUseCase {
@@ -38,13 +37,13 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     @Override
-    public Page<Colaborador> listarTodos(Pageable pageable) {
-        return colaboradorRepository.listarTodos(pageable);
+    public List<Colaborador> listarTodos() {
+        return colaboradorRepository.listarTodos();
     }
 
     @Override
-    public Page<Colaborador> buscarPorFiltros(ColaboradorFiltros filtros, Pageable pageable) {
-        return colaboradorRepository.buscarPorFiltros(filtros, pageable);
+    public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
+        return colaboradorRepository.buscarPorFiltros(filter, pageable);
     }
 
     @Override
