@@ -13,4 +13,14 @@ public interface ColaboradorRepositoryPort {
     List<Colaborador> listarTodos();
     Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable);
     void deletar(Long id);
+    
+    // Métodos para validações de unicidade
+    boolean existePorCpf(String cpf);
+    boolean existePorEmail(String email);
+    boolean existePorMatricula(String matricula);
+    
+    // Métodos para validações em atualização (excluindo o próprio registro)
+    boolean existePorCpfExcluindoId(String cpf, Long id);
+    boolean existePorEmailExcluindoId(String email, Long id);
+    boolean existePorMatriculaExcluindoId(String matricula, Long id);
 }

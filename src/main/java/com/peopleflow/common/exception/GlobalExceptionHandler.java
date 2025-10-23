@@ -25,6 +25,16 @@ public class GlobalExceptionHandler {
     
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateResourceException(DuplicateResourceException ex, HttpServletRequest request) {
+        log.warn("Duplicate resource: {} - {}", ex.getCode(), ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse(ex.getCode(), ex.getMessage());
+        error.setPath(request.getRequestURI());
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
         log.warn("Business exception: {} - {}", ex.getCode(), ex.getMessage());

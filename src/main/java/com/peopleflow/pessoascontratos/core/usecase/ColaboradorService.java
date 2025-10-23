@@ -1,20 +1,30 @@
 package com.peopleflow.pessoascontratos.core.usecase;
 
+import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
+import com.peopleflow.common.exception.ValidationException;
 import com.peopleflow.pessoascontratos.core.domain.ColaboradorDomainService;
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
+import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
+import com.peopleflow.pessoascontratos.core.valueobject.Email;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional
 public class ColaboradorService implements ColaboradorUseCase {
+    
+    private static final Logger log = LoggerFactory.getLogger(ColaboradorService.class);
 
     private final ColaboradorRepositoryPort colaboradorRepository;
     private final ColaboradorDomainService domainService;
@@ -27,36 +37,145 @@ public class ColaboradorService implements ColaboradorUseCase {
 
     @Override
     public Colaborador criar(Colaborador colaborador) {
-        return colaboradorRepository.salvar(colaborador);
+        log.info("Iniciando criação de colaborador: nome={}", colaborador.getNome());
+        
+        try {
+            domainService.validarDadosObrigatorios(colaborador);
+            
+            validarUnicidadeCpf(colaborador.getCpf());
+            validarUnicidadeEmail(colaborador.getEmail());
+            validarUnicidadeMatricula(colaborador.getMatricula());
+            
+            // TODO: Adicionar validações de clienteId, empresaId, departamentoId quando houver esses módulos
+            
+            Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
+            
+            log.info("Colaborador criado com sucesso: id={}, nome={}, cpf={}", 
+                     colaboradorCriado.getId(), colaboradorCriado.getNome(), 
+                     colaboradorCriado.getCpf() != null ? colaboradorCriado.getCpf().getValor() : null);
+            
+            return colaboradorCriado;
+        } catch (com.peopleflow.common.exception.BusinessException e) {
+            log.warn("Erro ao criar colaborador: {} - {}", e.getCode(), e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao criar colaborador: nome={}", colaborador.getNome(), e);
+            throw e;
+        }
+    }
+    
+    private void validarUnicidadeCpf(Cpf cpf) {
+        if (cpf != null) {
+            String cpfValor = cpf.getValorNumerico(); // Usa valor sem formatação para busca
+            if (colaboradorRepository.existePorCpf(cpfValor)) {
+                throw new DuplicateResourceException("CPF", cpf.getValor());
+            }
+        }
+    }
+    
+    private void validarUnicidadeEmail(Email email) {
+        if (email != null) {
+            String emailValor = email.getValor();
+            if (colaboradorRepository.existePorEmail(emailValor)) {
+                throw new DuplicateResourceException("Email", emailValor);
+            }
+        }
+    }
+    
+    private void validarUnicidadeMatricula(String matricula) {
+        if (matricula != null && !matricula.trim().isEmpty()) {
+            if (colaboradorRepository.existePorMatricula(matricula)) {
+                throw new DuplicateResourceException("Matrícula", matricula);
+            }
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Colaborador buscarPorId(Long id) {
+        log.debug("Buscando colaborador por ID: {}", id);
         return colaboradorRepository.buscarPorId(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Colaborador", id));
+                .orElseThrow(() -> {
+                    log.warn("Colaborador não encontrado: id={}", id);
+                    return new ResourceNotFoundException("Colaborador", id);
+                });
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Colaborador> listarTodos() {
         return colaboradorRepository.listarTodos();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
-        return colaboradorRepository.buscarPorFiltros(filter, pageable);
+        log.debug("Buscando colaboradores com filtros: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+        Page<Colaborador> result = colaboradorRepository.buscarPorFiltros(filter, pageable);
+        log.debug("Encontrados {} colaboradores", result.getTotalElements());
+        return result;
     }
 
     @Override
     public Colaborador atualizar(Long id, Colaborador colaborador) {
-        Colaborador colaboradorExistente = buscarPorId(id);
-        colaborador.setId(id);
+        log.info("Iniciando atualização de colaborador: id={}", id);
+        
+        try {
+            buscarPorId(id);
+            
+            domainService.validarDadosObrigatorios(colaborador);
+            
+            validarUnicidadeCpfParaAtualizacao(colaborador.getCpf(), id);
+            validarUnicidadeEmailParaAtualizacao(colaborador.getEmail(), id);
+            validarUnicidadeMatriculaParaAtualizacao(colaborador.getMatricula(), id);
+            
+            colaborador.setId(id);
 
-        return colaboradorRepository.salvar(colaborador);
+            Colaborador colaboradorAtualizado = colaboradorRepository.salvar(colaborador);
+            
+            log.info("Colaborador atualizado com sucesso: id={}, nome={}", id, colaborador.getNome());
+            
+            return colaboradorAtualizado;
+        } catch (com.peopleflow.common.exception.BusinessException e) {
+            log.warn("Erro ao atualizar colaborador: id={}, erro={}", id, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao atualizar colaborador: id={}", id, e);
+            throw e;
+        }
+    }
+    
+    private void validarUnicidadeCpfParaAtualizacao(Cpf cpf, Long id) {
+        if (cpf != null) {
+            String cpfValor = cpf.getValorNumerico();
+            if (colaboradorRepository.existePorCpfExcluindoId(cpfValor, id)) {
+                throw new DuplicateResourceException("CPF", cpf.getValor());
+            }
+        }
+    }
+    
+    private void validarUnicidadeEmailParaAtualizacao(Email email, Long id) {
+        if (email != null) {
+            String emailValor = email.getValor();
+            if (colaboradorRepository.existePorEmailExcluindoId(emailValor, id)) {
+                throw new DuplicateResourceException("Email", emailValor);
+            }
+        }
+    }
+    
+    private void validarUnicidadeMatriculaParaAtualizacao(String matricula, Long id) {
+        if (matricula != null && !matricula.trim().isEmpty()) {
+            if (colaboradorRepository.existePorMatriculaExcluindoId(matricula, id)) {
+                throw new DuplicateResourceException("Matrícula", matricula);
+            }
+        }
     }
 
     @Override
     public void deletar(Long id) {
+        log.warn("Deletando colaborador: id={}", id);
         colaboradorRepository.deletar(id);
+        log.info("Colaborador deletado: id={}", id);
     }
 
     public Colaborador demitir(Long id, LocalDate dataDemissao) {

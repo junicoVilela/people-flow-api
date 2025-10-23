@@ -3,12 +3,20 @@ package com.peopleflow.pessoascontratos.core.model;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Colaborador {
+    @Setter
     private Long id;
     private Long clienteId;
     private Long empresaId;
@@ -21,8 +29,6 @@ public class Colaborador {
     private LocalDate dataAdmissao;
     private LocalDate dataDemissao;
     private StatusColaborador status;
-
-    public Colaborador() {}
 
     public Colaborador(String nome, String cpf, String email) {
         this.nome = nome;

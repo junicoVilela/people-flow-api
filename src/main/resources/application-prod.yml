@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://postgres:5432/people_flow_rh
-    username: peopleflow
-    password: peopleflow
+    username: ${DB_USERNAME:peopleflow}
+    password: ${DB_PASSWORD:peopleflow}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -18,7 +18,21 @@ spring:
   flyway:
     enabled: true
     validate-on-migrate: true
-    clean-disabled: false
+    clean-disabled: true
+
+  # OAuth2 Resource Server - HABILITADO EM PRODUÇÃO
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Configurar com variáveis de ambiente
+          issuer-uri: ${JWT_ISSUER_URI:https://auth.example.com/realms/peopleflow}
+          jwk-set-uri: ${JWT_JWK_SET_URI:https://auth.example.com/realms/peopleflow/protocol/openid-connect/certs}
+
+# Configurações da aplicação
+app:
+  security:
+    enabled: ${SECURITY_ENABLED:true}  # Habilita segurança em produção
 
 logging:
   level:
