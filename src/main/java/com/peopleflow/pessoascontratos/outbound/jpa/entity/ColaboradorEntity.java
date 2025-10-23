@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +26,13 @@ import java.time.LocalDate;
 public class ColaboradorEntity extends AuditableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "colaborador_seq_gen")
+    @SequenceGenerator(
+        name = "colaborador_seq_gen",
+        sequenceName = "COLABORADOR_SEQ",
+        schema = "PEOPLE_FLOW_RH",
+        allocationSize = 1
+    )
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
