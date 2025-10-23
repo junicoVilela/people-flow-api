@@ -10,12 +10,10 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "COLABORADOR", schema = "PEOPLE_FLOW_RH")
@@ -27,7 +25,7 @@ import java.util.UUID;
 public class ColaboradorEntity extends AuditableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
