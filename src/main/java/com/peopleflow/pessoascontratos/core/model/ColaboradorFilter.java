@@ -1,4 +1,4 @@
-package com.peopleflow.pessoascontratos.core.ports.out;
+package com.peopleflow.pessoascontratos.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

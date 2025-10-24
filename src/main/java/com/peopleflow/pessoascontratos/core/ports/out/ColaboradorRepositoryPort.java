@@ -1,6 +1,7 @@
 package com.peopleflow.pessoascontratos.core.ports.out;
 
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
+import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

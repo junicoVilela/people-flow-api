@@ -1,15 +1,8 @@
 package com.peopleflow.pessoascontratos.inbound.web.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
-import com.peopleflow.pessoascontratos.core.valueobject.Email;
-import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;
-import com.peopleflow.pessoascontratos.inbound.web.dto.serialization.CpfDeserializer;
-import com.peopleflow.pessoascontratos.inbound.web.dto.serialization.EmailDeserializer;
-import com.peopleflow.pessoascontratos.inbound.web.dto.serialization.StatusColaboradorDeserializer;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -20,20 +13,20 @@ public class ColaboradorRequest {
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
     
-    @NotNull(message = "CPF é obrigatório")
-    @Valid
-    @JsonDeserialize(using = CpfDeserializer.class)
-    private Cpf cpf;
+    @NotBlank(message = "CPF é obrigatório")
+    @Pattern(regexp = "\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}", 
+             message = "CPF deve estar no formato 000.000.000-00 ou 00000000000")
+    private String cpf;
     
     private String matricula;
     
-    @NotNull(message = "Email é obrigatório")
-    @Valid
-    @JsonDeserialize(using = EmailDeserializer.class)
-    private Email email;
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Email deve ser válido")
+    private String email;
     
     private LocalDate dataAdmissao;
     
-    @JsonDeserialize(using = StatusColaboradorDeserializer.class)
-    private StatusColaborador status;
+    @Pattern(regexp = "ativo|inativo|demitido|excluido", 
+             message = "Status deve ser: ativo, inativo, demitido ou excluido")
+    private String status;
 }

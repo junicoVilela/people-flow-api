@@ -16,7 +16,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Colaborador {
-    @Setter
     private Long id;
     private Long clienteId;
     private Long empresaId;

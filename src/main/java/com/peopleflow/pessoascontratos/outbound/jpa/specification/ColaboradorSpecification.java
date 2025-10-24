@@ -1,6 +1,6 @@
 package com.peopleflow.pessoascontratos.outbound.jpa.specification;
 
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ColaboradorEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;

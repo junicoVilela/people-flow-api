@@ -2,11 +2,10 @@ package com.peopleflow.pessoascontratos.core.usecase;
 
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
-import com.peopleflow.common.exception.ValidationException;
 import com.peopleflow.pessoascontratos.core.domain.ColaboradorDomainService;
 import com.peopleflow.pessoascontratos.core.model.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;
@@ -41,8 +40,8 @@ public class ColaboradorService implements ColaboradorUseCase {
         
         try {
             domainService.validarDadosObrigatorios(colaborador);
-            
-            validarUnicidadeCpf(colaborador.getCpf());
+
+            validarCpfUnico(colaborador.getCpf(), null);
             validarUnicidadeEmail(colaborador.getEmail());
             validarUnicidadeMatricula(colaborador.getMatricula());
             
@@ -61,15 +60,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         } catch (Exception e) {
             log.error("Erro inesperado ao criar colaborador: nome={}", colaborador.getNome(), e);
             throw e;
-        }
-    }
-    
-    private void validarUnicidadeCpf(Cpf cpf) {
-        if (cpf != null) {
-            String cpfValor = cpf.getValorNumerico(); // Usa valor sem formatação para busca
-            if (colaboradorRepository.existePorCpf(cpfValor)) {
-                throw new DuplicateResourceException("CPF", cpf.getValor());
-            }
         }
     }
     
@@ -124,12 +114,10 @@ public class ColaboradorService implements ColaboradorUseCase {
             buscarPorId(id);
             
             domainService.validarDadosObrigatorios(colaborador);
-            
-            validarUnicidadeCpfParaAtualizacao(colaborador.getCpf(), id);
+
+            validarCpfUnico(colaborador.getCpf(), id);
             validarUnicidadeEmailParaAtualizacao(colaborador.getEmail(), id);
             validarUnicidadeMatriculaParaAtualizacao(colaborador.getMatricula(), id);
-            
-            colaborador.setId(id);
 
             Colaborador colaboradorAtualizado = colaboradorRepository.salvar(colaborador);
             
@@ -142,15 +130,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         } catch (Exception e) {
             log.error("Erro inesperado ao atualizar colaborador: id={}", id, e);
             throw e;
-        }
-    }
-    
-    private void validarUnicidadeCpfParaAtualizacao(Cpf cpf, Long id) {
-        if (cpf != null) {
-            String cpfValor = cpf.getValorNumerico();
-            if (colaboradorRepository.existePorCpfExcluindoId(cpfValor, id)) {
-                throw new DuplicateResourceException("CPF", cpf.getValor());
-            }
         }
     }
     
@@ -171,6 +150,17 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
+    public void validarCpfUnico(Cpf cpf, Long idExcluir) {
+        String cpfValor = cpf.getValorNumerico();
+        boolean existe = (idExcluir == null)
+                ? colaboradorRepository.existePorCpf(cpfValor)
+                : colaboradorRepository.existePorCpfExcluindoId(cpfValor, idExcluir);
+
+        if (existe) {
+            throw new DuplicateResourceException("CPF", cpf.getValor());
+        }
+    }
+
     @Override
     public void deletar(Long id) {
         log.warn("Deletando colaborador: id={}", id);
@@ -178,6 +168,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         log.info("Colaborador deletado: id={}", id);
     }
 
+    @Override
     public Colaborador demitir(Long id, LocalDate dataDemissao) {
         Colaborador colaborador = buscarPorId(id);
         
@@ -188,6 +179,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         return colaboradorRepository.salvar(colaborador);
     }
 
+    @Override
     public Colaborador ativar(Long id) {
         Colaborador colaborador = buscarPorId(id);
         
@@ -198,6 +190,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         return colaboradorRepository.salvar(colaborador);
     }
 
+    @Override
     public Colaborador inativar(Long id) {
         Colaborador colaborador = buscarPorId(id);
         colaborador.inativar();
@@ -205,6 +198,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         return colaboradorRepository.salvar(colaborador);
     }
 
+    @Override
     public Colaborador excluir(Long id) {
         Colaborador colaborador = buscarPorId(id);
         
