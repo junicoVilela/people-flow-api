@@ -2,10 +2,10 @@ package com.peopleflow.pessoascontratos.core.usecase;
 
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
-import com.peopleflow.pessoascontratos.core.model.Colaborador;
-import com.peopleflow.pessoascontratos.core.model.events.*;
+import com.peopleflow.pessoascontratos.core.domain.Colaborador;
+import com.peopleflow.pessoascontratos.core.domain.events.*;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;

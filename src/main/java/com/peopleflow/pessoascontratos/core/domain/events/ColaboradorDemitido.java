@@ -1,4 +1,4 @@
-package com.peopleflow.pessoascontratos.core.model.events;
+package com.peopleflow.pessoascontratos.core.domain.events;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

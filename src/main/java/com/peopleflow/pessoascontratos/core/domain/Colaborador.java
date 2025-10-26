@@ -1,4 +1,4 @@
-package com.peopleflow.pessoascontratos.core.model;
+package com.peopleflow.pessoascontratos.core.domain;
 
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
@@ -215,4 +215,5 @@ public class Colaborador {
     public boolean isExcluido() {
         return status.isExcluido();
     }
-} 
+}
+

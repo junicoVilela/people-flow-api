@@ -1,6 +1,6 @@
 package com.peopleflow.pessoascontratos.outbound.jpa.mapper;
 
-import com.peopleflow.pessoascontratos.core.model.Colaborador;
+import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;

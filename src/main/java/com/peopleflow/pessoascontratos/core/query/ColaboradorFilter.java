@@ -1,4 +1,4 @@
-package com.peopleflow.pessoascontratos.core.model;
+package com.peopleflow.pessoascontratos.core.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * Objeto de consulta/filtro para buscar Colaboradores
+ * 
+ * Este não é um objeto de domínio, mas sim um DTO para queries.
+ * Usado para construir filtros dinâmicos em pesquisas.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,3 +32,4 @@ public class ColaboradorFilter {
     private LocalDate dataDemissaoInicio;
     private LocalDate dataDemissaoFim;
 }
+

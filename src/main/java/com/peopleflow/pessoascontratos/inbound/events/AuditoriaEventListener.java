@@ -1,6 +1,6 @@
 package com.peopleflow.pessoascontratos.inbound.events;
 
-import com.peopleflow.pessoascontratos.core.model.events.ColaboradorEvent;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;

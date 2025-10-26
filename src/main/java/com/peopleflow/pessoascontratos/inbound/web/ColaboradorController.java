@@ -1,8 +1,8 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
-import com.peopleflow.pessoascontratos.core.model.Colaborador;
+import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;

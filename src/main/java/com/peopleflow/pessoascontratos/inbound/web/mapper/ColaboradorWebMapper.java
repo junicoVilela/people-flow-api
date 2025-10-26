@@ -1,7 +1,7 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
-import com.peopleflow.pessoascontratos.core.model.Colaborador;
-import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.domain.Colaborador;
+import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;

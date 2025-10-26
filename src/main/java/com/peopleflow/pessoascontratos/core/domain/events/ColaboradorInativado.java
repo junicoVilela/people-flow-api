@@ -1,4 +1,4 @@
-package com.peopleflow.pessoascontratos.core.model.events;
+package com.peopleflow.pessoascontratos.core.domain.events;
 
 import java.time.LocalDateTime;
 
@@ -27,4 +27,3 @@ public record ColaboradorInativado(
         this(colaboradorId, nomeColaborador, LocalDateTime.now());
     }
 }
-

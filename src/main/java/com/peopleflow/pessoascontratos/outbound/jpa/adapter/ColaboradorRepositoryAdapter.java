@@ -1,7 +1,7 @@
 package com.peopleflow.pessoascontratos.outbound.jpa.adapter;
 
-import com.peopleflow.pessoascontratos.core.model.Colaborador;
-import com.peopleflow.pessoascontratos.core.model.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.domain.Colaborador;
+import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ColaboradorEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.ColaboradorJpaMapper;
