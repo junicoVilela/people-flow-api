@@ -1,5 +1,6 @@
 package com.peopleflow.pessoascontratos.core.usecase;
 
+import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
@@ -7,8 +8,6 @@ import com.peopleflow.pessoascontratos.core.domain.events.*;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
-import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
-import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -56,13 +56,10 @@ public class ColaboradorService implements ColaboradorUseCase {
         log.info("Iniciando criação de colaborador: nome={}", colaborador.getNome());
         
         try {
-            // Validações de invariantes já estão no modelo
-            // Aqui validamos apenas unicidade (depende do repositório)
             validarUnicidadeParaCriacao(colaborador);
             
             Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
-            
-            // Publica evento de domínio
+
             eventPublisher.publishEvent(
                 new ColaboradorCriado(
                     colaboradorCriado.getId(),
@@ -78,7 +75,7 @@ public class ColaboradorService implements ColaboradorUseCase {
                      colaboradorCriado.getCpf().getValor());
             
             return colaboradorCriado;
-        } catch (com.peopleflow.common.exception.BusinessException e) {
+        } catch (BusinessException e) {
             log.warn("Erro ao criar colaborador: {} - {}", e.getCode(), e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -122,34 +119,50 @@ public class ColaboradorService implements ColaboradorUseCase {
         log.info("Iniciando atualização de colaborador: id={}", id);
         
         try {
-            // Verifica se existe
-            buscarPorId(id);
-            
-            // Validações de invariantes já estão no modelo
-            // Aqui validamos apenas unicidade (depende do repositório)
-            validarUnicidadeParaAtualizacao(colaborador, id);
 
+            validarUnicidadeParaAtualizacao(colaborador, id);
+            Colaborador original = buscarPorId(id);
             Colaborador colaboradorAtualizado = colaboradorRepository.salvar(colaborador);
-            
-            // Publica evento de domínio
+
+            // TODO: verificar se está cobrindo todos os campos que precisam ser atualizados
+            List<String> camposAlterados = detectarCamposAlterados(original, colaboradorAtualizado);
+
             eventPublisher.publishEvent(
                 new ColaboradorAtualizado(
                     colaboradorAtualizado.getId(),
                     colaboradorAtualizado.getNome(),
-                    "nome, email, cpf, matricula, dataAdmissao" // TODO: Implementar detecção de campos alterados
+                    String.join(",", camposAlterados)
                 )
             );
             
             log.info("Colaborador atualizado com sucesso: id={}, nome={}", id, colaborador.getNome());
             
             return colaboradorAtualizado;
-        } catch (com.peopleflow.common.exception.BusinessException e) {
+        } catch (BusinessException e) {
             log.warn("Erro ao atualizar colaborador: id={}, erro={}", id, e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error("Erro inesperado ao atualizar colaborador: id={}", id, e);
             throw e;
         }
+    }
+
+    public static List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
+        List<String> camposAlterados = null;
+
+        if (!Objects.equals(original.getNome(), atualizado.getNome())) {
+            camposAlterados = List.of("nome");
+        }
+
+        if (!Objects.equals(original.getCpf(), atualizado.getCpf())) {
+            camposAlterados = List.of("cpf");
+        }
+
+        if (!Objects.equals(original.getEmail(), atualizado.getEmail())) {
+            camposAlterados = List.of("email");
+        }
+
+        return camposAlterados;
     }
 
     @Override
@@ -214,8 +227,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaborador = buscarPorId(id);
         Colaborador colaboradorInativado = colaborador.inativar();
         Colaborador resultado = colaboradorRepository.salvar(colaboradorInativado);
-        
-        // Publica evento de domínio
+
         eventPublisher.publishEvent(
             new ColaboradorInativado(
                 resultado.getId(),

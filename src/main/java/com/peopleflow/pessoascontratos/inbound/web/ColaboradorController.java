@@ -6,6 +6,7 @@ import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
+import com.peopleflow.pessoascontratos.inbound.web.dto.DemissaoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ColaboradorWebMapper;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -78,4 +79,30 @@ public class ColaboradorController {
         colaboradorUseCase.deletar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/demitir")
+    public ResponseEntity<ColaboradorResponse> demitir(
+            @PathVariable Long id, @RequestBody @Valid DemissaoRequest demissaoRequest) {
+        Colaborador demitido = colaboradorUseCase.demitir(id, demissaoRequest.getDataDemissao());
+        return ResponseEntity.ok(mapper.toResponse(demitido));
+    }
+
+    @PatchMapping("/{id}/ativar")
+    public ResponseEntity<ColaboradorResponse> ativar(@PathVariable Long id) {
+        Colaborador ativado = colaboradorUseCase.ativar(id);
+        return ResponseEntity.ok(mapper.toResponse(ativado));
+    }
+
+    @PatchMapping("/{id}/inativar")
+    public ResponseEntity<ColaboradorResponse> inativar(@PathVariable Long id) {
+        Colaborador inativado = colaboradorUseCase.inativar(id);
+        return ResponseEntity.ok(mapper.toResponse(inativado));
+    }
+
+    @PatchMapping("/{id}/excluir")
+    public ResponseEntity<ColaboradorResponse> excluir(@PathVariable Long id) {
+        Colaborador excluido = colaboradorUseCase.excluir(id);
+        return ResponseEntity.ok(mapper.toResponse(excluido));
+    }
+
 } 
