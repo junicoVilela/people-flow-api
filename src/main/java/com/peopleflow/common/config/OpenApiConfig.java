@@ -32,7 +32,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title(apiTitle)
                         .version(apiVersion)
-                        .description(apiDescription)
+                        .description(buildDescription())
                         .contact(new Contact()
                                 .name("Equipe People Flow")
                                 .email("contato@peopleflow.com")
@@ -43,10 +43,13 @@ public class OpenApiConfig {
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:8080")
-                                .description("Servidor de Desenvolvimento"),
+                                .description("Ambiente de Desenvolvimento"),
+                        new Server()
+                                .url("https://api-dev.peopleflow.com")
+                                .description("Ambiente de Homologação"),
                         new Server()
                                 .url("https://api.peopleflow.com")
-                                .description("Servidor de Produção")))
+                                .description("Ambiente de Produção")))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components()
                         .addSecuritySchemes("Bearer Authentication",
@@ -54,7 +57,52 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                                        .description("Insira o token JWT obtido no servidor de autenticação")));
+                                        .description("Token JWT para autenticação. Formato: Bearer {token}")));
+    }
+
+    /**
+     * Constrói a descrição completa da API incluindo informações técnicas
+     */
+    private String buildDescription() {
+        return String.format("""
+            %s
+            
+            ## 🏗️ Arquitetura
+            
+            Esta API foi desenvolvida seguindo os princípios de:
+            - **Arquitetura Hexagonal** (Ports & Adapters)
+            - **Domain-Driven Design** (DDD)
+            - **Rich Domain Model** com validações de invariantes
+            - **Domain Events** para desacoplamento
+            - **CQRS Pattern** para separação de leitura/escrita
+            
+            ## 📋 Funcionalidades
+            
+            - Gerenciamento completo de colaboradores (CRUD)
+            - Operações de negócio (demitir, ativar, inativar, excluir)
+            - Busca avançada com filtros e paginação
+            - Validações de regras de negócio
+            - Auditoria automática de operações
+            
+            ## 🔐 Autenticação
+            
+            A API utiliza autenticação JWT. Para acessar endpoints protegidos:
+            1. Obtenha um token JWT no servidor de autenticação
+            2. Clique no botão "Authorize" (🔒) acima
+            3. Insira o token no formato: `Bearer seu-token-jwt`
+            
+            ## 📊 Códigos de Status
+            
+            - `200 OK` - Requisição bem-sucedida
+            - `201 Created` - Recurso criado com sucesso
+            - `204 No Content` - Requisição bem-sucedida sem retorno
+            - `400 Bad Request` - Erro de validação nos dados
+            - `401 Unauthorized` - Autenticação necessária
+            - `403 Forbidden` - Sem permissão para acessar
+            - `404 Not Found` - Recurso não encontrado
+            - `409 Conflict` - Conflito (ex: CPF duplicado)
+            - `500 Internal Server Error` - Erro interno do servidor
+            """, apiDescription);
     }
 }
 

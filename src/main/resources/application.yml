@@ -6,3 +6,27 @@ spring:
     servlet:
       compression:
         enabled: true
+
+# Informações da API
+app:
+  api:
+    version: 0.1.0-SNAPSHOT
+    title: People Flow API
+    description: API REST para gerenciamento de colaboradores e contratos
+
+# Documentação OpenAPI/Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+    displayRequestDuration: true
+  show-actuator: false
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json

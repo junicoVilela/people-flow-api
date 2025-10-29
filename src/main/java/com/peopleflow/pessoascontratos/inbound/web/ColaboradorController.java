@@ -8,6 +8,8 @@ import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DemissaoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ColaboradorWebMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/colaboradores")
+@RequestMapping("/api/v1/colaboradores")
+@Tag(name = "Colaboradores", description = "Gerenciamento de colaboradores")
 public class ColaboradorController {
 
     private final ColaboradorUseCase colaboradorUseCase;
@@ -31,6 +34,7 @@ public class ColaboradorController {
     }
 
     @PostMapping
+    @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")
     public ResponseEntity<ColaboradorResponse> criar(@Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
         Colaborador colaboradorCriado = colaboradorUseCase.criar(colaborador);
@@ -39,6 +43,7 @@ public class ColaboradorController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar colaborador por ID", description = "Retorna os dados de um colaborador específico")
     public ResponseEntity<ColaboradorResponse> buscarPorId(@PathVariable Long id) {
         Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
         ColaboradorResponse response = mapper.toResponse(colaborador);
@@ -46,6 +51,7 @@ public class ColaboradorController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todos os colaboradores", description = "Retorna lista completa de colaboradores")
     public ResponseEntity<List<ColaboradorResponse>> listarTodos() {
         
         List<Colaborador> colaboradores = colaboradorUseCase.listarTodos();
@@ -56,6 +62,7 @@ public class ColaboradorController {
     }
 
     @GetMapping("/buscar")
+    @Operation(summary = "Buscar colaboradores com filtros", description = "Busca colaboradores aplicando filtros e paginação")
     public ResponseEntity<Page<ColaboradorResponse>> buscarPorFiltros(
             @ModelAttribute ColaboradorFilterRequest filtrosRequest,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
@@ -67,6 +74,7 @@ public class ColaboradorController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar colaborador", description = "Atualiza os dados de um colaborador existente")
     public ResponseEntity<ColaboradorResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
         Colaborador colaboradorAtualizado = colaboradorUseCase.atualizar(id, colaborador);
@@ -75,12 +83,14 @@ public class ColaboradorController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar colaborador", description = "Remove permanentemente um colaborador do sistema")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         colaboradorUseCase.deletar(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/demitir")
+    @Operation(summary = "Demitir colaborador", description = "Registra a demissão de um colaborador")
     public ResponseEntity<ColaboradorResponse> demitir(
             @PathVariable Long id, @RequestBody @Valid DemissaoRequest demissaoRequest) {
         Colaborador demitido = colaboradorUseCase.demitir(id, demissaoRequest.getDataDemissao());
@@ -88,18 +98,21 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/ativar")
+    @Operation(summary = "Ativar colaborador", description = "Altera o status do colaborador para ATIVO")
     public ResponseEntity<ColaboradorResponse> ativar(@PathVariable Long id) {
         Colaborador ativado = colaboradorUseCase.ativar(id);
         return ResponseEntity.ok(mapper.toResponse(ativado));
     }
 
     @PatchMapping("/{id}/inativar")
+    @Operation(summary = "Inativar colaborador", description = "Altera o status do colaborador para INATIVO")
     public ResponseEntity<ColaboradorResponse> inativar(@PathVariable Long id) {
         Colaborador inativado = colaboradorUseCase.inativar(id);
         return ResponseEntity.ok(mapper.toResponse(inativado));
     }
 
     @PatchMapping("/{id}/excluir")
+    @Operation(summary = "Excluir colaborador", description = "Marca o colaborador como excluído (soft delete)")
     public ResponseEntity<ColaboradorResponse> excluir(@PathVariable Long id) {
         Colaborador excluido = colaboradorUseCase.excluir(id);
         return ResponseEntity.ok(mapper.toResponse(excluido));

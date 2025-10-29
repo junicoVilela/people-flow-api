@@ -24,14 +24,15 @@ spring:
     schemas: people_flow_rh
     default-schema: people_flow_rh
 
-  # OAuth2 Resource Server - Desabilitado em DEV
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # Descomentar e configurar quando tiver um servidor OAuth2 (Keycloak, Auth0, etc)
-          # issuer-uri: http://localhost:8180/realms/peopleflow
-          # jwk-set-uri: http://localhost:8180/realms/peopleflow/protocol/openid-connect/certs
+# OAuth2 Resource Server - Desabilitado em DEV
+# Para habilitar, descomente e configure:
+# spring:
+#   security:
+#     oauth2:
+#       resourceserver:
+#         jwt:
+#           issuer-uri: http://localhost:8180/realms/peopleflow
+#           jwk-set-uri: http://localhost:8180/realms/peopleflow/protocol/openid-connect/certs
 
 # Configurações da aplicação
 app:
