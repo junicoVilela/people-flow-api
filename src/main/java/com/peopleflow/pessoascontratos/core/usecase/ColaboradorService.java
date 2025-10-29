@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiPredicate;
@@ -117,26 +118,39 @@ public class ColaboradorService implements ColaboradorUseCase {
     @Override
     public Colaborador atualizar(Long id, Colaborador colaborador) {
         log.info("Iniciando atualização de colaborador: id={}", id);
-        
+
         try {
+            if (colaborador.getId() != null && !colaborador.getId().equals(id)) {
+                throw new BusinessException("ID_MISMATCH",
+                        String.format("ID do path (%d) diferente do ID do objeto (%d)",
+                                id, colaborador.getId()));
+            }
 
-            validarUnicidadeParaAtualizacao(colaborador, id);
             Colaborador original = buscarPorId(id);
-            Colaborador colaboradorAtualizado = colaboradorRepository.salvar(colaborador);
 
-            // TODO: verificar se está cobrindo todos os campos que precisam ser atualizados
+            Colaborador colaboradorParaAtualizar = colaborador.toBuilder()
+                    .id(id)  // Garante que o ID é o correto
+                    .build();
+
+            validarUnicidadeParaAtualizacao(colaboradorParaAtualizar, id);
+
+            Colaborador colaboradorAtualizado = colaboradorRepository.salvar(colaboradorParaAtualizar);
+
             List<String> camposAlterados = detectarCamposAlterados(original, colaboradorAtualizado);
 
-            eventPublisher.publishEvent(
-                new ColaboradorAtualizado(
-                    colaboradorAtualizado.getId(),
-                    colaboradorAtualizado.getNome(),
-                    String.join(",", camposAlterados)
-                )
-            );
-            
-            log.info("Colaborador atualizado com sucesso: id={}, nome={}", id, colaborador.getNome());
-            
+            if (!camposAlterados.equals(List.of("nenhum"))) {
+                eventPublisher.publishEvent(
+                        new ColaboradorAtualizado(
+                                colaboradorAtualizado.getId(),
+                                colaboradorAtualizado.getNome(),
+                                String.join(", ", camposAlterados)
+                        )
+                );
+            }
+
+            log.info("Colaborador atualizado com sucesso: id={}, nome={}, camposAlterados={}",
+                    id, colaborador.getNome(), camposAlterados);
+
             return colaboradorAtualizado;
         } catch (BusinessException e) {
             log.warn("Erro ao atualizar colaborador: id={}, erro={}", id, e.getMessage());
@@ -148,28 +162,43 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     public static List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
-        List<String> camposAlterados = null;
+        List<String> camposAlterados = new ArrayList<>();
 
         if (!Objects.equals(original.getNome(), atualizado.getNome())) {
-            camposAlterados = List.of("nome");
+            camposAlterados.add("nome");
         }
 
         if (!Objects.equals(original.getCpf(), atualizado.getCpf())) {
-            camposAlterados = List.of("cpf");
+            camposAlterados.add("cpf");
         }
 
         if (!Objects.equals(original.getEmail(), atualizado.getEmail())) {
-            camposAlterados = List.of("email");
+            camposAlterados.add("email");
         }
 
-        return camposAlterados;
+        if (!Objects.equals(original.getMatricula(), atualizado.getMatricula())) {
+            camposAlterados.add("matricula");
+        }
+
+        if (!Objects.equals(original.getDataAdmissao(), atualizado.getDataAdmissao())) {
+            camposAlterados.add("dataAdmissao");
+        }
+
+        if (!Objects.equals(original.getDataDemissao(), atualizado.getDataDemissao())) {
+            camposAlterados.add("dataDemissao");
+        }
+
+        if (!Objects.equals(original.getStatus(), atualizado.getStatus())) {
+            camposAlterados.add("status");
+        }
+
+        return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }
 
     @Override
     public void deletar(Long id) {
         log.warn("Deletando colaborador (hard delete): id={}", id);
         
-        // Verifica se existe
         buscarPorId(id);
         
         colaboradorRepository.deletar(id);
@@ -185,7 +214,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaboradorDemitido = colaborador.demitir(dataDemissao);
         Colaborador resultado = colaboradorRepository.salvar(colaboradorDemitido);
         
-        // Publica evento de domínio
         eventPublisher.publishEvent(
             new ColaboradorDemitido(
                 resultado.getId(),
@@ -248,7 +276,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaboradorExcluido = colaborador.excluir();
         Colaborador resultado = colaboradorRepository.salvar(colaboradorExcluido);
         
-        // Publica evento de domínio
         eventPublisher.publishEvent(
             new ColaboradorExcluido(
                 resultado.getId(),
@@ -261,11 +288,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         return resultado;
     }
 
-    // ========== MÉTODOS PRIVADOS DE VALIDAÇÃO (Bem Encapsulados) ==========
-
-    /**
-     * Valida unicidade de campos para criação de novo colaborador
-     */
     private void validarUnicidadeParaCriacao(Colaborador colaborador) {
         validarUnicidadeCampo(
             "CPF",

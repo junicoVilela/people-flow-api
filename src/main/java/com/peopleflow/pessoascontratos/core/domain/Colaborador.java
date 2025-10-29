@@ -36,18 +36,6 @@ public class Colaborador {
     private LocalDate dataDemissao;
     private StatusColaborador status;
 
-    /**
-     * Construtor para criação simplificada de novo colaborador
-     * @deprecated Use o Builder para maior controle e clareza
-     */
-    @Deprecated(since = "0.2.0", forRemoval = true)
-    public Colaborador(String nome, String cpf, String email) {
-        this.nome = nome;
-        this.cpf = cpf != null ? new Cpf(cpf) : null;
-        this.email = email != null ? new Email(email) : null;
-        this.status = StatusColaborador.ATIVO;
-        validarInvariantes();
-    }
 
     /**
      * Construtor customizado para Builder com validações
