@@ -14,7 +14,7 @@ import java.time.LocalDate;
  * Usado para construir filtros dinâmicos em pesquisas.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ColaboradorFilter {

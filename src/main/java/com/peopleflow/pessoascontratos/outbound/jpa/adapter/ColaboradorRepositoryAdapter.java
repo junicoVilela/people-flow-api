@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -37,14 +36,6 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
     public Optional<Colaborador> buscarPorId(Long id) {
         return repository.findById(id)
                 .map(mapper::toDomain);
-    }
-
-    @Override
-    public List<Colaborador> listarTodos() {
-        return repository.findAll()
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
     }
 
     @Override

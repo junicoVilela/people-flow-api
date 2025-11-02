@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.usecase;
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
+import com.peopleflow.common.security.SecurityContextService;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.domain.events.*;
 import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -44,19 +47,26 @@ public class ColaboradorService implements ColaboradorUseCase {
 
     private final ColaboradorRepositoryPort colaboradorRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final SecurityContextService securityContextService;
 
     public ColaboradorService(
             ColaboradorRepositoryPort colaboradorRepository,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher,
+            SecurityContextService securityContextService) {
         this.colaboradorRepository = colaboradorRepository;
         this.eventPublisher = eventPublisher;
+        this.securityContextService = securityContextService;
     }
 
     @Override
     public Colaborador criar(Colaborador colaborador) {
-        log.info("Iniciando criação de colaborador: nome={}", colaborador.getNome());
+        log.info("Iniciando criação de colaborador: nome={}, clienteId={}, empresaId={}", 
+                 colaborador.getNome(), colaborador.getClienteId(), colaborador.getEmpresaId());
         
         try {
+            // Valida permissões de acesso
+            validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
+            
             validarUnicidadeParaCriacao(colaborador);
             
             Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
@@ -89,18 +99,16 @@ public class ColaboradorService implements ColaboradorUseCase {
     @Transactional(readOnly = true)
     public Colaborador buscarPorId(Long id) {
         log.debug("Buscando colaborador por ID: {}", id);
-        return colaboradorRepository.buscarPorId(id)
+        Colaborador colaborador = colaboradorRepository.buscarPorId(id)
                 .orElseThrow(() -> {
                     log.warn("Colaborador não encontrado: id={}", id);
                     return new ResourceNotFoundException("Colaborador", id);
                 });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Colaborador> listarTodos() {
-        log.debug("Listando todos os colaboradores");
-        return colaboradorRepository.listarTodos();
+        
+        // Valida permissões de acesso
+        validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
+        
+        return colaborador;
     }
 
     @Override
@@ -109,7 +117,10 @@ public class ColaboradorService implements ColaboradorUseCase {
         log.debug("Buscando colaboradores com filtros: page={}, size={}", 
                   pageable.getPageNumber(), pageable.getPageSize());
         
-        Page<Colaborador> result = colaboradorRepository.buscarPorFiltros(filter, pageable);
+        // Aplica filtros de segurança automaticamente
+        ColaboradorFilter filtroComSeguranca = aplicarFiltrosDeSeguranca(filter);
+        
+        Page<Colaborador> result = colaboradorRepository.buscarPorFiltros(filtroComSeguranca, pageable);
         
         log.debug("Encontrados {} colaboradores", result.getTotalElements());
         return result;
@@ -125,6 +136,9 @@ public class ColaboradorService implements ColaboradorUseCase {
                         String.format("ID do path (%d) diferente do ID do objeto (%d)",
                                 id, colaborador.getId()));
             }
+            
+            // Valida permissões ANTES de buscar (para evitar leak de informações)
+            validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
 
             Colaborador original = buscarPorId(id);
 
@@ -161,38 +175,44 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    public static List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
+    /**
+     * Detecta quais campos foram alterados entre duas instâncias de Colaborador
+     * 
+     * @param original Colaborador antes da atualização
+     * @param atualizado Colaborador após a atualização
+     * @return Lista com nomes dos campos alterados, ou ["nenhum"] se nada mudou
+     */
+    private List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
         List<String> camposAlterados = new ArrayList<>();
-
-        if (!Objects.equals(original.getNome(), atualizado.getNome())) {
-            camposAlterados.add("nome");
-        }
-
-        if (!Objects.equals(original.getCpf(), atualizado.getCpf())) {
-            camposAlterados.add("cpf");
-        }
-
-        if (!Objects.equals(original.getEmail(), atualizado.getEmail())) {
-            camposAlterados.add("email");
-        }
-
-        if (!Objects.equals(original.getMatricula(), atualizado.getMatricula())) {
-            camposAlterados.add("matricula");
-        }
-
-        if (!Objects.equals(original.getDataAdmissao(), atualizado.getDataAdmissao())) {
-            camposAlterados.add("dataAdmissao");
-        }
-
-        if (!Objects.equals(original.getDataDemissao(), atualizado.getDataDemissao())) {
-            camposAlterados.add("dataDemissao");
-        }
-
-        if (!Objects.equals(original.getStatus(), atualizado.getStatus())) {
-            camposAlterados.add("status");
-        }
-
+        
+        // Usar método auxiliar para reduzir duplicação de código
+        compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
+        compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
+        compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
+        compararEAdicionar(camposAlterados, "centroCustoId", original.getCentroCustoId(), atualizado.getCentroCustoId());
+        compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
+        compararEAdicionar(camposAlterados, "cpf", original.getCpf(), atualizado.getCpf());
+        compararEAdicionar(camposAlterados, "matricula", original.getMatricula(), atualizado.getMatricula());
+        compararEAdicionar(camposAlterados, "email", original.getEmail(), atualizado.getEmail());
+        compararEAdicionar(camposAlterados, "dataAdmissao", original.getDataAdmissao(), atualizado.getDataAdmissao());
+        compararEAdicionar(camposAlterados, "dataDemissao", original.getDataDemissao(), atualizado.getDataDemissao());
+        compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
+        
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
+    }
+    
+    /**
+     * Método auxiliar para comparar valores e adicionar à lista se forem diferentes
+     * 
+     * @param lista Lista onde adicionar o nome do campo se houver mudança
+     * @param nomeCampo Nome do campo para adicionar à lista
+     * @param valorOriginal Valor original do campo
+     * @param valorAtualizado Valor atualizado do campo
+     */
+    private void compararEAdicionar(List<String> lista, String nomeCampo, Object valorOriginal, Object valorAtualizado) {
+        if (!Objects.equals(valorOriginal, valorAtualizado)) {
+            lista.add(nomeCampo);
+        }
     }
 
     @Override
@@ -373,5 +393,105 @@ public class ColaboradorService implements ColaboradorUseCase {
         if (validador.test(valor, idExcluir)) {
             throw new DuplicateResourceException(nomeCampo, valor);
         }
+    }
+
+    /**
+     * Valida se o usuário tem permissão para acessar dados de um cliente/empresa
+     * 
+     * @param clienteId ID do cliente
+     * @param empresaId ID da empresa
+     * @throws AccessDeniedException se não tiver permissão
+     */
+    private void validarPermissaoDeAcesso(Long clienteId, Long empresaId) {
+        // Admin global pode acessar tudo
+        if (securityContextService.isGlobalAdmin()) {
+            return;
+        }
+        
+        // Valida cliente
+        if (clienteId != null && !securityContextService.canAccessCliente(clienteId)) {
+            log.warn("Acesso negado: usuário {} tentou acessar clienteId={}", 
+                     securityContextService.getCurrentUsername(), clienteId);
+            throw new AccessDeniedException(
+                String.format("Você não tem permissão para acessar dados do cliente %d", clienteId)
+            );
+        }
+        
+        // Valida empresa
+        if (empresaId != null && !securityContextService.canAccessEmpresa(empresaId)) {
+            log.warn("Acesso negado: usuário {} tentou acessar empresaId={}", 
+                     securityContextService.getCurrentUsername(), empresaId);
+            throw new AccessDeniedException(
+                String.format("Você não tem permissão para acessar dados da empresa %d", empresaId)
+            );
+        }
+    }
+
+    /**
+     * Aplica filtros de segurança ao filtro de busca
+     * Garante que o usuário só veja colaboradores das empresas/clientes que tem acesso
+     * 
+     * @param filter Filtro original
+     * @return Filtro com restrições de segurança aplicadas
+     */
+    private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
+        // Admin global não tem restrições
+        if (securityContextService.isGlobalAdmin()) {
+            return filter;
+        }
+        
+        Set<Long> allowedClienteIds = securityContextService.getAllowedClienteIds();
+        Set<Long> allowedEmpresaIds = securityContextService.getAllowedEmpresaIds();
+        
+        // Se o usuário não tem acesso a nenhum cliente/empresa, retorna filtro vazio
+        if (allowedClienteIds.isEmpty() && !securityContextService.isGlobalAdmin()) {
+            log.warn("Usuário {} não tem clienteIds permitidos no token", 
+                     securityContextService.getCurrentUsername());
+            // Cria um filtro com ID impossível para retornar vazio
+            return ColaboradorFilter.builder()
+                .clienteId(-1L) // ID inexistente
+                .build();
+        }
+        
+        if (allowedEmpresaIds.isEmpty() && !securityContextService.isGlobalAdmin()) {
+            log.warn("Usuário {} não tem empresaIds permitidos no token", 
+                     securityContextService.getCurrentUsername());
+            return ColaboradorFilter.builder()
+                .empresaId(-1L) // ID inexistente
+                .build();
+        }
+        
+        // Aplica restrições ao filtro existente
+        ColaboradorFilter.ColaboradorFilterBuilder builder = filter != null 
+            ? filter.toBuilder() 
+            : ColaboradorFilter.builder();
+        
+        // Se o filtro já tem clienteId, valida se está permitido
+        if (filter != null && filter.getClienteId() != null) {
+            if (!allowedClienteIds.contains(filter.getClienteId())) {
+                throw new AccessDeniedException(
+                    String.format("Você não tem permissão para filtrar por clienteId=%d", 
+                                  filter.getClienteId())
+                );
+            }
+        } else if (!allowedClienteIds.isEmpty()) {
+            // Se não especificou cliente, usa o primeiro permitido
+            // (em filtros mais complexos, deveria buscar de todos os permitidos)
+            builder.clienteId(allowedClienteIds.iterator().next());
+        }
+        
+        // Mesma lógica para empresaId
+        if (filter != null && filter.getEmpresaId() != null) {
+            if (!allowedEmpresaIds.contains(filter.getEmpresaId())) {
+                throw new AccessDeniedException(
+                    String.format("Você não tem permissão para filtrar por empresaId=%d", 
+                                  filter.getEmpresaId())
+                );
+            }
+        } else if (!allowedEmpresaIds.isEmpty()) {
+            builder.empresaId(allowedEmpresaIds.iterator().next());
+        }
+        
+        return builder.build();
     }
 }

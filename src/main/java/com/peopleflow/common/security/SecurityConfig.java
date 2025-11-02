@@ -61,10 +61,11 @@ public class SecurityConfig {
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     
                     // Colaboradores - Permissões específicas
-                    .requestMatchers(HttpMethod.GET, "/colaboradores/**").hasAnyRole("USER", "ADMIN", "RH")
-                    .requestMatchers(HttpMethod.POST, "/colaboradores/**").hasAnyRole("ADMIN", "RH")
-                    .requestMatchers(HttpMethod.PUT, "/colaboradores/**").hasAnyRole("ADMIN", "RH")
-                    .requestMatchers(HttpMethod.DELETE, "/colaboradores/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/v1/colaboradores/**").hasAnyRole("USER", "ADMIN", "RH")
+                    .requestMatchers(HttpMethod.POST, "/api/v1/colaboradores/**").hasAnyRole("ADMIN", "RH")
+                    .requestMatchers(HttpMethod.PUT, "/api/v1/colaboradores/**").hasAnyRole("ADMIN", "RH")
+                    .requestMatchers(HttpMethod.PATCH, "/api/v1/colaboradores/**").hasAnyRole("ADMIN", "RH")
+                    .requestMatchers(HttpMethod.DELETE, "/api/v1/colaboradores/**").hasRole("ADMIN")
                     
                     // Tudo mais requer autenticação
                     .anyRequest().authenticated()
@@ -73,7 +74,7 @@ public class SecurityConfig {
             // Modo desenvolvimento - sem autenticação
             http.authorizeHttpRequests(authz -> authz
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/colaboradores/**").permitAll()
+                .requestMatchers("/api/v1/**").permitAll()
                 .anyRequest().permitAll()
             );
         }

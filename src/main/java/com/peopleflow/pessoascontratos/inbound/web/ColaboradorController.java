@@ -18,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/colaboradores")
 @Tag(name = "Colaboradores", description = "Gerenciamento de colaboradores")
@@ -51,18 +49,12 @@ public class ColaboradorController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todos os colaboradores", description = "Retorna lista completa de colaboradores")
-    public ResponseEntity<List<ColaboradorResponse>> listarTodos() {
-        
-        List<Colaborador> colaboradores = colaboradorUseCase.listarTodos();
-        List<ColaboradorResponse> response = colaboradores.stream()
-                .map(mapper::toResponse)
-                .toList();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/buscar")
-    @Operation(summary = "Buscar colaboradores com filtros", description = "Busca colaboradores aplicando filtros e paginação")
+    @Operation(
+        summary = "Listar colaboradores com filtros e paginação", 
+        description = "Busca colaboradores aplicando filtros opcionais e paginação. " +
+                      "Sempre retorna resultados paginados para garantir performance. " +
+                      "Use parâmetros de query para filtrar e ordenar os resultados."
+    )
     public ResponseEntity<Page<ColaboradorResponse>> buscarPorFiltros(
             @ModelAttribute ColaboradorFilterRequest filtrosRequest,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {

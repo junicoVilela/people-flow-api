@@ -61,10 +61,7 @@ public class Colaborador {
         }
     }
 
-    /**
-     * Valida as invariantes do modelo de domínio
-     * Um Colaborador deve SEMPRE estar em estado válido
-     */
+    
     private void validarInvariantes() {
         if (nome == null || nome.trim().isEmpty()) {
             throw new BusinessException("NOME_OBRIGATORIO", "Nome é obrigatório");
@@ -78,7 +75,16 @@ public class Colaborador {
             throw new BusinessException("EMAIL_OBRIGATORIO", "Email é obrigatório");
         }
 
-        // Validação de regra de negócio: data de demissão deve ser após admissão
+        if (clienteId == null) {
+            throw new BusinessException("CLIENTE_ID_OBRIGATORIO", 
+                "Cliente ID é obrigatório");
+        }
+        
+        if (empresaId == null) {
+            throw new BusinessException("EMPRESA_ID_OBRIGATORIO", 
+                "Empresa ID é obrigatória");
+        }
+
         if (dataDemissao != null && dataAdmissao != null && dataDemissao.isBefore(dataAdmissao)) {
             throw new BusinessException("DATA_DEMISSAO_INVALIDA", 
                 "Data de demissão não pode ser anterior à data de admissão");

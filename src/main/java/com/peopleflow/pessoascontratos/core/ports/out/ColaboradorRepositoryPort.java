@@ -5,13 +5,17 @@ import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
+/**
+ * Port de saída (driven port) para repositório de Colaborador
+ * 
+ * Define as operações de persistência necessárias para o domínio.
+ * Implementada por adapters na camada de infraestrutura.
+ */
 public interface ColaboradorRepositoryPort {
     Colaborador salvar(Colaborador colaborador);
     Optional<Colaborador> buscarPorId(Long id);
-    List<Colaborador> listarTodos();
     Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable);
     void deletar(Long id);
     

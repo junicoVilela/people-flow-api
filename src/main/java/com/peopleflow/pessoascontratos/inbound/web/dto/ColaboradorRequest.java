@@ -2,8 +2,10 @@ package com.peopleflow.pessoascontratos.inbound.web.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -53,4 +55,12 @@ public class ColaboradorRequest {
         message = "Status deve ser: ativo, inativo, demitido ou excluido"
     )
     private String status;
+
+    @NotNull(message = "Cliente ID é obrigatório")
+    @Positive(message = "Cliente ID deve ser positivo")
+    private Long clienteId;
+    
+    @NotNull(message = "Empresa ID é obrigatória")
+    @Positive(message = "Empresa ID deve ser positivo")
+    private Long empresaId;
 }
