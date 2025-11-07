@@ -42,7 +42,6 @@ public class Colaborador {
      */
     public static class ColaboradorBuilder {
         public Colaborador build() {
-            // Define valores padrão
             if (status == null) {
                 status = StatusColaborador.ATIVO;
             }
@@ -51,8 +50,7 @@ public class Colaborador {
                 id, clienteId, empresaId, departamentoId, centroCustoId,
                 nome, cpf, matricula, email, dataAdmissao, dataDemissao, status
             );
-            
-            // Valida invariantes apenas se não for um objeto em construção (tem nome)
+
             if (colaborador.nome != null) {
                 colaborador.validarInvariantes();
             }
@@ -91,13 +89,6 @@ public class Colaborador {
         }
     }
 
-    /**
-     * Demite o colaborador em uma determinada data
-     * 
-     * @param dataDemissao Data da demissão
-     * @return Nova instância do Colaborador com status DEMITIDO (imutável)
-     * @throws BusinessException se a data de demissão for inválida ou colaborador já estiver demitido
-     */
     public Colaborador demitir(LocalDate dataDemissao) {
         validarDemissao(dataDemissao);
         
@@ -123,12 +114,6 @@ public class Colaborador {
         }
     }
 
-    /**
-     * Ativa o colaborador
-     * 
-     * @return Nova instância do Colaborador com status ATIVO (imutável)
-     * @throws BusinessException se o colaborador estiver excluído
-     */
     public Colaborador ativar() {
         if (status.isExcluido()) {
             throw new BusinessException("COLABORADOR_EXCLUIDO", 
@@ -141,23 +126,12 @@ public class Colaborador {
             .build();
     }
 
-    /**
-     * Inativa o colaborador
-     * 
-     * @return Nova instância do Colaborador com status INATIVO (imutável)
-     */
     public Colaborador inativar() {
         return this.toBuilder()
             .status(StatusColaborador.INATIVO)
             .build();
     }
 
-    /**
-     * Exclui logicamente o colaborador (soft delete)
-     * 
-     * @return Nova instância do Colaborador com status EXCLUIDO (imutável)
-     * @throws BusinessException se o colaborador já estiver excluído
-     */
     public Colaborador excluir() {
         if (status.isExcluido()) {
             throw new BusinessException("COLABORADOR_JA_EXCLUIDO", 
@@ -169,16 +143,7 @@ public class Colaborador {
             .build();
     }
 
-    /**
-     * Atualiza os dados do colaborador mantendo imutabilidade
-     * 
-     * @param nome Nome atualizado
-     * @param cpf CPF atualizado
-     * @param email Email atualizado
-     * @param matricula Matrícula atualizada
-     * @param dataAdmissao Data de admissão atualizada
-     * @return Nova instância do Colaborador com dados atualizados
-     */
+
     public Colaborador atualizar(String nome, Cpf cpf, Email email, String matricula, LocalDate dataAdmissao) {
         return this.toBuilder()
             .nome(nome)
@@ -189,23 +154,14 @@ public class Colaborador {
             .build();
     }
 
-    /**
-     * Verifica se o colaborador está ativo
-     */
     public boolean isAtivo() {
         return status.isAtivo();
     }
 
-    /**
-     * Verifica se o colaborador está demitido
-     */
     public boolean isDemitido() {
         return status.isDemitido();
     }
 
-    /**
-     * Verifica se o colaborador está excluído
-     */
     public boolean isExcluido() {
         return status.isExcluido();
     }

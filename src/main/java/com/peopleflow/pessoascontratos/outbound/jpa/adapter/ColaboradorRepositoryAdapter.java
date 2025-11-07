@@ -40,7 +40,7 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
 
     @Override
     public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
-        Specification<ColaboradorEntity> specification = ColaboradorSpecification.comFiltros(filter);
+        Specification<ColaboradorEntity> specification = ColaboradorSpecification.filter(filter);
         return repository.findAll(specification, pageable)
                 .map(mapper::toDomain);
     }

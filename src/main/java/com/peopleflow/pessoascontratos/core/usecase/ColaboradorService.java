@@ -26,19 +26,6 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-/**
- * Serviço de aplicação para Colaborador
- * 
- * Responsabilidades:
- * - Orquestrar casos de uso
- * - Validar unicidade (dependência do repositório)
- * - Gerenciar transações
- * - Logging de operações
- * 
- * NÃO é responsabilidade deste serviço:
- * - Validar invariantes do modelo (isso é do Colaborador)
- * - Lógicas de negócio complexas (isso é do DomainService)
- */
 @Service
 @Transactional
 public class ColaboradorService implements ColaboradorUseCase {
@@ -64,7 +51,6 @@ public class ColaboradorService implements ColaboradorUseCase {
                  colaborador.getNome(), colaborador.getClienteId(), colaborador.getEmpresaId());
         
         try {
-            // Valida permissões de acesso
             validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
             
             validarUnicidadeParaCriacao(colaborador);
@@ -104,8 +90,7 @@ public class ColaboradorService implements ColaboradorUseCase {
                     log.warn("Colaborador não encontrado: id={}", id);
                     return new ResourceNotFoundException("Colaborador", id);
                 });
-        
-        // Valida permissões de acesso
+
         validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
         
         return colaborador;
@@ -116,8 +101,7 @@ public class ColaboradorService implements ColaboradorUseCase {
     public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
         log.debug("Buscando colaboradores com filtros: page={}, size={}", 
                   pageable.getPageNumber(), pageable.getPageSize());
-        
-        // Aplica filtros de segurança automaticamente
+
         ColaboradorFilter filtroComSeguranca = aplicarFiltrosDeSeguranca(filter);
         
         Page<Colaborador> result = colaboradorRepository.buscarPorFiltros(filtroComSeguranca, pageable);
@@ -136,14 +120,13 @@ public class ColaboradorService implements ColaboradorUseCase {
                         String.format("ID do path (%d) diferente do ID do objeto (%d)",
                                 id, colaborador.getId()));
             }
-            
-            // Valida permissões ANTES de buscar (para evitar leak de informações)
+
             validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
 
             Colaborador original = buscarPorId(id);
 
             Colaborador colaboradorParaAtualizar = colaborador.toBuilder()
-                    .id(id)  // Garante que o ID é o correto
+                    .id(id)
                     .build();
 
             validarUnicidadeParaAtualizacao(colaboradorParaAtualizar, id);
@@ -175,17 +158,9 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    /**
-     * Detecta quais campos foram alterados entre duas instâncias de Colaborador
-     * 
-     * @param original Colaborador antes da atualização
-     * @param atualizado Colaborador após a atualização
-     * @return Lista com nomes dos campos alterados, ou ["nenhum"] se nada mudou
-     */
     private List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
         List<String> camposAlterados = new ArrayList<>();
-        
-        // Usar método auxiliar para reduzir duplicação de código
+
         compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
         compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
         compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
@@ -200,15 +175,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }
-    
-    /**
-     * Método auxiliar para comparar valores e adicionar à lista se forem diferentes
-     * 
-     * @param lista Lista onde adicionar o nome do campo se houver mudança
-     * @param nomeCampo Nome do campo para adicionar à lista
-     * @param valorOriginal Valor original do campo
-     * @param valorAtualizado Valor atualizado do campo
-     */
+
     private void compararEAdicionar(List<String> lista, String nomeCampo, Object valorOriginal, Object valorAtualizado) {
         if (!Objects.equals(valorOriginal, valorAtualizado)) {
             lista.add(nomeCampo);
@@ -330,9 +297,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    /**
-     * Valida unicidade de campos para atualização de colaborador existente
-     */
     private void validarUnicidadeParaAtualizacao(Colaborador colaborador, Long id) {
         validarUnicidadeCampoComExclusao(
             "CPF",
@@ -358,13 +322,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    /**
-     * Método genérico para validar unicidade de um campo
-     * 
-     * @param nomeCampo Nome do campo para mensagem de erro
-     * @param valor Valor do campo a ser validado
-     * @param validador Função que verifica se o valor já existe
-     */
     private void validarUnicidadeCampo(
             String nomeCampo, 
             String valor, 
@@ -375,15 +332,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    /**
-     * Método genérico para validar unicidade de um campo excluindo um ID
-     * (usado em atualizações para permitir manter o mesmo valor)
-     * 
-     * @param nomeCampo Nome do campo para mensagem de erro
-     * @param valor Valor do campo a ser validado
-     * @param idExcluir ID do colaborador a ser excluído da verificação
-     * @param validador Função que verifica se o valor já existe (excluindo o ID)
-     */
     private void validarUnicidadeCampoComExclusao(
             String nomeCampo, 
             String valor, 
@@ -395,20 +343,11 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    /**
-     * Valida se o usuário tem permissão para acessar dados de um cliente/empresa
-     * 
-     * @param clienteId ID do cliente
-     * @param empresaId ID da empresa
-     * @throws AccessDeniedException se não tiver permissão
-     */
     private void validarPermissaoDeAcesso(Long clienteId, Long empresaId) {
-        // Admin global pode acessar tudo
         if (securityContextService.isGlobalAdmin()) {
             return;
         }
         
-        // Valida cliente
         if (clienteId != null && !securityContextService.canAccessCliente(clienteId)) {
             log.warn("Acesso negado: usuário {} tentou acessar clienteId={}", 
                      securityContextService.getCurrentUsername(), clienteId);
@@ -417,7 +356,6 @@ public class ColaboradorService implements ColaboradorUseCase {
             );
         }
         
-        // Valida empresa
         if (empresaId != null && !securityContextService.canAccessEmpresa(empresaId)) {
             log.warn("Acesso negado: usuário {} tentou acessar empresaId={}", 
                      securityContextService.getCurrentUsername(), empresaId);
@@ -427,15 +365,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         }
     }
 
-    /**
-     * Aplica filtros de segurança ao filtro de busca
-     * Garante que o usuário só veja colaboradores das empresas/clientes que tem acesso
-     * 
-     * @param filter Filtro original
-     * @return Filtro com restrições de segurança aplicadas
-     */
     private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
-        // Admin global não tem restrições
         if (securityContextService.isGlobalAdmin()) {
             return filter;
         }
@@ -443,11 +373,9 @@ public class ColaboradorService implements ColaboradorUseCase {
         Set<Long> allowedClienteIds = securityContextService.getAllowedClienteIds();
         Set<Long> allowedEmpresaIds = securityContextService.getAllowedEmpresaIds();
         
-        // Se o usuário não tem acesso a nenhum cliente/empresa, retorna filtro vazio
         if (allowedClienteIds.isEmpty() && !securityContextService.isGlobalAdmin()) {
             log.warn("Usuário {} não tem clienteIds permitidos no token", 
                      securityContextService.getCurrentUsername());
-            // Cria um filtro com ID impossível para retornar vazio
             return ColaboradorFilter.builder()
                 .clienteId(-1L) // ID inexistente
                 .build();
@@ -461,12 +389,10 @@ public class ColaboradorService implements ColaboradorUseCase {
                 .build();
         }
         
-        // Aplica restrições ao filtro existente
-        ColaboradorFilter.ColaboradorFilterBuilder builder = filter != null 
+        ColaboradorFilter.ColaboradorFilterBuilder builder = filter != null
             ? filter.toBuilder() 
             : ColaboradorFilter.builder();
         
-        // Se o filtro já tem clienteId, valida se está permitido
         if (filter != null && filter.getClienteId() != null) {
             if (!allowedClienteIds.contains(filter.getClienteId())) {
                 throw new AccessDeniedException(
@@ -475,12 +401,9 @@ public class ColaboradorService implements ColaboradorUseCase {
                 );
             }
         } else if (!allowedClienteIds.isEmpty()) {
-            // Se não especificou cliente, usa o primeiro permitido
-            // (em filtros mais complexos, deveria buscar de todos os permitidos)
             builder.clienteId(allowedClienteIds.iterator().next());
         }
         
-        // Mesma lógica para empresaId
         if (filter != null && filter.getEmpresaId() != null) {
             if (!allowedEmpresaIds.contains(filter.getEmpresaId())) {
                 throw new AccessDeniedException(

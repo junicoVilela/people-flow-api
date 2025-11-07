@@ -7,12 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * Objeto de consulta/filtro para buscar Colaboradores
- * 
- * Este não é um objeto de domínio, mas sim um DTO para queries.
- * Usado para construir filtros dinâmicos em pesquisas.
- */
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

@@ -7,12 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
-/**
- * Port de saída (driven port) para repositório de Colaborador
- * 
- * Define as operações de persistência necessárias para o domínio.
- * Implementada por adapters na camada de infraestrutura.
- */
 public interface ColaboradorRepositoryPort {
     Colaborador salvar(Colaborador colaborador);
     Optional<Colaborador> buscarPorId(Long id);

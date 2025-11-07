@@ -7,12 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 
-/**
- * Port de entrada (driving port) para casos de uso de Colaborador
- * 
- * Define as operações que a aplicação oferece para gerenciar colaboradores.
- * Este é o contrato que a camada de aplicação expõe para as camadas externas.
- */
 public interface ColaboradorUseCase {
     Colaborador criar(Colaborador colaborador);
     Colaborador buscarPorId(Long id);

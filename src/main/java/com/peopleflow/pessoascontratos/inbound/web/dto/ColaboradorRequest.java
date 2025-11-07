@@ -11,19 +11,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-/**
- * DTO de entrada para criação/atualização de Colaborador
- * 
- * Validações nesta camada (Apresentação):
- * - Formato básico dos campos (@Pattern, @Size)
- * - Presença de campos obrigatórios (@NotBlank)
- * - Validações simples e rápidas (feedback imediato ao usuário)
- * 
- * Validações no Domínio (Value Objects):
- * - Algoritmo de validação de CPF
- * - Regras complexas de negócio
- * - Garantia de invariantes
- */
 @Data
 public class ColaboradorRequest {
     
@@ -48,8 +35,7 @@ public class ColaboradorRequest {
     
     @PastOrPresent(message = "Data de admissão não pode ser futura")
     private LocalDate dataAdmissao;
-    
-    // Status é opcional - se não informado, será definido como ATIVO pelo domínio
+
     @Pattern(
         regexp = "^(ativo|inativo|demitido|excluido)?$",
         message = "Status deve ser: ativo, inativo, demitido ou excluido"
@@ -57,10 +43,8 @@ public class ColaboradorRequest {
     private String status;
 
     @NotNull(message = "Cliente ID é obrigatório")
-    @Positive(message = "Cliente ID deve ser positivo")
     private Long clienteId;
     
     @NotNull(message = "Empresa ID é obrigatória")
-    @Positive(message = "Empresa ID deve ser positivo")
     private Long empresaId;
 }
