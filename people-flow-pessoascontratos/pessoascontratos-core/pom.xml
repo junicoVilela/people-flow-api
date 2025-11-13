@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.peopleflow</groupId>
+        <artifactId>people-flow-pessoascontratos</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>pessoascontratos-core</artifactId>
+    <packaging>jar</packaging>
+    <name>pessoascontratos-core</name>
+    <description>Core do domínio Pessoas e Contratos (regras de negócio)</description>
+    
+    <dependencies>
+        <!-- Common -->
+        <dependency>
+            <groupId>com.peopleflow</groupId>
+            <artifactId>people-flow-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Spring Data (para Pageable) -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <!-- Spring Context (para @Service, @Transactional) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+
