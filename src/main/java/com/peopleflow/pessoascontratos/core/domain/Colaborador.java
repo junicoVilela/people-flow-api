@@ -24,10 +24,6 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Colaborador {
     private Long id;
-    private Long clienteId;
-    private Long empresaId;
-    private Long departamentoId;
-    private Long centroCustoId;
     private String nome;
     private Cpf cpf;
     private String matricula;
@@ -35,6 +31,10 @@ public class Colaborador {
     private LocalDate dataAdmissao;
     private LocalDate dataDemissao;
     private StatusColaborador status;
+    private Long clienteId;
+    private Long empresaId;
+    private Long departamentoId;
+    private Long centroCustoId;
 
 
     /**
@@ -47,8 +47,18 @@ public class Colaborador {
             }
             
             Colaborador colaborador = new Colaborador(
-                id, clienteId, empresaId, departamentoId, centroCustoId,
-                nome, cpf, matricula, email, dataAdmissao, dataDemissao, status
+                id,
+                nome,
+                cpf,
+                matricula,
+                email,
+                dataAdmissao,
+                dataDemissao,
+                status,
+                clienteId,
+                empresaId,
+                departamentoId,
+                centroCustoId
             );
 
             if (colaborador.nome != null) {
@@ -73,7 +83,7 @@ public class Colaborador {
             throw new BusinessException("EMAIL_OBRIGATORIO", "Email é obrigatório");
         }
 
-        if (clienteId == null) {
+        /*if (clienteId == null) {
             throw new BusinessException("CLIENTE_ID_OBRIGATORIO", 
                 "Cliente ID é obrigatório");
         }
@@ -81,7 +91,7 @@ public class Colaborador {
         if (empresaId == null) {
             throw new BusinessException("EMPRESA_ID_OBRIGATORIO", 
                 "Empresa ID é obrigatória");
-        }
+        }*/
 
         if (dataDemissao != null && dataAdmissao != null && dataDemissao.isBefore(dataAdmissao)) {
             throw new BusinessException("DATA_DEMISSAO_INVALIDA", 
