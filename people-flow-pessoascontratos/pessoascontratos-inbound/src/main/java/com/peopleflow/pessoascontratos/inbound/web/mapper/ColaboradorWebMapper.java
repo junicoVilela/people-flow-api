@@ -2,6 +2,7 @@ package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.query.PagedResult;
 import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
 import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;
@@ -12,6 +13,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 @Mapper(componentModel = "spring")
 public interface ColaboradorWebMapper {
@@ -34,9 +37,20 @@ public interface ColaboradorWebMapper {
 
     ColaboradorFilter toDomain(ColaboradorFilterRequest request);
 
-    default Page<ColaboradorResponse> toPageResponse(Page<Colaborador> page) {
-        if (page == null) return null;
-        return page.map(this::toResponse);
+    /**
+     * Converte PagedResult (core) para Page (Spring) para resposta HTTP
+     */
+    default Page<ColaboradorResponse> toPageResponse(PagedResult<Colaborador> pagedResult) {
+        if (pagedResult == null) return null;
+        
+        PageRequest pageRequest = PageRequest.of(pagedResult.page(), pagedResult.size());
+        return new PageImpl<>(
+            pagedResult.content().stream()
+                .map(this::toResponse)
+                .toList(),
+            pageRequest,
+            pagedResult.totalElements()
+        );
     }
     
     @Named("cpfToString")

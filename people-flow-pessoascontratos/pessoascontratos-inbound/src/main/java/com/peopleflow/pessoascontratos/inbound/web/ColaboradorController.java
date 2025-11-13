@@ -1,8 +1,10 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
-import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
+import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
+import com.peopleflow.pessoascontratos.core.query.PagedResult;
+import com.peopleflow.pessoascontratos.core.query.Pagination;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
@@ -12,7 +14,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,8 +64,25 @@ public class ColaboradorController {
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         
         ColaboradorFilter filtros = mapper.toDomain(filtrosRequest);
-        Page<Colaborador> colaboradores = colaboradorUseCase.buscarPorFiltros(filtros, pageable);
-        Page<ColaboradorResponse> response = mapper.toPageResponse(colaboradores);
+        
+        // Converte Pageable (Spring) para Pagination (core)
+        Pagination pagination = Pagination.of( pageable.getPageNumber(),
+            pageable.getPageSize(),
+            pageable.getSort().stream()
+                .findFirst()
+                .map(Sort.Order::getProperty)
+                .orElse(null),
+            pageable.getSort().stream()
+                .findFirst()
+                .map(order -> order.getDirection() == Sort.Direction.ASC ? Pagination.SortDirection.ASC : Pagination.SortDirection.DESC)
+                .orElse(Pagination.SortDirection.ASC)
+        );
+        
+        // Chama use case com abstração do core
+        PagedResult<Colaborador> resultado = colaboradorUseCase.buscarPorFiltros(filtros, pagination);
+        
+        // Converte PagedResult (core) para Page (Spring) para resposta HTTP
+        Page<ColaboradorResponse> response = mapper.toPageResponse(resultado);
         return ResponseEntity.ok(response);
     }
 

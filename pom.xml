@@ -98,6 +98,33 @@
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
+                <!-- Plugin para validar dependências proibidas -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-dependencies</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <!-- Valida que core não tem dependências Spring -->
+                                    <bannedDependencies>
+                                        <excludes>
+                                            <exclude>org.springframework:*</exclude>
+                                            <exclude>org.springframework.boot:*</exclude>
+                                            <exclude>org.springframework.data:*</exclude>
+                                        </excludes>
+                                        <message>❌ Módulo core não pode ter dependências Spring! Use interfaces e adaptadores.</message>
+                                    </bannedDependencies>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>

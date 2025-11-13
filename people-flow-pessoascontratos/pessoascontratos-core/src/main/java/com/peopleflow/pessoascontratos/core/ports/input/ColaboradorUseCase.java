@@ -1,16 +1,16 @@
-package com.peopleflow.pessoascontratos.core.ports.in;
+package com.peopleflow.pessoascontratos.core.ports.input;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.peopleflow.pessoascontratos.core.query.PagedResult;
+import com.peopleflow.pessoascontratos.core.query.Pagination;
 
 import java.time.LocalDate;
 
 public interface ColaboradorUseCase {
     Colaborador criar(Colaborador colaborador);
     Colaborador buscarPorId(Long id);
-    Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable);
+    PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination);
     Colaborador atualizar(Long id, Colaborador colaborador);
     void deletar(Long id);
     Colaborador demitir(Long id, LocalDate dataDemissao);
@@ -18,3 +18,4 @@ public interface ColaboradorUseCase {
     Colaborador inativar(Long id);
     Colaborador excluir(Long id);
 }
+

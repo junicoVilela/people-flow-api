@@ -1,16 +1,16 @@
-package com.peopleflow.pessoascontratos.core.ports.out;
+package com.peopleflow.pessoascontratos.core.ports.output;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.peopleflow.pessoascontratos.core.query.PagedResult;
+import com.peopleflow.pessoascontratos.core.query.Pagination;
 
 import java.util.Optional;
 
 public interface ColaboradorRepositoryPort {
     Colaborador salvar(Colaborador colaborador);
     Optional<Colaborador> buscarPorId(Long id);
-    Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable);
+    PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination);
     void deletar(Long id);
     
     boolean existePorCpf(String cpf);
@@ -21,3 +21,4 @@ public interface ColaboradorRepositoryPort {
     boolean existePorEmailExcluindoId(String email, Long id);
     boolean existePorMatriculaExcluindoId(String matricula, Long id);
 }
+

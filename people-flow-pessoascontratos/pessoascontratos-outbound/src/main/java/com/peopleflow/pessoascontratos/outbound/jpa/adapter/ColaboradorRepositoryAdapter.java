@@ -2,13 +2,16 @@ package com.peopleflow.pessoascontratos.outbound.jpa.adapter;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
+import com.peopleflow.pessoascontratos.core.query.PagedResult;
+import com.peopleflow.pessoascontratos.core.query.Pagination;
+import com.peopleflow.pessoascontratos.core.ports.output.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ColaboradorEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.ColaboradorJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.ColaboradorJpaRepository;
 import com.peopleflow.pessoascontratos.outbound.jpa.specification.ColaboradorSpecification;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -39,10 +42,29 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
     }
 
     @Override
-    public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
+    public PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination) {
         Specification<ColaboradorEntity> specification = ColaboradorSpecification.filter(filter);
-        return repository.findAll(specification, pageable)
-                .map(mapper::toDomain);
+        
+        // Converte Pagination (core) para Pageable (Spring)
+        Sort sort = pagination.sortBy() != null
+            ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC 
+                ? Sort.Direction.ASC 
+                : Sort.Direction.DESC, pagination.sortBy())
+            : Sort.unsorted();
+        
+        PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
+        
+        // Executa query usando Spring Data
+        Page<ColaboradorEntity> page = repository.findAll(specification, pageRequest);
+        
+        // Converte Page (Spring) para PagedResult (core)
+        return new PagedResult<>(
+            page.map(mapper::toDomain).getContent(),
+            page.getTotalElements(),
+            page.getTotalPages(),
+            page.getNumber(),
+            page.getSize()
+        );
     }
 
     @Override

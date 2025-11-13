@@ -1,22 +1,19 @@
-package com.peopleflow.pessoascontratos.core.usecase;
+package com.peopleflow.pessoascontratos.core.application;
 
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
-import com.peopleflow.common.security.SecurityContextService;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.domain.events.*;
-import com.peopleflow.pessoascontratos.core.ports.in.ColaboradorUseCase;
+import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
+import com.peopleflow.pessoascontratos.core.ports.input.SecurityContext;
+import com.peopleflow.pessoascontratos.core.ports.output.ColaboradorRepositoryPort;
+import com.peopleflow.pessoascontratos.core.ports.output.DomainEventPublisher;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
-import com.peopleflow.pessoascontratos.core.ports.out.ColaboradorRepositoryPort;
+import com.peopleflow.pessoascontratos.core.query.PagedResult;
+import com.peopleflow.pessoascontratos.core.query.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,23 +23,27 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-@Service
-@Transactional
+/**
+ * Serviço de casos de uso para Colaborador
+ * 
+ * Implementa as regras de negócio do domínio Colaborador.
+ * Este serviço é puro e não depende de frameworks específicos.
+ */
 public class ColaboradorService implements ColaboradorUseCase {
     
     private static final Logger log = LoggerFactory.getLogger(ColaboradorService.class);
 
     private final ColaboradorRepositoryPort colaboradorRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    private final SecurityContextService securityContextService;
+    private final DomainEventPublisher eventPublisher;
+    private final SecurityContext securityContext;
 
     public ColaboradorService(
             ColaboradorRepositoryPort colaboradorRepository,
-            ApplicationEventPublisher eventPublisher,
-            SecurityContextService securityContextService) {
+            DomainEventPublisher eventPublisher,
+            SecurityContext securityContext) {
         this.colaboradorRepository = colaboradorRepository;
         this.eventPublisher = eventPublisher;
-        this.securityContextService = securityContextService;
+        this.securityContext = securityContext;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class ColaboradorService implements ColaboradorUseCase {
             
             Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
 
-            eventPublisher.publishEvent(
+            eventPublisher.publish(
                 new ColaboradorCriado(
                     colaboradorCriado.getId(),
                     colaboradorCriado.getNome(),
@@ -82,7 +83,6 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Colaborador buscarPorId(Long id) {
         log.debug("Buscando colaborador por ID: {}", id);
         Colaborador colaborador = colaboradorRepository.buscarPorId(id)
@@ -97,16 +97,15 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pageable pageable) {
+    public PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination) {
         log.debug("Buscando colaboradores com filtros: page={}, size={}", 
-                  pageable.getPageNumber(), pageable.getPageSize());
+                  pagination.page(), pagination.size());
 
         ColaboradorFilter filtroComSeguranca = aplicarFiltrosDeSeguranca(filter);
         
-        Page<Colaborador> result = colaboradorRepository.buscarPorFiltros(filtroComSeguranca, pageable);
+        PagedResult<Colaborador> result = colaboradorRepository.buscarPorFiltros(filtroComSeguranca, pagination);
         
-        log.debug("Encontrados {} colaboradores", result.getTotalElements());
+        log.debug("Encontrados {} colaboradores", result.totalElements());
         return result;
     }
 
@@ -136,7 +135,7 @@ public class ColaboradorService implements ColaboradorUseCase {
             List<String> camposAlterados = detectarCamposAlterados(original, colaboradorAtualizado);
 
             if (!camposAlterados.equals(List.of("nenhum"))) {
-                eventPublisher.publishEvent(
+                eventPublisher.publish(
                         new ColaboradorAtualizado(
                                 colaboradorAtualizado.getId(),
                                 colaboradorAtualizado.getNome(),
@@ -201,7 +200,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaboradorDemitido = colaborador.demitir(dataDemissao);
         Colaborador resultado = colaboradorRepository.salvar(colaboradorDemitido);
         
-        eventPublisher.publishEvent(
+        eventPublisher.publish(
             new ColaboradorDemitido(
                 resultado.getId(),
                 resultado.getNome(),
@@ -223,7 +222,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador resultado = colaboradorRepository.salvar(colaboradorAtivado);
         
         // Publica evento de domínio
-        eventPublisher.publishEvent(
+        eventPublisher.publish(
             new ColaboradorAtivado(
                 resultado.getId(),
                 resultado.getNome()
@@ -243,7 +242,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaboradorInativado = colaborador.inativar();
         Colaborador resultado = colaboradorRepository.salvar(colaboradorInativado);
 
-        eventPublisher.publishEvent(
+        eventPublisher.publish(
             new ColaboradorInativado(
                 resultado.getId(),
                 resultado.getNome()
@@ -263,7 +262,7 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaboradorExcluido = colaborador.excluir();
         Colaborador resultado = colaboradorRepository.salvar(colaboradorExcluido);
         
-        eventPublisher.publishEvent(
+        eventPublisher.publish(
             new ColaboradorExcluido(
                 resultado.getId(),
                 resultado.getNome()
@@ -344,46 +343,48 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     private void validarPermissaoDeAcesso(Long clienteId, Long empresaId) {
-        if (securityContextService.isGlobalAdmin()) {
+        if (securityContext.isGlobalAdmin()) {
             return;
         }
         
-        if (clienteId != null && !securityContextService.canAccessCliente(clienteId)) {
+        if (clienteId != null && !securityContext.canAccessCliente(clienteId)) {
             log.warn("Acesso negado: usuário {} tentou acessar clienteId={}", 
-                     securityContextService.getCurrentUsername(), clienteId);
-            throw new AccessDeniedException(
+                     securityContext.getCurrentUsername(), clienteId);
+            throw new BusinessException(
+                "ACESSO_NEGADO",
                 String.format("Você não tem permissão para acessar dados do cliente %d", clienteId)
             );
         }
         
-        if (empresaId != null && !securityContextService.canAccessEmpresa(empresaId)) {
+        if (empresaId != null && !securityContext.canAccessEmpresa(empresaId)) {
             log.warn("Acesso negado: usuário {} tentou acessar empresaId={}", 
-                     securityContextService.getCurrentUsername(), empresaId);
-            throw new AccessDeniedException(
+                     securityContext.getCurrentUsername(), empresaId);
+            throw new BusinessException(
+                "ACESSO_NEGADO",
                 String.format("Você não tem permissão para acessar dados da empresa %d", empresaId)
             );
         }
     }
 
     private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
-        if (securityContextService.isGlobalAdmin()) {
+        if (securityContext.isGlobalAdmin()) {
             return filter;
         }
         
-        Set<Long> allowedClienteIds = securityContextService.getAllowedClienteIds();
-        Set<Long> allowedEmpresaIds = securityContextService.getAllowedEmpresaIds();
+        Set<Long> allowedClienteIds = securityContext.getAllowedClienteIds();
+        Set<Long> allowedEmpresaIds = securityContext.getAllowedEmpresaIds();
         
-        if (allowedClienteIds.isEmpty() && !securityContextService.isGlobalAdmin()) {
+        if (allowedClienteIds.isEmpty() && !securityContext.isGlobalAdmin()) {
             log.warn("Usuário {} não tem clienteIds permitidos no token", 
-                     securityContextService.getCurrentUsername());
+                     securityContext.getCurrentUsername());
             return ColaboradorFilter.builder()
                 .clienteId(-1L) // ID inexistente
                 .build();
         }
         
-        if (allowedEmpresaIds.isEmpty() && !securityContextService.isGlobalAdmin()) {
+        if (allowedEmpresaIds.isEmpty() && !securityContext.isGlobalAdmin()) {
             log.warn("Usuário {} não tem empresaIds permitidos no token", 
-                     securityContextService.getCurrentUsername());
+                     securityContext.getCurrentUsername());
             return ColaboradorFilter.builder()
                 .empresaId(-1L) // ID inexistente
                 .build();
@@ -395,7 +396,8 @@ public class ColaboradorService implements ColaboradorUseCase {
         
         if (filter != null && filter.getClienteId() != null) {
             if (!allowedClienteIds.contains(filter.getClienteId())) {
-                throw new AccessDeniedException(
+                throw new BusinessException(
+                    "ACESSO_NEGADO",
                     String.format("Você não tem permissão para filtrar por clienteId=%d", 
                                   filter.getClienteId())
                 );
@@ -406,7 +408,8 @@ public class ColaboradorService implements ColaboradorUseCase {
         
         if (filter != null && filter.getEmpresaId() != null) {
             if (!allowedEmpresaIds.contains(filter.getEmpresaId())) {
-                throw new AccessDeniedException(
+                throw new BusinessException(
+                    "ACESSO_NEGADO",
                     String.format("Você não tem permissão para filtrar por empresaId=%d", 
                                   filter.getEmpresaId())
                 );
@@ -418,3 +421,4 @@ public class ColaboradorService implements ColaboradorUseCase {
         return builder.build();
     }
 }
+

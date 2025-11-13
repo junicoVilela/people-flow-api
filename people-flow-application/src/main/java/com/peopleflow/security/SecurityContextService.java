@@ -1,4 +1,4 @@
-package com.peopleflow.common.security;
+package com.peopleflow.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
  * 
  * Centraliza a lógica de extração de dados do JWT e do Authentication,
  * facilitando a validação de permissões e auditoria.
+ * 
+ * Este serviço está no módulo application porque depende de Spring Security.
+ * Para uso no core, use a interface SecurityContext através do adaptador.
  */
 @Service
 public class SecurityContextService {

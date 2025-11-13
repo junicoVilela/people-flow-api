@@ -138,6 +138,7 @@ public class GlobalExceptionHandler {
             case "RESOURCE_NOT_FOUND" -> HttpStatus.NOT_FOUND;
             case "VALIDATION_ERROR" -> HttpStatus.BAD_REQUEST;
             case "DUPLICATE_RESOURCE" -> HttpStatus.CONFLICT;
+            case "ACESSO_NEGADO" -> HttpStatus.FORBIDDEN;
             default -> HttpStatus.BAD_REQUEST;
         };
     }
