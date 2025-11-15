@@ -1,4 +1,4 @@
-package com.peopleflow.pessoascontratos.core.query;
+package com.peopleflow.common.query;
 
 import java.util.List;
 
@@ -7,6 +7,11 @@ import java.util.List;
  * 
  * Esta classe substitui Page do Spring Data, permitindo que o core
  * trabalhe com resultados paginados sem conhecer frameworks específicos.
+ * 
+ * <p><strong>Nota Arquitetural:</strong> Esta é uma abstração pura (sem dependências Spring)
+ * que pode ser usada pelo módulo core sem violar os princípios da Arquitetura Hexagonal.
+ * Embora esteja no módulo common (que tem dependências Spring), esta classe específica
+ * não possui nenhuma dependência de framework.
  * 
  * @param <T> Tipo dos elementos
  */

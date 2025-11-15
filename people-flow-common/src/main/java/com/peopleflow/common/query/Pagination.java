@@ -1,10 +1,15 @@
-package com.peopleflow.pessoascontratos.core.query;
+package com.peopleflow.common.query;
 
 /**
  * Abstração para paginação de resultados
  * 
  * Esta classe substitui Pageable do Spring Data, permitindo que o core
  * trabalhe com paginação sem conhecer frameworks específicos.
+ * 
+ * <p><strong>Nota Arquitetural:</strong> Esta é uma abstração pura (sem dependências Spring)
+ * que pode ser usada pelo módulo core sem violar os princípios da Arquitetura Hexagonal.
+ * Embora esteja no módulo common (que tem dependências Spring), esta classe específica
+ * não possui nenhuma dependência de framework.
  */
 public record Pagination(
     int page,

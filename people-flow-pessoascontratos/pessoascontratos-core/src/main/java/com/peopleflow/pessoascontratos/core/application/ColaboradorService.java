@@ -9,9 +9,9 @@ import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.SecurityContext;
 import com.peopleflow.pessoascontratos.core.ports.output.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.DomainEventPublisher;
+import com.peopleflow.common.query.PagedResult;
+import com.peopleflow.common.query.Pagination;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
-import com.peopleflow.pessoascontratos.core.query.PagedResult;
-import com.peopleflow.pessoascontratos.core.query.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
