@@ -35,9 +35,10 @@
             <artifactId>organizacao-outbound</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Common Infra (inclui common-core transitivamente) -->
         <dependency>
             <groupId>com.peopleflow</groupId>
-            <artifactId>people-flow-common</artifactId>
+            <artifactId>people-flow-common-infra</artifactId>
             <version>${project.version}</version>
         </dependency>
         

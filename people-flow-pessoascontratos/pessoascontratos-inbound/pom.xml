@@ -20,10 +20,10 @@
             <artifactId>pessoascontratos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Common -->
+        <!-- Common Infra (inclui common-core transitivamente) -->
         <dependency>
             <groupId>com.peopleflow</groupId>
-            <artifactId>people-flow-common</artifactId>
+            <artifactId>people-flow-common-infra</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Spring Web -->

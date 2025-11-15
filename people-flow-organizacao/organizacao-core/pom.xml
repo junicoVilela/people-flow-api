@@ -15,10 +15,10 @@
     <description>Core do domínio Pessoas e Contratos (regras de negócio)</description>
 
     <dependencies>
-        <!-- Common -->
+        <!-- Common Core (abstrações puras) -->
         <dependency>
             <groupId>com.peopleflow</groupId>
-            <artifactId>people-flow-common</artifactId>
+            <artifactId>people-flow-common-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Lombok -->
@@ -49,7 +49,7 @@
                                         <exclude>org.springframework.data:*</exclude>
                                     </excludes>
                                     <searchTransitive>false</searchTransitive>
-                                    <message>❌ ERRO: Módulo core não pode ter dependências Spring DIRETAS! Isso viola a Arquitetura Hexagonal. O core deve ser independente de frameworks. Soluções: Use interfaces (ports) no core, implemente adaptadores nos módulos inbound/outbound, veja ADR-001 para mais detalhes. Nota: Dependências transitivas do common são permitidas temporariamente.</message>
+                                    <message>❌ ERRO: Módulo core não pode ter dependências Spring DIRETAS! Isso viola a Arquitetura Hexagonal. O core deve ser independente de frameworks. Soluções: Use interfaces (ports) no core, implemente adaptadores nos módulos inbound/outbound, veja ADR-001 para mais detalhes.</message>
                                 </bannedDependencies>
                             </rules>
                         </configuration>

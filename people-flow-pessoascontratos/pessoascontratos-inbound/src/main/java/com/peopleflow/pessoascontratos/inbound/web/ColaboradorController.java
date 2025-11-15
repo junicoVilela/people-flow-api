@@ -2,8 +2,8 @@ package com.peopleflow.pessoascontratos.inbound.web;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
-import com.peopleflow.common.query.PagedResult;
-import com.peopleflow.common.query.Pagination;
+import com.peopleflow.common.pagination.PagedResult;
+import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;

@@ -1,8 +1,8 @@
 package com.peopleflow.pessoascontratos.core.ports.input;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
-import com.peopleflow.common.query.PagedResult;
-import com.peopleflow.common.query.Pagination;
+import com.peopleflow.common.pagination.PagedResult;
+import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 
 import java.time.LocalDate;

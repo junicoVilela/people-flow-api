@@ -1,7 +1,7 @@
 package com.peopleflow.organizacao.core.ports.output;
 
-import com.peopleflow.common.query.PagedResult;
-import com.peopleflow.common.query.Pagination;
+import com.peopleflow.common.pagination.PagedResult;
+import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 

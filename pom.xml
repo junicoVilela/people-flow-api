@@ -16,7 +16,8 @@
     <description>People Flow API - Multi-módulo</description>
     
     <modules>
-        <module>people-flow-common</module>
+        <module>people-flow-common-core</module>
+        <module>people-flow-common-infra</module>
         <module>people-flow-pessoascontratos</module>
         <module>people-flow-organizacao</module>
         <module>people-flow-application</module>
