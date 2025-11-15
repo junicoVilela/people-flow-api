@@ -10,11 +10,52 @@
     </parent>
 
     <artifactId>organizacao-core</artifactId>
+    <packaging>jar</packaging>
+    <name>organizacao-core</name>
+    <description>Core do domínio Pessoas e Contratos (regras de negócio)</description>
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <dependencies>
+        <!-- Common -->
+        <dependency>
+            <groupId>com.peopleflow</groupId>
+            <artifactId>people-flow-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Valida que core não tem dependências Spring -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-dependencies</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.springframework:*</exclude>
+                                        <exclude>org.springframework.boot:*</exclude>
+                                        <exclude>org.springframework.data:*</exclude>
+                                    </excludes>
+                                    <searchTransitive>false</searchTransitive>
+                                    <message>❌ ERRO: Módulo core não pode ter dependências Spring DIRETAS! Isso viola a Arquitetura Hexagonal. O core deve ser independente de frameworks. Soluções: Use interfaces (ports) no core, implemente adaptadores nos módulos inbound/outbound, veja ADR-001 para mais detalhes. Nota: Dependências transitivas do common são permitidas temporariamente.</message>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

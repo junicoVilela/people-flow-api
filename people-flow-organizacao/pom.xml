@@ -15,6 +15,7 @@
     
     <modules>
         <module>organizacao-outbound</module>
+        <module>organizacao-core</module>
     </modules>
 </project>
 

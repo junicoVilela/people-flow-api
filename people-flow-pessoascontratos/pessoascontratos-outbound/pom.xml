@@ -14,18 +14,18 @@
     <description>Camada de saída (adaptadores secundários) - JPA</description>
     
     <dependencies>
-        <!-- Core -->
+        <!-- Modulos Pessoas e Contratos -->
         <dependency>
             <groupId>com.peopleflow</groupId>
             <artifactId>pessoascontratos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Common -->
         <dependency>
             <groupId>com.peopleflow</groupId>
             <artifactId>people-flow-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

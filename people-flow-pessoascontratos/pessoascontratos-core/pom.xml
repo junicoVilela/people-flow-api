@@ -11,7 +11,7 @@
     <artifactId>pessoascontratos-core</artifactId>
     <packaging>jar</packaging>
     <name>pessoascontratos-core</name>
-    <description>Core do domínio Pessoas e Contratos (regras de negócio)</description>
+    <description>Core do domínio Organização (regras de negócio)</description>
     
     <dependencies>
         <!-- Common -->
