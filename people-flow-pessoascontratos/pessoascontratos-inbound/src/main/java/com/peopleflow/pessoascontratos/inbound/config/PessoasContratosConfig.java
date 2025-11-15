@@ -2,7 +2,6 @@ package com.peopleflow.pessoascontratos.inbound.config;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.ports.input.SecurityContext;
 import com.peopleflow.pessoascontratos.core.ports.output.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.DomainEventPublisher;
 import com.peopleflow.common.pagination.PagedResult;
@@ -36,9 +35,8 @@ public class PessoasContratosConfig {
     @Bean
     public ColaboradorUseCase colaboradorUseCase(
             ColaboradorRepositoryPort repository,
-            DomainEventPublisher eventPublisher,
-            SecurityContext securityContext) {
-        ColaboradorService service = new ColaboradorService(repository, eventPublisher, securityContext);
+            DomainEventPublisher eventPublisher) {
+        ColaboradorService service = new ColaboradorService(repository, eventPublisher);
         return new TransactionalColaboradorUseCase(service);
     }
     

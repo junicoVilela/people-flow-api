@@ -24,23 +24,7 @@ spring:
     schemas: people_flow_rh
     default-schema: people_flow_rh
 
-# OAuth2 Resource Server - Desabilitado em DEV
-# Para habilitar, descomente e configure:
-# spring:
-#   security:
-#     oauth2:
-#       resourceserver:
-#         jwt:
-#           issuer-uri: http://localhost:8180/realms/peopleflow
-#           jwk-set-uri: http://localhost:8180/realms/peopleflow/protocol/openid-connect/certs
-
-# Configurações da aplicação
-app:
-  security:
-    enabled: false  # Desabilita segurança em desenvolvimento
-
 logging:
   level:
     com.peopleflow: DEBUG
-    org.springframework.security: DEBUG
     org.flywaydb: DEBUG

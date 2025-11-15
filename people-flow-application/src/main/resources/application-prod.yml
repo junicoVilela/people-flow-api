@@ -19,24 +19,9 @@ spring:
     validate-on-migrate: true
     clean-disabled: true
 
-  # OAuth2 Resource Server - HABILITADO EM PRODUÇÃO
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # Configurar com variáveis de ambiente
-          issuer-uri: ${JWT_ISSUER_URI:https://auth.example.com/realms/peopleflow}
-          jwk-set-uri: ${JWT_JWK_SET_URI:https://auth.example.com/realms/peopleflow/protocol/openid-connect/certs}
-
-# Configurações da aplicação
-app:
-  security:
-    enabled: ${SECURITY_ENABLED:true}  # Habilita segurança em produção
-
 logging:
   level:
     com.peopleflow: INFO
-    org.springframework.security: WARN
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql.BasicBinder: WARN
     root: WARN

@@ -1,12 +1,9 @@
 package com.peopleflow.common.config;
 
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -49,15 +46,7 @@ public class OpenApiConfig {
                                 .description("Ambiente de Homologação"),
                         new Server()
                                 .url("https://api.peopleflow.com")
-                                .description("Ambiente de Produção")))
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .components(new Components()
-                        .addSecuritySchemes("Bearer Authentication",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .description("Token JWT para autenticação. Formato: Bearer {token}")));
+                                .description("Ambiente de Produção")));
     }
 
     /**
@@ -84,21 +73,12 @@ public class OpenApiConfig {
             - Validações de regras de negócio
             - Auditoria automática de operações
             
-            ## 🔐 Autenticação
-            
-            A API utiliza autenticação JWT. Para acessar endpoints protegidos:
-            1. Obtenha um token JWT no servidor de autenticação
-            2. Clique no botão "Authorize" (🔒) acima
-            3. Insira o token no formato: `Bearer seu-token-jwt`
-            
             ## 📊 Códigos de Status
             
             - `200 OK` - Requisição bem-sucedida
             - `201 Created` - Recurso criado com sucesso
             - `204 No Content` - Requisição bem-sucedida sem retorno
             - `400 Bad Request` - Erro de validação nos dados
-            - `401 Unauthorized` - Autenticação necessária
-            - `403 Forbidden` - Sem permissão para acessar
             - `404 Not Found` - Recurso não encontrado
             - `409 Conflict` - Conflito (ex: CPF duplicado)
             - `500 Internal Server Error` - Erro interno do servidor

@@ -6,7 +6,6 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.domain.events.*;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
-import com.peopleflow.pessoascontratos.core.ports.input.SecurityContext;
 import com.peopleflow.pessoascontratos.core.ports.output.ColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.DomainEventPublisher;
 import com.peopleflow.common.pagination.PagedResult;
@@ -19,7 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -35,15 +33,12 @@ public class ColaboradorService implements ColaboradorUseCase {
 
     private final ColaboradorRepositoryPort colaboradorRepository;
     private final DomainEventPublisher eventPublisher;
-    private final SecurityContext securityContext;
 
     public ColaboradorService(
             ColaboradorRepositoryPort colaboradorRepository,
-            DomainEventPublisher eventPublisher,
-            SecurityContext securityContext) {
+            DomainEventPublisher eventPublisher) {
         this.colaboradorRepository = colaboradorRepository;
         this.eventPublisher = eventPublisher;
-        this.securityContext = securityContext;
     }
 
     @Override
@@ -52,8 +47,6 @@ public class ColaboradorService implements ColaboradorUseCase {
                  colaborador.getNome(), colaborador.getClienteId(), colaborador.getEmpresaId());
         
         try {
-            validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
-            
             validarUnicidadeParaCriacao(colaborador);
             
             Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
@@ -90,8 +83,6 @@ public class ColaboradorService implements ColaboradorUseCase {
                     log.warn("Colaborador não encontrado: id={}", id);
                     return new ResourceNotFoundException("Colaborador", id);
                 });
-
-        validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
         
         return colaborador;
     }
@@ -100,10 +91,8 @@ public class ColaboradorService implements ColaboradorUseCase {
     public PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination) {
         log.debug("Buscando colaboradores com filtros: page={}, size={}", 
                   pagination.page(), pagination.size());
-
-        ColaboradorFilter filtroComSeguranca = aplicarFiltrosDeSeguranca(filter);
         
-        PagedResult<Colaborador> result = colaboradorRepository.buscarPorFiltros(filtroComSeguranca, pagination);
+        PagedResult<Colaborador> result = colaboradorRepository.buscarPorFiltros(filter, pagination);
         
         log.debug("Encontrados {} colaboradores", result.totalElements());
         return result;
@@ -119,8 +108,6 @@ public class ColaboradorService implements ColaboradorUseCase {
                         String.format("ID do path (%d) diferente do ID do objeto (%d)",
                                 id, colaborador.getId()));
             }
-
-            validarPermissaoDeAcesso(colaborador.getClienteId(), colaborador.getEmpresaId());
 
             Colaborador original = buscarPorId(id);
 
@@ -340,85 +327,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         if (validador.test(valor, idExcluir)) {
             throw new DuplicateResourceException(nomeCampo, valor);
         }
-    }
-
-    private void validarPermissaoDeAcesso(Long clienteId, Long empresaId) {
-        if (securityContext.isGlobalAdmin()) {
-            return;
-        }
-        
-        if (clienteId != null && !securityContext.canAccessCliente(clienteId)) {
-            log.warn("Acesso negado: usuário {} tentou acessar clienteId={}", 
-                     securityContext.getCurrentUsername(), clienteId);
-            throw new BusinessException(
-                "ACESSO_NEGADO",
-                String.format("Você não tem permissão para acessar dados do cliente %d", clienteId)
-            );
-        }
-        
-        if (empresaId != null && !securityContext.canAccessEmpresa(empresaId)) {
-            log.warn("Acesso negado: usuário {} tentou acessar empresaId={}", 
-                     securityContext.getCurrentUsername(), empresaId);
-            throw new BusinessException(
-                "ACESSO_NEGADO",
-                String.format("Você não tem permissão para acessar dados da empresa %d", empresaId)
-            );
-        }
-    }
-
-    private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
-        if (securityContext.isGlobalAdmin()) {
-            return filter;
-        }
-        
-        Set<Long> allowedClienteIds = securityContext.getAllowedClienteIds();
-        Set<Long> allowedEmpresaIds = securityContext.getAllowedEmpresaIds();
-        
-        if (allowedClienteIds.isEmpty() && !securityContext.isGlobalAdmin()) {
-            log.warn("Usuário {} não tem clienteIds permitidos no token", 
-                     securityContext.getCurrentUsername());
-            return ColaboradorFilter.builder()
-                .clienteId(-1L) // ID inexistente
-                .build();
-        }
-        
-        if (allowedEmpresaIds.isEmpty() && !securityContext.isGlobalAdmin()) {
-            log.warn("Usuário {} não tem empresaIds permitidos no token", 
-                     securityContext.getCurrentUsername());
-            return ColaboradorFilter.builder()
-                .empresaId(-1L) // ID inexistente
-                .build();
-        }
-        
-        ColaboradorFilter.ColaboradorFilterBuilder builder = filter != null
-            ? filter.toBuilder() 
-            : ColaboradorFilter.builder();
-        
-        if (filter != null && filter.getClienteId() != null) {
-            if (!allowedClienteIds.contains(filter.getClienteId())) {
-                throw new BusinessException(
-                    "ACESSO_NEGADO",
-                    String.format("Você não tem permissão para filtrar por clienteId=%d", 
-                                  filter.getClienteId())
-                );
-            }
-        } else if (!allowedClienteIds.isEmpty()) {
-            builder.clienteId(allowedClienteIds.iterator().next());
-        }
-        
-        if (filter != null && filter.getEmpresaId() != null) {
-            if (!allowedEmpresaIds.contains(filter.getEmpresaId())) {
-                throw new BusinessException(
-                    "ACESSO_NEGADO",
-                    String.format("Você não tem permissão para filtrar por empresaId=%d", 
-                                  filter.getEmpresaId())
-                );
-            }
-        } else if (!allowedEmpresaIds.isEmpty()) {
-            builder.empresaId(allowedEmpresaIds.iterator().next());
-        }
-        
-        return builder.build();
     }
 }
 
