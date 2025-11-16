@@ -83,7 +83,7 @@ public class Colaborador {
             throw new BusinessException("EMAIL_OBRIGATORIO", "Email é obrigatório");
         }
 
-        /*if (clienteId == null) {
+        if (clienteId == null) {
             throw new BusinessException("CLIENTE_ID_OBRIGATORIO", 
                 "Cliente ID é obrigatório");
         }
@@ -91,7 +91,7 @@ public class Colaborador {
         if (empresaId == null) {
             throw new BusinessException("EMPRESA_ID_OBRIGATORIO", 
                 "Empresa ID é obrigatória");
-        }*/
+        }
 
         if (dataDemissao != null && dataAdmissao != null && dataDemissao.isBefore(dataAdmissao)) {
             throw new BusinessException("DATA_DEMISSAO_INVALIDA", 
@@ -118,14 +118,14 @@ public class Colaborador {
                 "Data de demissão não pode ser anterior à data de admissão");
         }
         
-        if (status.isDemitido()) {
+        if (isDemitido()) {
             throw new BusinessException("COLABORADOR_JA_DEMITIDO", 
                 "Colaborador já está demitido");
         }
     }
 
     public Colaborador ativar() {
-        if (status.isExcluido()) {
+        if (isExcluido()) {
             throw new BusinessException("COLABORADOR_EXCLUIDO", 
                 "Não é possível ativar colaborador excluído");
         }
@@ -143,7 +143,7 @@ public class Colaborador {
     }
 
     public Colaborador excluir() {
-        if (status.isExcluido()) {
+        if (isExcluido()) {
             throw new BusinessException("COLABORADOR_JA_EXCLUIDO", 
                 "Colaborador já está excluído");
         }
@@ -162,10 +162,6 @@ public class Colaborador {
             .matricula(matricula)
             .dataAdmissao(dataAdmissao)
             .build();
-    }
-
-    public boolean isAtivo() {
-        return status.isAtivo();
     }
 
     public boolean isDemitido() {

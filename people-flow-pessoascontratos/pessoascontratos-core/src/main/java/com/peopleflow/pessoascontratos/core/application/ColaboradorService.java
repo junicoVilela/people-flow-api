@@ -21,12 +21,6 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-/**
- * Serviço de casos de uso para Colaborador
- * 
- * Implementa as regras de negócio do domínio Colaborador.
- * Este serviço é puro e não depende de frameworks específicos.
- */
 public class ColaboradorService implements ColaboradorUseCase {
     
     private static final Logger log = LoggerFactory.getLogger(ColaboradorService.class);
@@ -111,8 +105,18 @@ public class ColaboradorService implements ColaboradorUseCase {
 
             Colaborador original = buscarPorId(id);
 
-            Colaborador colaboradorParaAtualizar = colaborador.toBuilder()
+            Colaborador colaboradorParaAtualizar = original.atualizar(
+                    colaborador.getNome(),
+                    colaborador.getCpf(),
+                    colaborador.getEmail(),
+                    colaborador.getMatricula(),
+                    colaborador.getDataAdmissao()
+            ).toBuilder()
                     .id(id)
+                    .clienteId(colaborador.getClienteId())
+                    .empresaId(colaborador.getEmpresaId())
+                    .departamentoId(colaborador.getDepartamentoId())
+                    .centroCustoId(colaborador.getCentroCustoId())
                     .build();
 
             validarUnicidadeParaAtualizacao(colaboradorParaAtualizar, id);
@@ -197,7 +201,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         Colaborador colaboradorAtivado = colaborador.ativar();
         Colaborador resultado = colaboradorRepository.salvar(colaboradorAtivado);
         
-        // Publica evento de domínio
         eventPublisher.publish(
             new ColaboradorAtivado(
                 resultado.getId(),
