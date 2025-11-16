@@ -12,4 +12,6 @@ public interface EmpresaRepositoryPort {
     Empresa salvar(Empresa colaborador);
     Optional<Empresa> buscarPorId(Long id);
     PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination);
+
+    boolean existePorCNPJ(String cnpj);
 }

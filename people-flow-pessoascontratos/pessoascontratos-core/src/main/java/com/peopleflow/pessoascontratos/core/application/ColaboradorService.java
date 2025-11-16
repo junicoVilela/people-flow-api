@@ -11,6 +11,7 @@ import com.peopleflow.pessoascontratos.core.ports.output.DomainEventPublisher;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,19 +22,13 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+@RequiredArgsConstructor
 public class ColaboradorService implements ColaboradorUseCase {
     
     private static final Logger log = LoggerFactory.getLogger(ColaboradorService.class);
 
     private final ColaboradorRepositoryPort colaboradorRepository;
     private final DomainEventPublisher eventPublisher;
-
-    public ColaboradorService(
-            ColaboradorRepositoryPort colaboradorRepository,
-            DomainEventPublisher eventPublisher) {
-        this.colaboradorRepository = colaboradorRepository;
-        this.eventPublisher = eventPublisher;
-    }
 
     @Override
     public Colaborador criar(Colaborador colaborador) {

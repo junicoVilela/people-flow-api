@@ -9,9 +9,9 @@ import java.time.LocalDate;
 
 public interface ColaboradorUseCase {
     Colaborador criar(Colaborador colaborador);
+    Colaborador atualizar(Long id, Colaborador colaborador);
     Colaborador buscarPorId(Long id);
     PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination);
-    Colaborador atualizar(Long id, Colaborador colaborador);
     Colaborador demitir(Long id, LocalDate dataDemissao);
     Colaborador ativar(Long id);
     Colaborador inativar(Long id);

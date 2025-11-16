@@ -43,6 +43,9 @@ public class EmpresaEntity extends AuditableEntity {
     @Column(name = "INSCRICAO_ESTADUAL")
     private String inscricaoEstadual;
 
+    @Column(name = "STATUS", nullable = false)
+    private String status;
+
     @Column(name = "CLIENTE_ID", nullable = false)
     private Long clienteId;
 }
