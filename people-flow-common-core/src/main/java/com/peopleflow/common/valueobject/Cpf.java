@@ -1,12 +1,16 @@
-package com.peopleflow.pessoascontratos.core.valueobject;
+package com.peopleflow.common.valueobject;
 
 import com.peopleflow.common.exception.BusinessException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Objects;
-
+/**
+ * Value Object para CPF (Cadastro de Pessoa Física)
+ * 
+ * Encapsula validação e formatação de CPF brasileiro.
+ * Este é um value object genérico que pode ser reutilizado em qualquer módulo.
+ */
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -68,4 +72,5 @@ public class Cpf {
                cpf.substring(6, 9) + "-" +
                cpf.substring(9, 11);
     }
-} 
+}
+

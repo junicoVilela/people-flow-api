@@ -1,13 +1,18 @@
-package com.peopleflow.pessoascontratos.core.valueobject;
+package com.peopleflow.common.valueobject;
 
 import com.peopleflow.common.exception.BusinessException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
+/**
+ * Value Object para Email
+ * 
+ * Encapsula validação e formatação de email.
+ * Este é um value object genérico que pode ser reutilizado em qualquer módulo.
+ */
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -34,4 +39,5 @@ public class Email {
     private boolean isValidEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches();
     }
-} 
+}
+

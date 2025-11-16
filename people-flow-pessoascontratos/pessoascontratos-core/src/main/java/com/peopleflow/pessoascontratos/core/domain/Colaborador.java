@@ -1,8 +1,8 @@
 package com.peopleflow.pessoascontratos.core.domain;
 
 import com.peopleflow.common.exception.BusinessException;
-import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
-import com.peopleflow.pessoascontratos.core.valueobject.Email;
+import com.peopleflow.common.valueobject.Cpf;
+import com.peopleflow.common.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

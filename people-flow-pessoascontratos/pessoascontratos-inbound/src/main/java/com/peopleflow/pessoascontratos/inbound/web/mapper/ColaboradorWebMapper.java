@@ -2,9 +2,9 @@ package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.common.pagination.PagedResult;
+import com.peopleflow.common.valueobject.Cpf;
+import com.peopleflow.common.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
-import com.peopleflow.pessoascontratos.core.valueobject.Cpf;
-import com.peopleflow.pessoascontratos.core.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.valueobject.StatusColaborador;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
