@@ -68,11 +68,6 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
     }
 
     @Override
-    public void deletar(Long id) {
-        repository.deleteById(id);
-    }
-
-    @Override
     public boolean existePorCpf(String cpf) {
         return repository.existsByCpf(cpf);
     }

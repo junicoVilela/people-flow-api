@@ -12,5 +12,4 @@ public interface EmpresaRepositoryPort {
     Empresa salvar(Empresa colaborador);
     Optional<Empresa> buscarPorId(Long id);
     PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination);
-    void deletar(Long id);
 }

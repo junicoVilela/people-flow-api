@@ -666,7 +666,6 @@ Gerencia colaboradores, contratos e informações relacionadas.
 - `GET /api/v1/colaboradores/{id}` - Buscar por ID
 - `GET /api/v1/colaboradores` - Listar com filtros e paginação
 - `PUT /api/v1/colaboradores/{id}` - Atualizar
-- `DELETE /api/v1/colaboradores/{id}` - Deletar (hard delete)
 - `PATCH /api/v1/colaboradores/{id}/demitir` - Demitir
 - `PATCH /api/v1/colaboradores/{id}/ativar` - Ativar
 - `PATCH /api/v1/colaboradores/{id}/inativar` - Inativar

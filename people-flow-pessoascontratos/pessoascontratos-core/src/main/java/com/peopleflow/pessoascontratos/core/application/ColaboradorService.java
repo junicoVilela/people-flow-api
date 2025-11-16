@@ -169,17 +169,6 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     @Override
-    public void deletar(Long id) {
-        log.warn("Deletando colaborador (hard delete): id={}", id);
-        
-        buscarPorId(id);
-        
-        colaboradorRepository.deletar(id);
-        
-        log.info("Colaborador deletado: id={}", id);
-    }
-
-    @Override
     public Colaborador demitir(Long id, LocalDate dataDemissao) {
         log.info("Iniciando demissão de colaborador: id={}, dataDemissao={}", id, dataDemissao);
         

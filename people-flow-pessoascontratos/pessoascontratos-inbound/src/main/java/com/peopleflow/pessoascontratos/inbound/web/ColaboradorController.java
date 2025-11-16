@@ -95,13 +95,6 @@ public class ColaboradorController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar colaborador", description = "Remove permanentemente um colaborador do sistema")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        colaboradorUseCase.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @PatchMapping("/{id}/demitir")
     @Operation(summary = "Demitir colaborador", description = "Registra a demissão de um colaborador")
     public ResponseEntity<ColaboradorResponse> demitir(

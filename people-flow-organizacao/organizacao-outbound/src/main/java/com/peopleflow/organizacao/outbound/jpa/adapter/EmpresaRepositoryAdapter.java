@@ -33,9 +33,4 @@ public class EmpresaRepositoryAdapter implements EmpresaRepositoryPort {
     public PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination) {
         return null;
     }
-
-    @Override
-    public void deletar(Long id) {
-
-    }
 }

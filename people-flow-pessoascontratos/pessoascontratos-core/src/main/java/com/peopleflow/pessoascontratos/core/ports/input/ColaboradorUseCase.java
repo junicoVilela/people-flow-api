@@ -12,7 +12,6 @@ public interface ColaboradorUseCase {
     Colaborador buscarPorId(Long id);
     PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination);
     Colaborador atualizar(Long id, Colaborador colaborador);
-    void deletar(Long id);
     Colaborador demitir(Long id, LocalDate dataDemissao);
     Colaborador ativar(Long id);
     Colaborador inativar(Long id);

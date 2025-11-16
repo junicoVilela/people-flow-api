@@ -79,12 +79,6 @@ public class PessoasContratosConfig {
         
         @Override
         @Transactional
-        public void deletar(Long id) {
-            delegate.deletar(id);
-        }
-        
-        @Override
-        @Transactional
         public Colaborador demitir(Long id, LocalDate dataDemissao) {
             return delegate.demitir(id, dataDemissao);
         }

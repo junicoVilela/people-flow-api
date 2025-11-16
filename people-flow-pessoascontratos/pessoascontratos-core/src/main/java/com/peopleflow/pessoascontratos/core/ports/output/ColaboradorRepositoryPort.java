@@ -11,7 +11,6 @@ public interface ColaboradorRepositoryPort {
     Colaborador salvar(Colaborador colaborador);
     Optional<Colaborador> buscarPorId(Long id);
     PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination);
-    void deletar(Long id);
     
     boolean existePorCpf(String cpf);
     boolean existePorEmail(String email);
