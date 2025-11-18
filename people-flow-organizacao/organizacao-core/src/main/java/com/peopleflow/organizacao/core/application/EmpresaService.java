@@ -1,6 +1,8 @@
 package com.peopleflow.organizacao.core.application;
 
+import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.DuplicateResourceException;
+import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
@@ -11,6 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
@@ -18,7 +24,7 @@ public class EmpresaService implements EmpresaUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(EmpresaService.class);
 
-    private final EmpresaRepositoryPort empresaRepositoryPort;
+    private final EmpresaRepositoryPort empresaRepository;
 
 
     @Override
@@ -32,7 +38,7 @@ public class EmpresaService implements EmpresaUseCase {
 
         validarUnicidadeCriacao(empresa);
 
-        Empresa empresaCriar = empresaRepositoryPort.salvar(empresa);
+        Empresa empresaCriar = empresaRepository.salvar(empresa);
 
         log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}, status={}, clienteId={}",
                 empresa.getNome(),
@@ -45,30 +51,114 @@ public class EmpresaService implements EmpresaUseCase {
     }
 
     @Override
-    public Empresa atualizar(Long id, Empresa colaborador) {
-        return null;
+    public Empresa atualizar(Long id, Empresa empresa) {
+        log.info("Iniciando atualização de empresa: id={}", id);
+
+        try {
+            if (empresa.getId() != null && !empresa.getId().equals(id)) {
+                throw new BusinessException("ID_MISMATCH",
+                        String.format("ID do path (%d) diferente do ID do objeto (%d)",
+                                id, empresa.getId()));
+            }
+
+            Empresa original = buscarPorId(id);
+
+            Empresa empresaAtualizar = original.atualizar(
+                    empresa.getNome(),
+                    empresa.getCnpj(),
+                    empresa.getInscricaoEstadual(),
+                    empresa.getClienteId()
+                    ).toBuilder()
+                    .id(id)
+                    .build();
+
+            validarUnicidadeParaAtualizacao(empresaAtualizar, id);
+
+            Empresa empresaAtualizado = empresaRepository.salvar(empresaAtualizar);
+
+            List<String> camposAlterados = detectarCamposAlterados(original, empresaAtualizado);
+
+            log.info("Empresa atualizado com sucesso: id={}, nome={}, cnpj={}, camposAlterados={}",
+                    id, empresa.getNome(), empresa.getCnpj(), camposAlterados);
+
+            return empresaAtualizado;
+        } catch (BusinessException e) {
+            log.warn("Erro ao atualizar empresa: id={}, erro={}", id, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao atualizar empresa: id={}", id, e);
+            throw e;
+        }
+
     }
 
     @Override
     public Empresa buscarPorId(Long id) {
-        return null;
+        log.debug("Buscando empresa por ID: {}", id);
+        Empresa empresa = empresaRepository.buscarPorId(id)
+                .orElseThrow(() -> {
+                    log.warn("Empresa não encontrado: id={}", id);
+                    return new ResourceNotFoundException("Empresa", id);
+                });
+
+        return empresa;
     }
 
     @Override
     public PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination) {
-        return null;
+        log.debug("Buscando empresas com filtros: page={}, size={}",
+                pagination.page(), pagination.size());
+
+        PagedResult<Empresa> result = empresaRepository.buscarPorFiltros(filter, pagination);
+
+        log.debug("Encontrados {} empresas", result.totalElements());
+        return result;
+    }
+
+    @Override
+    public Empresa ativar(Long id) {
+        log.info("Ativando empresa: id={}", id);
+
+        Empresa empresa = buscarPorId(id);
+        Empresa empresaAtivado = empresa.ativar();
+        Empresa resultado = empresaRepository.salvar(empresaAtivado);
+
+        log.info("Empresa ativado com sucesso: id={}, nome={}", id, resultado.getNome());
+
+        return resultado;
+    }
+
+    @Override
+    public Empresa inativar(Long id) {
+        log.info("Inativando empresa: id={}", id);
+
+        Empresa empresa = buscarPorId(id);
+        Empresa empresaInativado = empresa.inativar();
+        Empresa resultado = empresaRepository.salvar(empresaInativado);
+
+        log.info("Empresa inativado com sucesso: id={}, nome={}", id, resultado.getNome());
+
+        return resultado;
     }
 
     @Override
     public Empresa excluir(Long id) {
-        return null;
+        log.info("Excluindo empresa (soft delete): id={}", id);
+
+        Empresa empresa = buscarPorId(id);
+        Empresa empresaExcluido = empresa.excluir();
+        Empresa resultado = empresaRepository.salvar(empresaExcluido);
+
+        log.info("Empresa excluído com sucesso: id={}, nome={}", id, resultado.getNome());
+
+        return resultado;
     }
 
     private void validarUnicidadeCriacao(Empresa empresa) {
         validarUnicidadeCampo(
                 "CNPJ",
                 empresa.getCnpj(),
-                empresaRepositoryPort::existePorCNPJ
+                empresaRepository::existePorCnpj
         );
     }
 
@@ -79,6 +169,50 @@ public class EmpresaService implements EmpresaUseCase {
 
         if (validador.test(valor)) {
             throw new DuplicateResourceException(nomeCampo, valor);
+        }
+    }
+
+    private void validarUnicidadeCampoComExclusao(
+            String nomeCampo,
+            String valor,
+            Long idExcluir,
+            BiPredicate<String, Long> validador) {
+
+        if (validador.test(valor, idExcluir)) {
+            throw new DuplicateResourceException(nomeCampo, valor);
+        }
+    }
+
+    private void validarUnicidadeParaAtualizacao(Empresa empresa, Long id) {
+        validarUnicidadeCampoComExclusao(
+                "CNPJ",
+                empresa.getCnpj(),
+                id,
+                empresaRepository::existePorCnpjExcluindoId
+        );
+
+        validarUnicidadeCampoComExclusao(
+                "INSCRICAO_ESTADUAL",
+                empresa.getInscricaoEstadual(),
+                id,
+                empresaRepository::existePorCnpjExcluindoId
+        );
+    }
+
+    private List<String> detectarCamposAlterados(Empresa original, Empresa atualizado) {
+        List<String> camposAlterados = new ArrayList<>();
+
+        compararEAdicionar(camposAlterados, "nome", original.getNome(), original.getNome());
+        compararEAdicionar(camposAlterados, "cnpj", original.getCnpj(), original.getCnpj());
+        compararEAdicionar(camposAlterados, "inscricaoEstadual", original.getInscricaoEstadual(), original.getInscricaoEstadual());
+        compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
+
+        return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
+    }
+
+    private void compararEAdicionar(List<String> lista, String nomeCampo, Object valorOriginal, Object valorAtualizado) {
+        if (!Objects.equals(valorOriginal, valorAtualizado)) {
+            lista.add(nomeCampo);
         }
     }
 }

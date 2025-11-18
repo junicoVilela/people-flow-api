@@ -14,4 +14,6 @@ public interface EmpresaUseCase {
     Empresa buscarPorId(Long id);
     PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination);
     Empresa excluir(Long id);
+    Empresa ativar(Long id);
+    Empresa inativar(Long id);
 }

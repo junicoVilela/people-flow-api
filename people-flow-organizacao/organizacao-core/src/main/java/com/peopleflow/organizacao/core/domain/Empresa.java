@@ -60,10 +60,19 @@ public class Empresa {
 
     }
 
+    public Empresa atualizar(String nome, String cnpj, String inscricaoEstadual, Long clienteId) {
+        return this.toBuilder()
+                .nome(nome)
+                .cnpj(cnpj)
+                .inscricaoEstadual(inscricaoEstadual)
+                .clienteId(clienteId)
+                .build();
+    }
+
     public Empresa ativar() {
         if (isExcluido()) {
-            throw new BusinessException("EMPRESA_EXCLUIDA",
-                    "Não é possível ativar empresa excluída");
+            throw new BusinessException("EMPRESA_EXCLUIDO",
+                    "Não é possível ativar empresa excluído");
         }
 
         return this.toBuilder()
@@ -72,11 +81,6 @@ public class Empresa {
     }
 
     public Empresa inativar() {
-        if (isExcluido()) {
-            throw new BusinessException("EMPRESA_EXCLUIDA",
-                    "Não é possível inativar empresa excluída");
-        }
-
         return this.toBuilder()
                 .status(StatusEmpresa.INATIVO)
                 .build();

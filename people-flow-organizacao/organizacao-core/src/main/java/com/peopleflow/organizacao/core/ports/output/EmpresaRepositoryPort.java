@@ -13,5 +13,7 @@ public interface EmpresaRepositoryPort {
     Optional<Empresa> buscarPorId(Long id);
     PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination);
 
-    boolean existePorCNPJ(String cnpj);
+    boolean existePorCnpj(String cnpj);
+
+    boolean existePorCnpjExcluindoId(String cpf, Long id);
 }

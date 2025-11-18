@@ -154,13 +154,18 @@ public class Colaborador {
     }
 
 
-    public Colaborador atualizar(String nome, Cpf cpf, Email email, String matricula, LocalDate dataAdmissao) {
+    public Colaborador atualizar(String nome, Cpf cpf, Email email, String matricula, LocalDate dataAdmissao,
+                                  Long clienteId, Long empresaId, Long departamentoId, Long centroCustoId) {
         return this.toBuilder()
             .nome(nome)
             .cpf(cpf)
             .email(email)
             .matricula(matricula)
             .dataAdmissao(dataAdmissao)
+            .clienteId(clienteId)
+            .empresaId(empresaId)
+            .departamentoId(departamentoId)
+            .centroCustoId(centroCustoId)
             .build();
     }
 

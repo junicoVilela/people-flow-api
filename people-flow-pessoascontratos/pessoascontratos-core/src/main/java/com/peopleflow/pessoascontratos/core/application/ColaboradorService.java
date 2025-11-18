@@ -105,13 +105,13 @@ public class ColaboradorService implements ColaboradorUseCase {
                     colaborador.getCpf(),
                     colaborador.getEmail(),
                     colaborador.getMatricula(),
-                    colaborador.getDataAdmissao()
+                    colaborador.getDataAdmissao(),
+                    colaborador.getClienteId(),
+                    colaborador.getEmpresaId(),
+                    colaborador.getDepartamentoId(),
+                    colaborador.getCentroCustoId()
             ).toBuilder()
                     .id(id)
-                    .clienteId(colaborador.getClienteId())
-                    .empresaId(colaborador.getEmpresaId())
-                    .departamentoId(colaborador.getDepartamentoId())
-                    .centroCustoId(colaborador.getCentroCustoId())
                     .build();
 
             validarUnicidadeParaAtualizacao(colaboradorParaAtualizar, id);
@@ -146,17 +146,15 @@ public class ColaboradorService implements ColaboradorUseCase {
     private List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
         List<String> camposAlterados = new ArrayList<>();
 
-        compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
-        compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
-        compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
-        compararEAdicionar(camposAlterados, "centroCustoId", original.getCentroCustoId(), atualizado.getCentroCustoId());
         compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
         compararEAdicionar(camposAlterados, "cpf", original.getCpf(), atualizado.getCpf());
         compararEAdicionar(camposAlterados, "matricula", original.getMatricula(), atualizado.getMatricula());
         compararEAdicionar(camposAlterados, "email", original.getEmail(), atualizado.getEmail());
         compararEAdicionar(camposAlterados, "dataAdmissao", original.getDataAdmissao(), atualizado.getDataAdmissao());
-        compararEAdicionar(camposAlterados, "dataDemissao", original.getDataDemissao(), atualizado.getDataDemissao());
-        compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
+        compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
+        compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
+        compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
+        compararEAdicionar(camposAlterados, "centroCustoId", original.getCentroCustoId(), atualizado.getCentroCustoId());
         
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }
