@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.application;
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
+import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.domain.events.*;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
@@ -18,9 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 public class ColaboradorService implements ColaboradorUseCase {
@@ -146,23 +144,17 @@ public class ColaboradorService implements ColaboradorUseCase {
     private List<String> detectarCamposAlterados(Colaborador original, Colaborador atualizado) {
         List<String> camposAlterados = new ArrayList<>();
 
-        compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
-        compararEAdicionar(camposAlterados, "cpf", original.getCpf(), atualizado.getCpf());
-        compararEAdicionar(camposAlterados, "matricula", original.getMatricula(), atualizado.getMatricula());
-        compararEAdicionar(camposAlterados, "email", original.getEmail(), atualizado.getEmail());
-        compararEAdicionar(camposAlterados, "dataAdmissao", original.getDataAdmissao(), atualizado.getDataAdmissao());
-        compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
-        compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
-        compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
-        compararEAdicionar(camposAlterados, "centroCustoId", original.getCentroCustoId(), atualizado.getCentroCustoId());
+        ServiceUtils.compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
+        ServiceUtils.compararEAdicionar(camposAlterados, "cpf", original.getCpf(), atualizado.getCpf());
+        ServiceUtils.compararEAdicionar(camposAlterados, "matricula", original.getMatricula(), atualizado.getMatricula());
+        ServiceUtils.compararEAdicionar(camposAlterados, "email", original.getEmail(), atualizado.getEmail());
+        ServiceUtils.compararEAdicionar(camposAlterados, "dataAdmissao", original.getDataAdmissao(), atualizado.getDataAdmissao());
+        ServiceUtils.compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
+        ServiceUtils.compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
+        ServiceUtils.compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
+        ServiceUtils.compararEAdicionar(camposAlterados, "centroCustoId", original.getCentroCustoId(), atualizado.getCentroCustoId());
         
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
-    }
-
-    private void compararEAdicionar(List<String> lista, String nomeCampo, Object valorOriginal, Object valorAtualizado) {
-        if (!Objects.equals(valorOriginal, valorAtualizado)) {
-            lista.add(nomeCampo);
-        }
     }
 
     @Override
@@ -247,20 +239,20 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     private void validarUnicidadeParaCriacao(Colaborador colaborador) {
-        validarUnicidadeCampo(
+        ServiceUtils.validarUnicidadeCampo(
             "CPF",
             colaborador.getCpf().getValorNumerico(),
             colaboradorRepository::existePorCpf
         );
         
-        validarUnicidadeCampo(
+        ServiceUtils.validarUnicidadeCampo(
             "Email",
             colaborador.getEmail().getValor(),
             colaboradorRepository::existePorEmail
         );
         
         if (colaborador.getMatricula() != null && !colaborador.getMatricula().trim().isEmpty()) {
-            validarUnicidadeCampo(
+            ServiceUtils.validarUnicidadeCampo(
                 "Matrícula",
                 colaborador.getMatricula(),
                 colaboradorRepository::existePorMatricula
@@ -269,14 +261,14 @@ public class ColaboradorService implements ColaboradorUseCase {
     }
 
     private void validarUnicidadeParaAtualizacao(Colaborador colaborador, Long id) {
-        validarUnicidadeCampoComExclusao(
+        ServiceUtils.validarUnicidadeCampoComExclusao(
             "CPF",
             colaborador.getCpf().getValorNumerico(),
             id,
             colaboradorRepository::existePorCpfExcluindoId
         );
         
-        validarUnicidadeCampoComExclusao(
+        ServiceUtils.validarUnicidadeCampoComExclusao(
             "Email",
             colaborador.getEmail().getValor(),
             id,
@@ -284,33 +276,12 @@ public class ColaboradorService implements ColaboradorUseCase {
         );
         
         if (colaborador.getMatricula() != null && !colaborador.getMatricula().trim().isEmpty()) {
-            validarUnicidadeCampoComExclusao(
+            ServiceUtils.validarUnicidadeCampoComExclusao(
                 "Matrícula",
                 colaborador.getMatricula(),
                 id,
                 colaboradorRepository::existePorMatriculaExcluindoId
             );
-        }
-    }
-
-    private void validarUnicidadeCampo(
-            String nomeCampo, 
-            String valor, 
-            Predicate<String> validador) {
-        
-        if (validador.test(valor)) {
-            throw new DuplicateResourceException(nomeCampo, valor);
-        }
-    }
-
-    private void validarUnicidadeCampoComExclusao(
-            String nomeCampo, 
-            String valor, 
-            Long idExcluir,
-            BiPredicate<String, Long> validador) {
-        
-        if (validador.test(valor, idExcluir)) {
-            throw new DuplicateResourceException(nomeCampo, valor);
         }
     }
 }

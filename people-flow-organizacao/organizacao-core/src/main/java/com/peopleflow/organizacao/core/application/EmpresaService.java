@@ -3,6 +3,7 @@ package com.peopleflow.organizacao.core.application;
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
+import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
@@ -15,9 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 public class EmpresaService implements EmpresaUseCase {
@@ -155,43 +153,22 @@ public class EmpresaService implements EmpresaUseCase {
     }
 
     private void validarUnicidadeCriacao(Empresa empresa) {
-        validarUnicidadeCampo(
+        ServiceUtils.validarUnicidadeCampo(
                 "CNPJ",
                 empresa.getCnpj(),
                 empresaRepository::existePorCnpj
         );
     }
 
-    private void validarUnicidadeCampo(
-            String nomeCampo,
-            String valor,
-            Predicate<String> validador) {
-
-        if (validador.test(valor)) {
-            throw new DuplicateResourceException(nomeCampo, valor);
-        }
-    }
-
-    private void validarUnicidadeCampoComExclusao(
-            String nomeCampo,
-            String valor,
-            Long idExcluir,
-            BiPredicate<String, Long> validador) {
-
-        if (validador.test(valor, idExcluir)) {
-            throw new DuplicateResourceException(nomeCampo, valor);
-        }
-    }
-
     private void validarUnicidadeParaAtualizacao(Empresa empresa, Long id) {
-        validarUnicidadeCampoComExclusao(
+        ServiceUtils.validarUnicidadeCampoComExclusao(
                 "CNPJ",
                 empresa.getCnpj(),
                 id,
                 empresaRepository::existePorCnpjExcluindoId
         );
 
-        validarUnicidadeCampoComExclusao(
+        ServiceUtils.validarUnicidadeCampoComExclusao(
                 "INSCRICAO_ESTADUAL",
                 empresa.getInscricaoEstadual(),
                 id,
@@ -202,17 +179,11 @@ public class EmpresaService implements EmpresaUseCase {
     private List<String> detectarCamposAlterados(Empresa original, Empresa atualizado) {
         List<String> camposAlterados = new ArrayList<>();
 
-        compararEAdicionar(camposAlterados, "nome", original.getNome(), original.getNome());
-        compararEAdicionar(camposAlterados, "cnpj", original.getCnpj(), original.getCnpj());
-        compararEAdicionar(camposAlterados, "inscricaoEstadual", original.getInscricaoEstadual(), original.getInscricaoEstadual());
-        compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
+        ServiceUtils.compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
+        ServiceUtils.compararEAdicionar(camposAlterados, "cnpj", original.getCnpj(), atualizado.getCnpj());
+        ServiceUtils.compararEAdicionar(camposAlterados, "inscricaoEstadual", original.getInscricaoEstadual(), atualizado.getInscricaoEstadual());
+        ServiceUtils.compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
-    }
-
-    private void compararEAdicionar(List<String> lista, String nomeCampo, Object valorOriginal, Object valorAtualizado) {
-        if (!Objects.equals(valorOriginal, valorAtualizado)) {
-            lista.add(nomeCampo);
-        }
     }
 }
