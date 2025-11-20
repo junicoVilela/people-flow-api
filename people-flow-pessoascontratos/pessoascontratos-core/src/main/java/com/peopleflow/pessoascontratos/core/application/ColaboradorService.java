@@ -1,7 +1,6 @@
 package com.peopleflow.pessoascontratos.core.application;
 
 import com.peopleflow.common.exception.BusinessException;
-import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;

@@ -1,7 +1,6 @@
 package com.peopleflow.organizacao.core.application;
 
 import com.peopleflow.common.exception.BusinessException;
-import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.common.pagination.PagedResult;
@@ -155,7 +154,7 @@ public class EmpresaService implements EmpresaUseCase {
     private void validarUnicidadeCriacao(Empresa empresa) {
         ServiceUtils.validarUnicidadeCampo(
                 "CNPJ",
-                empresa.getCnpj(),
+                empresa.getCnpj().getValor(),
                 empresaRepository::existePorCnpj
         );
     }
@@ -163,7 +162,7 @@ public class EmpresaService implements EmpresaUseCase {
     private void validarUnicidadeParaAtualizacao(Empresa empresa, Long id) {
         ServiceUtils.validarUnicidadeCampoComExclusao(
                 "CNPJ",
-                empresa.getCnpj(),
+                empresa.getCnpj().getValor(),
                 id,
                 empresaRepository::existePorCnpjExcluindoId
         );

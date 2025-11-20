@@ -15,7 +15,7 @@ public class EmpresaRepositoryAdapter implements EmpresaRepositoryPort {
 
     private final EmpresaJpaRepository empresaJpaRepository;
 
-    public EmpresaRepositoryAdapter(EmpresaJpaRepository empresaJpaRepository) {
+    public EmpresaRepositoryAdapter(final EmpresaJpaRepository empresaJpaRepository) {
         this.empresaJpaRepository = empresaJpaRepository;
     }
 
@@ -32,5 +32,15 @@ public class EmpresaRepositoryAdapter implements EmpresaRepositoryPort {
     @Override
     public PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination) {
         return null;
+    }
+
+    @Override
+    public boolean existePorCnpj(String cnpj) {
+        return false;
+    }
+
+    @Override
+    public boolean existePorCnpjExcluindoId(String cpf, Long id) {
+        return false;
     }
 }
