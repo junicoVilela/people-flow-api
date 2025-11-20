@@ -16,15 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 /**
- * Configuração do módulo Pessoas e Contratos
- * 
+ * Configuração para o agregado de Colaboradores.
+ *
  * Registra os beans do core e configura transações.
  * Esta configuração permite que o core seja puro, sem anotações Spring.
  * As transações são gerenciadas através de um wrapper transacional.
  */
 @Configuration
 @EnableTransactionManagement
-public class PessoasContratosConfig {
+public class ColaboradorConfig {
     
     /**
      * Registra o ColaboradorService como bean do Spring com suporte a transações
@@ -102,4 +102,3 @@ public class PessoasContratosConfig {
         }
     }
 }
-
