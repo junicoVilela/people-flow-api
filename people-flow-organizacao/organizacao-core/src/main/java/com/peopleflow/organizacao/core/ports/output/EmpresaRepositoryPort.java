@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface EmpresaRepositoryPort {
 
-    Empresa salvar(Empresa colaborador);
+    Empresa salvar(Empresa empresa);
     Optional<Empresa> buscarPorId(Long id);
     PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination);
 
     boolean existePorCnpj(String cnpj);
 
-    boolean existePorCnpjExcluindoId(String cpf, Long id);
+    boolean existePorCnpjExcluindoId(String cnpj, Long id);
 }

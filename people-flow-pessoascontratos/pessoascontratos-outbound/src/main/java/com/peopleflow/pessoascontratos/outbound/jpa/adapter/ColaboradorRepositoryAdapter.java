@@ -23,7 +23,7 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
     private final ColaboradorJpaRepository repository;
     private final ColaboradorJpaMapper mapper;
 
-    public ColaboradorRepositoryAdapter(ColaboradorJpaRepository repository, ColaboradorJpaMapper mapper) {
+    public ColaboradorRepositoryAdapter(final ColaboradorJpaRepository repository, final ColaboradorJpaMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }

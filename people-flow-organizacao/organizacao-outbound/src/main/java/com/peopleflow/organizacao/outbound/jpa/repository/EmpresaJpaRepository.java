@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EmpresaJpaRepository extends JpaRepository<EmpresaEntity, Long>,
         JpaSpecificationExecutor<EmpresaEntity> {
+
+    boolean existsByCnpj(String cnpj);
+    boolean existsByCnpjAndIdNot(String cnpj, Long id);
 }

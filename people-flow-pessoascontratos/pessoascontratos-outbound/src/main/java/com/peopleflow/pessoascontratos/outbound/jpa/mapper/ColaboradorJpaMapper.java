@@ -20,10 +20,6 @@ public interface ColaboradorJpaMapper {
     @Mapping(target = "cpf", source = "cpf", qualifiedByName = "cpfToString")
     @Mapping(target = "email", source = "email", qualifiedByName = "emailToString")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    @Mapping(target = "criadoPor", ignore = true)
-    @Mapping(target = "criadoEm", ignore = true)
-    @Mapping(target = "atualizadoPor", ignore = true)
-    @Mapping(target = "atualizadoEm", ignore = true)
     ColaboradorEntity toEntity(Colaborador colaborador);
 
     @Named("stringToCpf")
