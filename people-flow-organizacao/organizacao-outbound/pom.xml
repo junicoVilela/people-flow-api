@@ -14,13 +14,12 @@
     <description>Camada de saída (adaptadores secundários) - JPA</description>
     
     <dependencies>
-        <!-- Modulos Organização -->
+        <!-- Modules -->
         <dependency>
             <groupId>com.peopleflow</groupId>
             <artifactId>organizacao-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Common Infra (inclui common-core transitivamente) -->
         <dependency>
             <groupId>com.peopleflow</groupId>
             <artifactId>people-flow-common-infra</artifactId>
@@ -43,5 +42,14 @@
             <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 

@@ -14,7 +14,7 @@
     <description>Core do domínio Organização (regras de negócio)</description>
     
     <dependencies>
-        <!-- Common Core (abstrações puras) -->
+        <!-- Modules -->
         <dependency>
             <groupId>com.peopleflow</groupId>
             <artifactId>people-flow-common-core</artifactId>

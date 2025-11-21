@@ -14,8 +14,9 @@
     <description>Módulo de Organização - Agregador</description>
     
     <modules>
-        <module>organizacao-outbound</module>
         <module>organizacao-core</module>
+        <module>organizacao-inbound</module>
+        <module>organizacao-outbound</module>
     </modules>
 </project>
 
