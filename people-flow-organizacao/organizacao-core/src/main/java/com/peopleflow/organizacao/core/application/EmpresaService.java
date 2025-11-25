@@ -165,13 +165,8 @@ public class EmpresaService implements EmpresaUseCase {
                 id,
                 empresaRepository::existePorCnpjExcluindoId
         );
-
-        ServiceUtils.validarUnicidadeCampoComExclusao(
-                "INSCRICAO_ESTADUAL",
-                empresa.getInscricaoEstadual(),
-                id,
-                empresaRepository::existePorCnpjExcluindoId
-        );
+        // Nota: Inscrição Estadual não precisa de validação de unicidade
+        // pois pode haver empresas de estados diferentes com a mesma IE
     }
 
     private List<String> detectarCamposAlterados(Empresa original, Empresa atualizado) {

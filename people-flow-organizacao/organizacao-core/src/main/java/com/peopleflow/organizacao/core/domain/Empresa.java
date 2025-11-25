@@ -2,6 +2,7 @@ package com.peopleflow.organizacao.core.domain;
 
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.valueobject.Cnpj;
+import com.peopleflow.common.valueobject.InscricaoEstadual;
 import com.peopleflow.organizacao.core.valueobjects.StatusEmpresa;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ public class Empresa {
     private Long id;
     private String nome;
     private Cnpj cnpj;
-    private String inscricaoEstadual;
+    private InscricaoEstadual inscricaoEstadual;
     private StatusEmpresa status;
     private Long clienteId;
 
@@ -61,7 +62,7 @@ public class Empresa {
 
     }
 
-    public Empresa atualizar(String nome, Cnpj cnpj, String inscricaoEstadual, Long clienteId) {
+    public Empresa atualizar(String nome, Cnpj cnpj, InscricaoEstadual inscricaoEstadual, Long clienteId) {
         return this.toBuilder()
                 .nome(nome)
                 .cnpj(cnpj)

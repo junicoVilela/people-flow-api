@@ -2,6 +2,7 @@ package com.peopleflow.organizacao.inbound.web.mapper;
 
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.valueobject.Cnpj;
+import com.peopleflow.common.valueobject.InscricaoEstadual;
 import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 import com.peopleflow.organizacao.core.valueobjects.StatusEmpresa;
@@ -21,10 +22,12 @@ public interface EmpresaWebMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "clienteId", ignore = true)
     @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "stringToCnpj")
+    @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "stringToInscricaoEstadual")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
     Empresa toDomain(EmpresaRequest request);
 
     @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "cnpjToString")
+    @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "inscricaoEstadualToString")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
     EmpresaResponse toResponse(Empresa colaborador);
 
@@ -48,6 +51,11 @@ public interface EmpresaWebMapper {
         return cnpj != null ? new Cnpj(cnpj) : null;
     }
 
+    @Named("stringToInscricaoEstadual")
+    default InscricaoEstadual stringToInscricaoEstadual(String ie) {
+        return InscricaoEstadual.of(ie);
+    }
+
     @Named("stringToStatus")
     default StatusEmpresa stringToStatus(String status) {
         return status != null ? StatusEmpresa.of(status) : null;
@@ -56,6 +64,11 @@ public interface EmpresaWebMapper {
     @Named("cnpjToString")
     default String cnpjToString(Cnpj cnpj) {
         return cnpj != null ? cnpj.getValor() : null;
+    }
+
+    @Named("inscricaoEstadualToString")
+    default String inscricaoEstadualToString(InscricaoEstadual ie) {
+        return ie != null ? ie.getValor() : null;
     }
 
     @Named("statusToString")
