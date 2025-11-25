@@ -5,8 +5,6 @@ import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 
-import java.time.LocalDate;
-
 public interface EmpresaUseCase {
 
     Empresa criar(Empresa colaborador);

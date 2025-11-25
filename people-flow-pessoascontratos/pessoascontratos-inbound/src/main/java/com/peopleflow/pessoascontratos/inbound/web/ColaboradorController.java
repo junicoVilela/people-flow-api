@@ -13,6 +13,7 @@ import com.peopleflow.pessoascontratos.inbound.web.mapper.ColaboradorWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,16 +25,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/colaboradores")
+@RequiredArgsConstructor
 @Tag(name = "Colaboradores", description = "Gerenciamento de colaboradores")
 public class ColaboradorController {
 
     private final ColaboradorUseCase colaboradorUseCase;
     private final ColaboradorWebMapper mapper;
-
-    public ColaboradorController(ColaboradorUseCase colaboradorUseCase, ColaboradorWebMapper mapper) {
-        this.colaboradorUseCase = colaboradorUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")

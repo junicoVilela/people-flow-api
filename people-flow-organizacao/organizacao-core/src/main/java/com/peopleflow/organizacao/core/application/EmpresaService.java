@@ -23,7 +23,6 @@ public class EmpresaService implements EmpresaUseCase {
 
     private final EmpresaRepositoryPort empresaRepository;
 
-
     @Override
     public Empresa criar(Empresa empresa) {
         log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}, status={}, clienteId={}",

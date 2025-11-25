@@ -18,7 +18,7 @@
         <!-- Modules -->
         <dependency>
             <groupId>com.peopleflow</groupId>
-            <artifactId>pessoascontratos-core</artifactId>
+            <artifactId>organizacao-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

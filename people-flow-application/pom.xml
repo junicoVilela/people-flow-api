@@ -32,6 +32,16 @@
         </dependency>
         <dependency>
             <groupId>com.peopleflow</groupId>
+            <artifactId>organizacao-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.peopleflow</groupId>
+            <artifactId>organizacao-inbound</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.peopleflow</groupId>
             <artifactId>organizacao-outbound</artifactId>
             <version>${project.version}</version>
         </dependency>
