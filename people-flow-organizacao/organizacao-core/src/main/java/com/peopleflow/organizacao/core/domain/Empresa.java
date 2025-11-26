@@ -100,4 +100,24 @@ public class Empresa {
     public boolean isExcluido() {
         return status.isExcluido();
     }
+
+    public static Empresa nova(
+            String nome,
+            String cnpjString,
+            String inscricaoEstadualString,
+            Long clienteId) {
+        
+        // Validar e criar Value Objects (lança exceção se inválido)
+        Cnpj cnpj = new Cnpj(cnpjString);
+        InscricaoEstadual inscricaoEstadual = InscricaoEstadual.of(inscricaoEstadualString);
+        
+        // Construir empresa com status inicial ATIVO
+        return Empresa.builder()
+            .nome(nome)
+            .cnpj(cnpj)
+            .inscricaoEstadual(inscricaoEstadual)
+            .status(StatusEmpresa.ATIVO)
+            .clienteId(clienteId)
+            .build();
+    }
 }

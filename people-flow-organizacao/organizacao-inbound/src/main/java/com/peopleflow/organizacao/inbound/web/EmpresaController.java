@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -71,7 +70,7 @@ public class EmpresaController {
                     "Sempre retorna resultados paginados para garantir performance. " +
                     "Use parâmetros de query para filtrar e ordenar os resultados."
     )
-    public ResponseEntity<Page<EmpresaResponse>> buscarPorFiltros(
+    public ResponseEntity<PagedResult<EmpresaResponse>> buscarPorFiltros(
             @ModelAttribute EmpresaFilterRequest filtrosRequest,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
@@ -90,7 +89,7 @@ public class EmpresaController {
         );
 
         PagedResult<Empresa> resultado = empresaUseCase.buscarPorFiltros(filtros, pagination);
-        Page<EmpresaResponse> response = mapper.toPageResponse(resultado);
+        PagedResult<EmpresaResponse> response = mapper.toPagedResponse(resultado);
 
         return ResponseEntity.ok(response);
     }

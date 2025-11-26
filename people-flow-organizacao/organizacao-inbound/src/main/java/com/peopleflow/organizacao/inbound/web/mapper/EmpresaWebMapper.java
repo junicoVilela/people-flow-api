@@ -12,15 +12,10 @@ import com.peopleflow.organizacao.inbound.web.dto.EmpresaResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-
 @Mapper(componentModel = "spring")
 public interface EmpresaWebMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "clienteId", ignore = true)
     @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "stringToCnpj")
     @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "stringToInscricaoEstadual")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
@@ -29,20 +24,21 @@ public interface EmpresaWebMapper {
     @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "cnpjToString")
     @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "inscricaoEstadualToString")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    EmpresaResponse toResponse(Empresa colaborador);
+    EmpresaResponse toResponse(Empresa empresa);
 
     EmpresaFilter toDomain(EmpresaFilterRequest request);
 
-    default Page<EmpresaResponse> toPageResponse(PagedResult<Empresa> pagedResult) {
+    default PagedResult<EmpresaResponse> toPagedResponse(PagedResult<Empresa> pagedResult) {
         if (pagedResult == null) return null;
 
-        PageRequest pageRequest = PageRequest.of(pagedResult.page(), pagedResult.size());
-        return new PageImpl<>(
+        return new PagedResult<>(
                 pagedResult.content().stream()
                         .map(this::toResponse)
                         .toList(),
-                pageRequest,
-                pagedResult.totalElements()
+                pagedResult.totalElements(),
+                pagedResult.totalPages(),
+                pagedResult.page(),
+                pagedResult.size()
         );
     }
 
