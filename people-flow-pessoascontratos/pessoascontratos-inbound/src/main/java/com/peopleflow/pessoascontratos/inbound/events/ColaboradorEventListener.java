@@ -1,6 +1,15 @@
 package com.peopleflow.pessoascontratos.inbound.events;
 
-import com.peopleflow.pessoascontratos.core.domain.events.*;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorAtivado;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorAtualizado;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorCriado;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorDemitido;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorEvent;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorExcluido;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorImportado;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorInativado;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorReativado;
+import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorTransferido;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -132,6 +141,83 @@ public class ColaboradorEventListener {
         // TODO: Aqui você pode:
         // - Remover acessos permanentemente
         // - Arquivar dados
+    }
+    
+    /**
+     * Reage ao evento de transferência de colaborador
+     * 
+     * Executado de forma assíncrona.
+     * Casos de uso:
+     * - Atualizar sistemas de acesso com nova empresa/departamento
+     * - Notificar gerentes (origem e destino)
+     * - Ajustar permissões
+     */
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleColaboradorTransferido(ColaboradorTransferido event) {
+        log.info("📢 EVENTO: Colaborador transferido - ID: {}, Nome: {}, De: Empresa {} para Empresa {}, Data: {}", 
+                 event.colaboradorId(), 
+                 event.nomeColaborador(),
+                 event.empresaAnteriorId(),
+                 event.novaEmpresaId(),
+                 event.dataTransferencia());
+        
+        // TODO: Aqui você pode (processamento assíncrono):
+        // - sistemaAcessoService.atualizarPermissoes(event.colaboradorId(), event.novaEmpresaId())
+        // - emailService.notificarGerenteOrigem(event)
+        // - emailService.notificarGerenteDestino(event)
+        // - rhService.registrarMovimentacao(event)
+    }
+    
+    /**
+     * Reage ao evento de importação de colaborador de sistema legado
+     * 
+     * Executado de forma assíncrona.
+     * Casos de uso:
+     * - Auditar qualidade dos dados importados
+     * - Métricas de migração
+     * - Validações pós-importação
+     */
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleColaboradorImportado(ColaboradorImportado event) {
+        log.info("📢 EVENTO: Colaborador importado - ID: {}, Nome: {}, Matrícula Legado: {}, Nova: {}, Status Original: {}", 
+                 event.colaboradorId(), 
+                 event.nomeColaborador(),
+                 event.matriculaLegado(),
+                 event.matriculaNova(),
+                 event.statusLegado());
+        
+        // TODO: Aqui você pode (processamento assíncrono):
+        // - qualidadeDadosService.validarImportacao(event)
+        // - metricsService.incrementarContadorImportacao()
+        // - alertaService.notificarSeStatusIncomum(event.statusLegado())
+        // - documentacaoService.registrarOrigemDados(event)
+    }
+    
+    /**
+     * Reage ao evento de reativação de colaborador
+     * 
+     * Executado de forma assíncrona.
+     * Casos de uso:
+     * - Restaurar acessos
+     * - Notificar equipe
+     * - Auditar (reativações frequentes podem indicar problema)
+     */
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleColaboradorReativado(ColaboradorReativado event) {
+        log.info("📢 EVENTO: Colaborador reativado - ID: {}, Nome: {}, Admissão Anterior: {}, Nova: {}", 
+                 event.colaboradorId(), 
+                 event.nomeColaborador(),
+                 event.dataAdmissaoAnterior(),
+                 event.novaDataAdmissao());
+        
+        // TODO: Aqui você pode (processamento assíncrono):
+        // - sistemaAcessoService.restaurarAcessos(event.colaboradorId())
+        // - emailService.notificarReativacao(event)
+        // - auditoriaService.verificarFrequenciaReativacoes(event.colaboradorId())
+        // - alertaService.notificarSeReativacaoFrequente(event)
     }
     
     /**

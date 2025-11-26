@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -63,7 +62,7 @@ public class ColaboradorController {
                       "Sempre retorna resultados paginados para garantir performance. " +
                       "Use parâmetros de query para filtrar e ordenar os resultados."
     )
-    public ResponseEntity<Page<ColaboradorResponse>> buscarPorFiltros(
+    public ResponseEntity<PagedResult<ColaboradorResponse>> buscarPorFiltros(
             @ModelAttribute ColaboradorFilterRequest filtrosRequest,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         
@@ -83,7 +82,7 @@ public class ColaboradorController {
         
         PagedResult<Colaborador> resultado = colaboradorUseCase.buscarPorFiltros(filtros, pagination);
         
-        Page<ColaboradorResponse> response = mapper.toPageResponse(resultado);
+        PagedResult<ColaboradorResponse> response = mapper.toPagedResponse(resultado);
         return ResponseEntity.ok(response);
     }
 

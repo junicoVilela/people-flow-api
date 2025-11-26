@@ -12,10 +12,6 @@ import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-
 @Mapper(componentModel = "spring")
 public interface ColaboradorWebMapper {
 
@@ -37,16 +33,17 @@ public interface ColaboradorWebMapper {
 
     ColaboradorFilter toDomain(ColaboradorFilterRequest request);
 
-    default Page<ColaboradorResponse> toPageResponse(PagedResult<Colaborador> pagedResult) {
+    default PagedResult<ColaboradorResponse> toPagedResponse(PagedResult<Colaborador> pagedResult) {
         if (pagedResult == null) return null;
         
-        PageRequest pageRequest = PageRequest.of(pagedResult.page(), pagedResult.size());
-        return new PageImpl<>(
+        return new PagedResult<>(
             pagedResult.content().stream()
                 .map(this::toResponse)
                 .toList(),
-            pageRequest,
-            pagedResult.totalElements()
+            pagedResult.totalElements(),
+            pagedResult.totalPages(),
+            pagedResult.page(),
+            pagedResult.size()
         );
     }
     
