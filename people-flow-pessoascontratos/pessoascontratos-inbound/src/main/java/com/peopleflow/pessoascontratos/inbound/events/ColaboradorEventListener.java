@@ -119,8 +119,9 @@ public class ColaboradorEventListener {
     }
     
     /**
-     * Reage ao evento de exclusão
+     * Reage ao evento de exclusão (assíncrono)
      */
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleColaboradorExcluido(ColaboradorExcluido event) {
         log.info("📢 EVENTO: Colaborador excluído (soft delete) - ID: {}, Nome: {}, Timestamp: {}", 

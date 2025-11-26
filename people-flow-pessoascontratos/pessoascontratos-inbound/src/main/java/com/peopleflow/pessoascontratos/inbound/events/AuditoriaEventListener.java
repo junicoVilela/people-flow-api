@@ -30,6 +30,9 @@ public class AuditoriaEventListener {
      * 
      * Este método é genérico e registra todos os tipos de eventos.
      * Executado APÓS o commit para garantir que o evento realmente aconteceu.
+     * 
+     * NOTA: Este método NÃO é @Async pois auditoria deve ser processada
+     * de forma síncrona para garantir rastreabilidade imediata e compliance.
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void auditarEvento(ColaboradorEvent event) {
