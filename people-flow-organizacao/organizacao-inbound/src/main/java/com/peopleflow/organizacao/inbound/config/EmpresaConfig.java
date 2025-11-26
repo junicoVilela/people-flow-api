@@ -12,34 +12,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Configuração para o agregado de Empresas.
- *
- * Registra os beans do core e configura transações.
- * Esta configuração permite que o core seja puro, sem anotações Spring.
- * As transações são gerenciadas através de um wrapper transacional.
- */
 @Configuration
 @EnableTransactionManagement
 public class EmpresaConfig {
-    
-    /**
-     * Registra o EmpresaService como bean do Spring com suporte a transações
-     * 
-     * O wrapper aplica @Transactional aos métodos, permitindo que o core
-     * permaneça puro sem anotações Spring.
-     */
+
     @Bean
     public EmpresaUseCase empresaUseCase(EmpresaRepositoryPort repository) {
         EmpresaService service = new EmpresaService(repository);
         return new TransactionalEmpresaUseCase(service);
     }
-    
-    /**
-     * Wrapper transacional para EmpresaUseCase
-     * 
-     * Aplica transações aos métodos do service sem poluir o core com anotações Spring.
-     */
+
     @Transactional
     private static class TransactionalEmpresaUseCase implements EmpresaUseCase {
         private final EmpresaService delegate;

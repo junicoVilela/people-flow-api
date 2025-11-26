@@ -73,8 +73,7 @@ public class Empresa {
 
     public Empresa ativar() {
         if (isExcluido()) {
-            throw new BusinessException("EMPRESA_EXCLUIDO",
-                    "Não é possível ativar empresa excluído");
+            throw new BusinessException("EMPRESA_EXCLUIDO", "Não é possível ativar empresa excluído");
         }
 
         return this.toBuilder()
@@ -90,8 +89,7 @@ public class Empresa {
 
     public Empresa excluir() {
         if (isExcluido()) {
-            throw new BusinessException("EMPRESA_JA_EXCLUIDA",
-                    "Empresa já está excluída");
+            throw new BusinessException("EMPRESA_JA_EXCLUIDA", "Empresa já está excluída");
         }
 
         return this.toBuilder()

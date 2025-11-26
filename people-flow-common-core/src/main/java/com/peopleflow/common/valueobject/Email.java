@@ -7,12 +7,6 @@ import lombok.ToString;
 
 import java.util.regex.Pattern;
 
-/**
- * Value Object para Email
- * 
- * Encapsula validação e formatação de email.
- * Este é um value object genérico que pode ser reutilizado em qualquer módulo.
- */
 @Getter
 @EqualsAndHashCode
 @ToString

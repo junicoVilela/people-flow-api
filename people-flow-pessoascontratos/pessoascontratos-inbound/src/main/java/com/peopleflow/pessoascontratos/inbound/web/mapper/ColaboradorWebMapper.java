@@ -37,9 +37,6 @@ public interface ColaboradorWebMapper {
 
     ColaboradorFilter toDomain(ColaboradorFilterRequest request);
 
-    /**
-     * Converte PagedResult (core) para Page (Spring) para resposta HTTP
-     */
     default Page<ColaboradorResponse> toPageResponse(PagedResult<Colaborador> pagedResult) {
         if (pagedResult == null) return null;
         
@@ -71,7 +68,7 @@ public interface ColaboradorWebMapper {
     @Named("stringToCpf")
     default Cpf stringToCpf(String cpf) {
         if (cpf == null || cpf.trim().isEmpty()) {
-            return null; // Transformação: null/vazio → null
+            return null;
         }
         return new Cpf(cpf);
     }

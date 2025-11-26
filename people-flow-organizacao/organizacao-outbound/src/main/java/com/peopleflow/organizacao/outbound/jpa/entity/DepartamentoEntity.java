@@ -34,6 +34,12 @@ public class DepartamentoEntity extends AuditableEntity {
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
+    @Column(name = "NOME", nullable = false)
+    private String nome;
+
+    @Column(name = "CODIGO")
+    private String codigo;
+
     @Column(name = "CLIENTE_ID", nullable = false)
     private Long clienteId;
 
@@ -42,10 +48,4 @@ public class DepartamentoEntity extends AuditableEntity {
 
     @Column(name = "UNIDADE_ID")
     private Long unidadeId;
-
-    @Column(name = "NOME", nullable = false)
-    private String nome;
-
-    @Column(name = "CODIGO")
-    private String codigo;
 }

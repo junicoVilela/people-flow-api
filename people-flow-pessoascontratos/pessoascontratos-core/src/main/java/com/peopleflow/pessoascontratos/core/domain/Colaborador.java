@@ -12,12 +12,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * Entidade de domínio Colaborador (Rich Domain Model)
- * 
- * Este modelo é IMUTÁVEL - todos os métodos de negócio retornam uma NOVA instância.
- * As validações de invariantes estão contidas no próprio modelo.
- */
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,10 +30,6 @@ public class Colaborador {
     private Long departamentoId;
     private Long centroCustoId;
 
-
-    /**
-     * Construtor customizado para Builder com validações
-     */
     public static class ColaboradorBuilder {
         public Colaborador build() {
             if (status == null) {

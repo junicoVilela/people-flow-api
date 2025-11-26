@@ -5,12 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-/**
- * Value Object para CNPJ (Cadastro Nacional de Pessoa Jurídica)
- * 
- * Encapsula validação e formatação de CNPJ brasileiro.
- * Este é um value object genérico que pode ser reutilizado em qualquer módulo.
- */
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -40,12 +34,10 @@ public class Cnpj {
             return false;
         }
 
-        // Verifica se todos os dígitos são iguais (ex: 00000000000000)
         if (cnpj.matches("(\\d)\\1{13}")) {
             return false;
         }
 
-        // Valida primeiro dígito verificador
         int soma = 0;
         int peso = 5;
         for (int i = 0; i < 12; i++) {
@@ -61,7 +53,6 @@ public class Cnpj {
             return false;
         }
 
-        // Valida segundo dígito verificador
         soma = 0;
         peso = 6;
         for (int i = 0; i < 13; i++) {

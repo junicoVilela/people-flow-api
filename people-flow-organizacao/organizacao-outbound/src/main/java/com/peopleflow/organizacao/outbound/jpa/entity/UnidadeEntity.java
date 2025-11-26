@@ -34,15 +34,15 @@ public class UnidadeEntity extends AuditableEntity {
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
-    @Column(name = "EMPRESA_ID", nullable = false)
-    private Long empresaId;
-
     @Column(name = "NOME", nullable = false)
     private String nome;
 
     @Column(name = "CODIGO")
     private String codigo;
+
+    @Column(name = "CLIENTE_ID", nullable = false)
+    private Long clienteId;
+
+    @Column(name = "EMPRESA_ID", nullable = false)
+    private Long empresaId;
 }

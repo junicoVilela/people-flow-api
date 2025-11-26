@@ -5,12 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-/**
- * Value Object para CPF (Cadastro de Pessoa Física)
- * 
- * Encapsula validação e formatação de CPF brasileiro.
- * Este é um value object genérico que pode ser reutilizado em qualquer módulo.
- */
 @Getter
 @EqualsAndHashCode
 @ToString

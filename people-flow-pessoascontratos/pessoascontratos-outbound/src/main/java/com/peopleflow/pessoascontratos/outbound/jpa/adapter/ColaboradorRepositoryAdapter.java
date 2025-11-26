@@ -45,7 +45,6 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
     public PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination) {
         Specification<ColaboradorEntity> specification = ColaboradorSpecification.filter(filter);
         
-        // Converte Pagination (core) para Pageable (Spring)
         Sort sort = pagination.sortBy() != null
             ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC 
                 ? Sort.Direction.ASC 
@@ -54,10 +53,8 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
         
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
         
-        // Executa query usando Spring Data
         Page<ColaboradorEntity> page = repository.findAll(specification, pageRequest);
         
-        // Converte Page (Spring) para PagedResult (core)
         return new PagedResult<>(
             page.map(mapper::toDomain).getContent(),
             page.getTotalElements(),

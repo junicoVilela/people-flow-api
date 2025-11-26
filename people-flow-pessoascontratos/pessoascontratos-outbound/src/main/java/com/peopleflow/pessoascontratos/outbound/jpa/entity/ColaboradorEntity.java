@@ -36,18 +36,6 @@ public class ColaboradorEntity extends AuditableEntity {
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
-    @Column(name = "EMPRESA_ID", nullable = false)
-    private Long empresaId;
-
-    @Column(name = "DEPARTAMENTO_ID")
-    private Long departamentoId;
-
-    @Column(name = "CENTRO_CUSTO_ID")
-    private Long centroCustoId;
-
     @Column(name = "NOME", nullable = false)
     private String nome;
 
@@ -68,4 +56,16 @@ public class ColaboradorEntity extends AuditableEntity {
 
     @Column(name = "STATUS", nullable = false)
     private String status;
+
+    @Column(name = "CLIENTE_ID", nullable = false)
+    private Long clienteId;
+
+    @Column(name = "EMPRESA_ID", nullable = false)
+    private Long empresaId;
+
+    @Column(name = "DEPARTAMENTO_ID")
+    private Long departamentoId;
+
+    @Column(name = "CENTRO_CUSTO_ID")
+    private Long centroCustoId;
 }

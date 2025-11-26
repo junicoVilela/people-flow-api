@@ -12,9 +12,7 @@ import java.util.function.Predicate;
  */
 public final class ServiceUtils {
 
-    private ServiceUtils() {
-        // Classe utilitária - não deve ser instanciada
-    }
+    private ServiceUtils() {}
 
     /**
      * Compara dois valores e adiciona o nome do campo à lista se forem diferentes
