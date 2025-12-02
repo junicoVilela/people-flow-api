@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class ColaboradorController {
     private final ColaboradorWebMapper mapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('colaborador:criar')")
     @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")
     public ResponseEntity<ColaboradorResponse> criar(@Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
@@ -48,6 +50,7 @@ public class ColaboradorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('colaborador:ler')")
     @Operation(summary = "Buscar colaborador por ID", description = "Retorna os dados de um colaborador específico")
     public ResponseEntity<ColaboradorResponse> buscarPorId(@PathVariable Long id) {
         Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
@@ -56,6 +59,7 @@ public class ColaboradorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('colaborador:ler')")
     @Operation(
         summary = "Listar colaboradores com filtros e paginação", 
         description = "Busca colaboradores aplicando filtros opcionais e paginação. " +
@@ -87,6 +91,7 @@ public class ColaboradorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('colaborador:atualizar')")
     @Operation(summary = "Atualizar colaborador", description = "Atualiza os dados de um colaborador existente")
     public ResponseEntity<ColaboradorResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
@@ -96,6 +101,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/demitir")
+    @PreAuthorize("hasRole('colaborador:demitir')")
     @Operation(summary = "Demitir colaborador", description = "Registra a demissão de um colaborador")
     public ResponseEntity<ColaboradorResponse> demitir(
             @PathVariable Long id, @RequestBody @Valid DemissaoRequest demissaoRequest) {
@@ -104,6 +110,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/ativar")
+    @PreAuthorize("hasRole('colaborador:atualizar')")
     @Operation(summary = "Ativar colaborador", description = "Altera o status do colaborador para ATIVO")
     public ResponseEntity<ColaboradorResponse> ativar(@PathVariable Long id) {
         Colaborador ativado = colaboradorUseCase.ativar(id);
@@ -111,6 +118,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/inativar")
+    @PreAuthorize("hasRole('colaborador:atualizar')")
     @Operation(summary = "Inativar colaborador", description = "Altera o status do colaborador para INATIVO")
     public ResponseEntity<ColaboradorResponse> inativar(@PathVariable Long id) {
         Colaborador inativado = colaboradorUseCase.inativar(id);
@@ -118,6 +126,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('colaborador:demitir')")
     @Operation(summary = "Excluir colaborador", description = "Marca o colaborador como excluído (soft delete)")
     public ResponseEntity<ColaboradorResponse> excluir(@PathVariable Long id) {
         Colaborador excluido = colaboradorUseCase.excluir(id);

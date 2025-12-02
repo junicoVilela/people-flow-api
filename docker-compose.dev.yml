@@ -24,4 +24,5 @@ volumes:
 
 networks:
   people-flow-network:
+    name: people-flow-network
     driver: bridge

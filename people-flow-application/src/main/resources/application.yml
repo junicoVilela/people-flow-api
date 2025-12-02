@@ -6,6 +6,12 @@ spring:
     servlet:
       compression:
         enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/peopleflow
+          jwk-set-uri: http://localhost:8081/realms/peopleflow/protocol/openid-connect/certs
 
 # Informações da API
 app:
@@ -30,3 +36,12 @@ springdoc:
   show-actuator: false
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
+
+keycloak:
+  realm: peopleflow
+  auth-server-url: http://localhost:8081
+  client-id: peopleflow-api
+  client-secret: peopleflow-secret-change-in-production
+  admin:
+    username: admin
+    password: admin

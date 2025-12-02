@@ -14,7 +14,14 @@ import java.time.LocalDateTime;
  * - Eventos contêm DADOS necessários para reagir
  * 
  * @see ColaboradorCriado
+ * @see ColaboradorAtualizado
  * @see ColaboradorDemitido
+ * @see ColaboradorAtivado
+ * @see ColaboradorInativado
+ * @see ColaboradorExcluido
+ * @see ColaboradorImportado
+ * @see ColaboradorReativado
+ * @see ColaboradorTransferido
  */
 public sealed interface ColaboradorEvent permits 
     ColaboradorCriado,
@@ -22,7 +29,10 @@ public sealed interface ColaboradorEvent permits
     ColaboradorDemitido,
     ColaboradorAtivado,
     ColaboradorInativado,
-    ColaboradorExcluido {
+    ColaboradorExcluido,
+    ColaboradorImportado,
+    ColaboradorReativado,
+    ColaboradorTransferido {
     
     /**
      * ID do colaborador que gerou o evento
