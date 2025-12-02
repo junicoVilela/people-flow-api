@@ -1,9 +1,11 @@
 package com.peopleflow.accesscontrol.inbound.events;
 
 import com.peopleflow.accesscontrol.core.application.UsuarioService;
+import com.peopleflow.accesscontrol.core.domain.events.UsuarioKeycloakCriado;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorCriado;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,7 @@ import java.util.Map;
 public class ColaboradorEventListener {
 
     private final UsuarioService usuarioService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Quando um colaborador é criado, cria automaticamente um usuário no Keycloak
@@ -36,48 +39,80 @@ public class ColaboradorEventListener {
     @Async
     @EventListener
     public void handleColaboradorCriado(ColaboradorCriado event) {
-        log.info("🎧 Recebido evento ColaboradorCriado: ID={}, Nome={}", 
-                event.colaboradorId(), event.nomeColaborador());
+        log.info("🎧 Recebido evento ColaboradorCriado: ID={}, Nome={}, RequerAcesso={}", 
+                event.colaboradorId(), event.nomeColaborador(), event.requerAcessoSistema());
+        
+        // ✅ Verificar se o colaborador requer acesso ao sistema
+        if (!event.requerAcessoSistema()) {
+            log.info("Colaborador {} não requer acesso ao sistema. Usuário não será criado.", 
+                    event.colaboradorId());
+            return;
+        }
         
         try {
-            // Extrair dados do evento
             String email = event.email();
             String[] nomes = event.nomeColaborador().split(" ", 2);
             String firstName = nomes[0];
             String lastName = nomes.length > 1 ? nomes[1] : "";
             
-            // Verificar se usuário já existe
             Map<String, Object> existingUser = usuarioService.buscarPorUsername(email);
             if (existingUser != null) {
-                log.warn("⚠️ Usuário já existe no Keycloak: {}", email);
+
+                String userId = (String) existingUser.get("id");
+                
+                log.warn("⚠️ Usuário já existe no Keycloak: {}. Vinculando ao colaborador...", email);
+                
+                usuarioService.atualizarAtributo(
+                    userId, 
+                    "colaboradorId", 
+                    event.colaboradorId().toString()
+                );
+                
+                eventPublisher.publishEvent(
+                    new UsuarioKeycloakCriado(userId, event.colaboradorId(), email)
+                );
+                
+                log.info("✅ Usuário existente {} vinculado ao colaborador {}", 
+                        userId, event.colaboradorId());
                 return;
             }
             
-            // Atributos customizados para rastreamento
             Map<String, List<String>> attributes = Map.of(
                 "colaboradorId", List.of(event.colaboradorId().toString()),
-                "cpf", List.of(event.cpf())
+                "cpf", List.of(event.cpf()),
+                "clienteId", List.of(event.clienteId().toString()),
+                "empresaId", List.of(event.empresaId().toString())
             );
             
-            // Criar usuário no Keycloak
             String userId = usuarioService.criar(
                 email,           // username = email
                 email,           // email
                 firstName,       // nome
                 lastName,        // sobrenome
-                null,            // senha será definida depois (reset password)
+                null,            // senha será definida via email
                 attributes       // atributos customizados
             );
             
-            log.info("✅ Usuário criado no Keycloak com sucesso! userId={}, email={}", 
-                    userId, email);
+            log.info("✅ Usuário {} criado no Keycloak para colaborador {}", 
+                    userId, event.colaboradorId());
             
-            // TODO: Adicionar usuário ao grupo padrão baseado no cargo/departamento
-            // TODO: Enviar email para colaborador definir senha inicial
+            try {
+                usuarioService.enviarEmailDefinirSenha(userId);
+                log.info("📧 Email de configuração de senha enviado para {}", email);
+            } catch (Exception e) {
+                log.warn("⚠️ Erro ao enviar email de senha para {}: {}", 
+                        email, e.getMessage());
+            }
+            
+            eventPublisher.publishEvent(
+                new UsuarioKeycloakCriado(userId, event.colaboradorId(), email)
+            );
+            
+            log.info("✅ Processamento completo para colaborador {}", event.colaboradorId());
             
         } catch (Exception e) {
-            log.error("❌ Erro ao criar usuário no Keycloak para colaborador ID={}", 
-                     event.colaboradorId(), e);
+            log.error("❌ Erro ao criar usuário no Keycloak para colaborador ID={}: {}", 
+                     event.colaboradorId(), e.getMessage(), e);
             
             // Não lançar exceção para não afetar o fluxo principal
             // Em produção, considere enviar para uma fila de retry

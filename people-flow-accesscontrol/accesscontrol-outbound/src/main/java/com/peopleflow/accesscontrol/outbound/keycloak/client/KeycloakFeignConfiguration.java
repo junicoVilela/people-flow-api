@@ -7,9 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuração do Feign Client para Keycloak
- */
 @Slf4j
 @Configuration
 public class KeycloakFeignConfiguration {
@@ -26,9 +23,6 @@ public class KeycloakFeignConfiguration {
         return Logger.Level.BASIC;
     }
 
-    /**
-     * Interceptor para adicionar headers comuns em todas as requisições
-     */
     @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
@@ -37,10 +31,6 @@ public class KeycloakFeignConfiguration {
         };
     }
 
-    /**
-     * Decodificador de erros customizado
-     * Converte erros HTTP do Keycloak em exceções específicas
-     */
     @Bean
     public ErrorDecoder errorDecoder() {
         return (methodKey, response) -> {
@@ -73,8 +63,6 @@ public class KeycloakFeignConfiguration {
         };
     }
 }
-
-// ==================== EXCEÇÕES CUSTOMIZADAS ====================
 
 /**
  * Exceção base para erros do Keycloak

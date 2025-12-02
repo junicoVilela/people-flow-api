@@ -95,5 +95,20 @@ public class UsuarioService {
         log.info("Forçando logout do usuário: {}", userId);
         keycloakPort.logoutUser(userId);
     }
+    
+    public void atualizarAtributo(String userId, String attributeName, String attributeValue) {
+        log.info("Atualizando atributo {} do usuário {}", attributeName, userId);
+        keycloakPort.updateUserAttribute(userId, attributeName, attributeValue);
+    }
+    
+    public void atribuirRoles(String userId, List<String> roleNames) {
+        log.info("Atribuindo roles {} ao usuário {}", roleNames, userId);
+        keycloakPort.assignClientRoles(userId, roleNames);
+    }
+    
+    public void enviarEmailDefinirSenha(String userId) {
+        log.info("Enviando email para definir senha: {}", userId);
+        keycloakPort.sendPasswordSetupEmail(userId);
+    }
 }
 

@@ -33,5 +33,11 @@ public interface KeycloakUsuarioPort {
     List<Map<String, Object>> getUserGroups(String userId);
     
     void logoutUser(String userId);
+    
+    void updateUserAttribute(String userId, String attributeName, String attributeValue);
+    
+    void assignClientRoles(String userId, List<String> roleNames);
+    
+    void sendPasswordSetupEmail(String userId);
 }
 

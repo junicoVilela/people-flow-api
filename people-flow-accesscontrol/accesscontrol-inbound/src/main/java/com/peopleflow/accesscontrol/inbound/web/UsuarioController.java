@@ -125,5 +125,64 @@ public class UsuarioController {
         usuarioService.forcarLogout(userId);
         return ResponseEntity.ok().build();
     }
+    
+    @GetMapping("/colaborador/{colaboradorId}")
+    @PreAuthorize("hasRole('admin')")
+    @Operation(summary = "Buscar usuário por colaboradorId", 
+               description = "Busca usuário Keycloak vinculado a um colaborador")
+    public ResponseEntity<Map<String, Object>> buscarPorColaborador(
+            @PathVariable Long colaboradorId) {
+        
+        List<Map<String, Object>> users = usuarioService.buscarPorAtributo(
+            "colaboradorId", 
+            colaboradorId.toString()
+        );
+        
+        if (users.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(users.get(0));
+    }
+    
+    @PostMapping("/{userId}/roles")
+    @PreAuthorize("hasRole('admin')")
+    @Operation(summary = "Atribuir roles ao usuário", 
+               description = "Atribui roles de client ao usuário")
+    public ResponseEntity<Void> atribuirRoles(
+            @PathVariable String userId,
+            @RequestBody List<String> roleNames) {
+        
+        usuarioService.atribuirRoles(userId, roleNames);
+        return ResponseEntity.ok().build();
+    }
+    
+    @PostMapping("/{userId}/enviar-email-senha")
+    @PreAuthorize("hasRole('admin')")
+    @Operation(summary = "Enviar email para definir senha", 
+               description = "Envia email para o usuário definir/redefinir sua senha")
+    public ResponseEntity<Void> enviarEmailSenha(@PathVariable String userId) {
+        usuarioService.enviarEmailDefinirSenha(userId);
+        return ResponseEntity.ok().build();
+    }
+    
+    @PatchMapping("/{userId}/atributo")
+    @PreAuthorize("hasRole('admin')")
+    @Operation(summary = "Atualizar atributo customizado", 
+               description = "Atualiza um atributo customizado do usuário")
+    public ResponseEntity<Void> atualizarAtributo(
+            @PathVariable String userId,
+            @RequestBody Map<String, String> atributo) {
+        
+        String nome = atributo.get("nome");
+        String valor = atributo.get("valor");
+        
+        if (nome == null || valor == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        usuarioService.atualizarAtributo(userId, nome, valor);
+        return ResponseEntity.ok().build();
+    }
 }
 

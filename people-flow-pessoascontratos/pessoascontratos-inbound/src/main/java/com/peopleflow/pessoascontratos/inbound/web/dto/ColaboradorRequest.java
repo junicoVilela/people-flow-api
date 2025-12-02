@@ -47,4 +47,19 @@ public class ColaboradorRequest {
     
     @NotNull(message = "Empresa ID é obrigatória")
     private Long empresaId;
+    
+    @Positive(message = "Cargo ID deve ser um número positivo")
+    private Long cargoId;
+    
+    @Positive(message = "Departamento ID deve ser um número positivo")
+    private Long departamentoId;
+    
+    @Positive(message = "Centro de Custo ID deve ser um número positivo")
+    private Long centroCustoId;
+    
+    /**
+     * Indica se o colaborador requer acesso ao sistema (criação de usuário no Keycloak)
+     * Default: false (não cria usuário automaticamente)
+     */
+    private Boolean requerAcessoSistema = false;
 }

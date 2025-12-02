@@ -44,7 +44,15 @@ public class ColaboradorController {
     @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")
     public ResponseEntity<ColaboradorResponse> criar(@Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
-        Colaborador colaboradorCriado = colaboradorUseCase.criar(colaborador);
+        boolean requerAcesso = request.getRequerAcessoSistema() != null && request.getRequerAcessoSistema();
+        
+        Colaborador colaboradorCriado;
+        if (colaboradorUseCase instanceof com.peopleflow.pessoascontratos.core.application.ColaboradorService service) {
+            colaboradorCriado = service.criar(colaborador, requerAcesso);
+        } else {
+            colaboradorCriado = colaboradorUseCase.criar(colaborador);
+        }
+        
         ColaboradorResponse response = mapper.toResponse(colaboradorCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

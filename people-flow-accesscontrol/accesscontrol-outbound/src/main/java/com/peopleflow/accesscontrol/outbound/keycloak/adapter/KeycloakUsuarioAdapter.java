@@ -217,5 +217,82 @@ public class KeycloakUsuarioAdapter implements KeycloakUsuarioPort {
         
         log.info("Logout realizado com sucesso");
     }
+    
+    @Override
+    public void updateUserAttribute(String userId, String attributeName, String attributeValue) {
+        log.info("Atualizando atributo {} do usuário {}", attributeName, userId);
+        
+        String token = getAdminToken();
+        
+        Map<String, Object> user = keycloakClient.getUser(realm, userId, token);
+        
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> attributes = (Map<String, List<String>>) user.get("attributes");
+        
+        if (attributes == null) {
+            attributes = new HashMap<>();
+        } else {
+            attributes = new HashMap<>(attributes); // Cópia mutável
+        }
+        
+        attributes.put(attributeName, List.of(attributeValue));
+        
+        Map<String, Object> updateData = Map.of("attributes", attributes);
+        keycloakClient.updateUser(realm, userId, token, updateData);
+        
+        log.info("Atributo {} atualizado com sucesso", attributeName);
+    }
+    
+    @Override
+    public void assignClientRoles(String userId, List<String> roleNames) {
+        log.info("Atribuindo roles {} ao usuário {}", roleNames, userId);
+        
+        String token = getAdminToken();
+        
+        List<Map<String, Object>> clients = keycloakClient.findClientByClientId(
+            realm, "peopleflow-api", token
+        );
+        
+        if (clients.isEmpty()) {
+            throw new RuntimeException("Client peopleflow-api não encontrado");
+        }
+        
+        String clientUuid = (String) clients.get(0).get("id");
+        
+        List<Map<String, Object>> availableRoles = keycloakClient.getAvailableClientRoles(
+            realm, userId, clientUuid, token
+        );
+        
+        List<Map<String, Object>> rolesToAssign = availableRoles.stream()
+            .filter(role -> roleNames.contains(role.get("name")))
+            .toList();
+        
+        if (rolesToAssign.isEmpty()) {
+            log.warn("Nenhuma das roles solicitadas está disponível: {}", roleNames);
+            return;
+        }
+        
+        keycloakClient.assignClientRolesToUser(
+            realm, userId, clientUuid, token, rolesToAssign
+        );
+        
+        log.info("Roles atribuídas com sucesso: {}", 
+                rolesToAssign.stream().map(r -> r.get("name")).toList());
+    }
+    
+    @Override
+    public void sendPasswordSetupEmail(String userId) {
+        log.info("Enviando email de configuração de senha para usuário: {}", userId);
+        
+        String token = getAdminToken();
+        
+        List<String> actions = List.of("UPDATE_PASSWORD");
+        
+        keycloakClient.executeActionsEmail(
+            realm, userId, "peopleflow-api", null, token, actions
+        );
+        
+        log.info("Email de configuração de senha enviado com sucesso");
+    }
 }
 

@@ -29,8 +29,18 @@ public class ColaboradorService implements ColaboradorUseCase {
 
     @Override
     public Colaborador criar(Colaborador colaborador) {
-        log.info("Iniciando criação de colaborador: nome={}, clienteId={}, empresaId={}", 
-                 colaborador.getNome(), colaborador.getClienteId(), colaborador.getEmpresaId());
+        return criar(colaborador, false);
+    }
+    
+    /**
+     * Cria um novo colaborador com opção de criar acesso ao sistema
+     * @param colaborador Dados do colaborador
+     * @param requerAcessoSistema Se true, criará usuário no Keycloak automaticamente
+     * @return Colaborador criado
+     */
+    public Colaborador criar(Colaborador colaborador, boolean requerAcessoSistema) {
+        log.info("Iniciando criação de colaborador: nome={}, clienteId={}, empresaId={}, requerAcesso={}", 
+                 colaborador.getNome(), colaborador.getClienteId(), colaborador.getEmpresaId(), requerAcessoSistema);
         
         try {
             validarUnicidadeParaCriacao(colaborador);
@@ -42,7 +52,12 @@ public class ColaboradorService implements ColaboradorUseCase {
                     colaboradorCriado.getId(),
                     colaboradorCriado.getNome(),
                     colaboradorCriado.getCpf().getValor(),
-                    colaboradorCriado.getEmail().getValor()
+                    colaboradorCriado.getEmail().getValor(),
+                    colaboradorCriado.getCargoId(),
+                    colaboradorCriado.getDepartamentoId(),
+                    colaboradorCriado.getClienteId(),
+                    colaboradorCriado.getEmpresaId(),
+                    requerAcessoSistema
                 )
             );
             
@@ -106,7 +121,8 @@ public class ColaboradorService implements ColaboradorUseCase {
                     colaborador.getClienteId(),
                     colaborador.getEmpresaId(),
                     colaborador.getDepartamentoId(),
-                    colaborador.getCentroCustoId()
+                    colaborador.getCentroCustoId(),
+                    colaborador.getCargoId()
             ).toBuilder()
                     .id(id)
                     .build();

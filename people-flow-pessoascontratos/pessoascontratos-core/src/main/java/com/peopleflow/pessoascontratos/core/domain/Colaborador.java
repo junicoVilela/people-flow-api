@@ -29,6 +29,8 @@ public class Colaborador {
     private Long empresaId;
     private Long departamentoId;
     private Long centroCustoId;
+    private Long cargoId;
+    private String keycloakUserId;
 
     public static class ColaboradorBuilder {
         public Colaborador build() {
@@ -48,7 +50,9 @@ public class Colaborador {
                 clienteId,
                 empresaId,
                 departamentoId,
-                centroCustoId
+                centroCustoId,
+                cargoId,
+                keycloakUserId
             );
 
             if (colaborador.nome != null) {
@@ -145,7 +149,7 @@ public class Colaborador {
 
 
     public Colaborador atualizar(String nome, Cpf cpf, Email email, String matricula, LocalDate dataAdmissao,
-                                  Long clienteId, Long empresaId, Long departamentoId, Long centroCustoId) {
+                                  Long clienteId, Long empresaId, Long departamentoId, Long centroCustoId, Long cargoId) {
         return this.toBuilder()
             .nome(nome)
             .cpf(cpf)
@@ -156,6 +160,7 @@ public class Colaborador {
             .empresaId(empresaId)
             .departamentoId(departamentoId)
             .centroCustoId(centroCustoId)
+            .cargoId(cargoId)
             .build();
     }
 
@@ -165,6 +170,30 @@ public class Colaborador {
 
     public boolean isExcluido() {
         return status.isExcluido();
+    }
+
+    /**
+     * Vincula um usuário Keycloak a este colaborador
+     * @param keycloakUserId UUID do usuário no Keycloak
+     * @return Colaborador atualizado com vínculo
+     */
+    public Colaborador vincularUsuarioKeycloak(String keycloakUserId) {
+        if (keycloakUserId == null || keycloakUserId.isBlank()) {
+            throw new BusinessException("KEYCLOAK_USER_ID_INVALIDO", 
+                "ID do usuário Keycloak não pode ser vazio");
+        }
+        
+        return this.toBuilder()
+            .keycloakUserId(keycloakUserId)
+            .build();
+    }
+
+    /**
+     * Verifica se o colaborador tem acesso ao sistema
+     * @return true se o colaborador está vinculado a um usuário Keycloak
+     */
+    public boolean temAcessoSistema() {
+        return keycloakUserId != null && !keycloakUserId.isBlank();
     }
 
     // =====================================================================

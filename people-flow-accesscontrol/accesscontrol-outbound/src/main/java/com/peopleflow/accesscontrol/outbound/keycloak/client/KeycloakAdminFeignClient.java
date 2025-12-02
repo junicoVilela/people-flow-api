@@ -58,9 +58,6 @@ public interface KeycloakAdminFeignClient {
         @RequestHeader("Authorization") String bearerToken
     );
 
-    /**
-     * Atualiza dados do usuário
-     */
     @PutMapping("/admin/realms/{realm}/users/{userId}")
     void updateUser(
         @PathVariable("realm") String realm,
@@ -184,6 +181,33 @@ public interface KeycloakAdminFeignClient {
         @PathVariable("realm") String realm,
         @RequestParam("clientId") String clientId,
         @RequestHeader("Authorization") String bearerToken
+    );
+
+    @PostMapping("/admin/realms/{realm}/users/{userId}/role-mappings/clients/{clientUuid}")
+    void assignClientRolesToUser(
+        @PathVariable("realm") String realm,
+        @PathVariable("userId") String userId,
+        @PathVariable("clientUuid") String clientUuid,
+        @RequestHeader("Authorization") String bearerToken,
+        @RequestBody List<Map<String, Object>> roles
+    );
+
+    @GetMapping("/admin/realms/{realm}/users/{userId}/role-mappings/clients/{clientUuid}/available")
+    List<Map<String, Object>> getAvailableClientRoles(
+        @PathVariable("realm") String realm,
+        @PathVariable("userId") String userId,
+        @PathVariable("clientUuid") String clientUuid,
+        @RequestHeader("Authorization") String bearerToken
+    );
+
+    @PutMapping("/admin/realms/{realm}/users/{userId}/execute-actions-email")
+    void executeActionsEmail(
+        @PathVariable("realm") String realm,
+        @PathVariable("userId") String userId,
+        @RequestParam(required = false) String clientId,
+        @RequestParam(required = false) String redirectUri,
+        @RequestHeader("Authorization") String bearerToken,
+        @RequestBody List<String> actions
     );
 }
 

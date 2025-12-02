@@ -19,14 +19,31 @@ public record ColaboradorCriado(
     String nomeColaborador,
     String cpf,
     String email,
+    Long cargoId,
+    Long departamentoId,
+    Long clienteId,
+    Long empresaId,
+    boolean requerAcessoSistema,
     LocalDateTime ocorridoEm
 ) implements ColaboradorEvent {
     
     /**
      * Construtor conveniente que define o timestamp automaticamente
      */
+    public ColaboradorCriado(Long colaboradorId, String nomeColaborador, String cpf, String email,
+                            Long cargoId, Long departamentoId, Long clienteId, Long empresaId,
+                            boolean requerAcessoSistema) {
+        this(colaboradorId, nomeColaborador, cpf, email, cargoId, departamentoId, 
+             clienteId, empresaId, requerAcessoSistema, LocalDateTime.now());
+    }
+    
+    /**
+     * Construtor legado (compatibilidade)
+     * @deprecated Use o construtor com todos os parâmetros
+     */
+    @Deprecated
     public ColaboradorCriado(Long colaboradorId, String nomeColaborador, String cpf, String email) {
-        this(colaboradorId, nomeColaborador, cpf, email, LocalDateTime.now());
+        this(colaboradorId, nomeColaborador, cpf, email, null, null, null, null, false, LocalDateTime.now());
     }
 }
 
