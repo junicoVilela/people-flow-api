@@ -1,5 +1,6 @@
 package com.peopleflow.accesscontrol.inbound.events;
 
+import com.peopleflow.accesscontrol.core.application.AutoAtribuicaoService;
 import com.peopleflow.accesscontrol.core.application.UsuarioService;
 import com.peopleflow.accesscontrol.core.domain.events.UsuarioKeycloakCriado;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorCriado;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class ColaboradorEventListener {
 
     private final UsuarioService usuarioService;
+    private final AutoAtribuicaoService autoAtribuicaoService;
     private final ApplicationEventPublisher eventPublisher;
 
     /**
@@ -95,6 +97,26 @@ public class ColaboradorEventListener {
             
             log.info("✅ Usuário {} criado no Keycloak para colaborador {}", 
                     userId, event.colaboradorId());
+            
+            // Auto-atribuição de roles por cargo
+            if (event.cargoId() != null) {
+                try {
+                    autoAtribuicaoService.atribuirRolesPorCargo(userId, event.cargoId());
+                } catch (Exception roleEx) {
+                    log.error("❌ Erro ao auto-atribuir roles para userId={}, cargoId={}: {}", 
+                            userId, event.cargoId(), roleEx.getMessage());
+                }
+            }
+            
+            // Auto-atribuição de grupo por departamento
+            if (event.departamentoId() != null) {
+                try {
+                    autoAtribuicaoService.atribuirGrupoPorDepartamento(userId, event.departamentoId());
+                } catch (Exception groupEx) {
+                    log.error("❌ Erro ao auto-atribuir grupo para userId={}, departamentoId={}: {}", 
+                            userId, event.departamentoId(), groupEx.getMessage());
+                }
+            }
             
             try {
                 usuarioService.enviarEmailDefinirSenha(userId);

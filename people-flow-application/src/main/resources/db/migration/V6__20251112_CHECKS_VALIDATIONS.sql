@@ -20,18 +20,25 @@ ALTER TABLE PEOPLE_FLOW_RH.CLIENTE
     ADD CONSTRAINT CHK_CLIENTE_CNPJ_LENGTH CHECK (CNPJ IS NULL OR LENGTH(CNPJ) = 18);
 
 -- ============================
--- SEGURANÇA / RBAC
--- ============================
-
-ALTER TABLE PEOPLE_FLOW_RH.USUARIO
-    ADD CONSTRAINT CHK_USUARIO_STATUS CHECK (STATUS IN ('ativo', 'inativo', 'bloqueado'));
-
-ALTER TABLE PEOPLE_FLOW_RH.USUARIO
-    ADD CONSTRAINT CHK_USUARIO_EMAIL_FORMAT CHECK (EMAIL ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
-
--- ============================
 -- PESSOAS / COLABORADORES
 -- ============================
+
+-- Validações de COLABORADOR já existem acima (CHK_COLABORADOR_DATAS, etc.)
+
+-- ============================
+-- JORNADA & CARGOS
+-- ============================
+-- Validação de FAIXA_SALARIAL já existe acima (CHK_FAIXA_MIN_MAX)
+
+-- ============================
+-- FÉRIAS
+-- ============================
+-- Validação de FERIAS_SOLICITACAO já existe acima
+
+-- ============================
+-- CONTRATOS
+-- ============================
+-- Validação de CONTRATO já existe acima (CHK_CONTRATO_DATAS)
 
 ALTER TABLE PEOPLE_FLOW_RH.COLABORADOR
     ADD CONSTRAINT CHK_COLABORADOR_STATUS CHECK (STATUS IN ('ativo', 'inativo', 'afastado', 'demitido', 'aposentado'));

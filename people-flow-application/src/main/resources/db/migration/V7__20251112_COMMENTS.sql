@@ -38,32 +38,9 @@ COMMENT ON TABLE PEOPLE_FLOW_RH.CENTRO_CUSTO IS
 COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.CODIGO IS 'Código do centro de custo (único por cliente)';
 
 -- ============================
--- SEGURANÇA / RBAC
--- ============================
-
-COMMENT ON TABLE PEOPLE_FLOW_RH.USUARIO IS 
-'Usuários do sistema com acesso à plataforma. Diferentes de colaboradores.';
-
-COMMENT ON COLUMN PEOPLE_FLOW_RH.USUARIO.EMAIL IS 'Email único por cliente, usado para login';
-COMMENT ON COLUMN PEOPLE_FLOW_RH.USUARIO.STATUS IS 'Status: ativo, inativo, bloqueado';
-
-COMMENT ON TABLE PEOPLE_FLOW_RH.PAPEL IS 
-'Papéis/roles do sistema para controle de acesso (RBAC).';
-
-COMMENT ON COLUMN PEOPLE_FLOW_RH.PAPEL.NOME IS 'Nome do papel (ex: Admin, RH, Gestor, Colaborador)';
-
-COMMENT ON TABLE PEOPLE_FLOW_RH.PERMISSAO IS 
-'Permissões granulares do sistema. Baseado em recurso + ação.';
-
-COMMENT ON COLUMN PEOPLE_FLOW_RH.PERMISSAO.RECURSO IS 'Recurso/entidade (ex: colaborador, folha, ponto)';
-COMMENT ON COLUMN PEOPLE_FLOW_RH.PERMISSAO.ACAO IS 'Ação permitida (ex: create, read, update, delete)';
-
-COMMENT ON TABLE PEOPLE_FLOW_RH.USUARIO_PAPEL IS 
-'Associação entre usuários e papéis. Um usuário pode ter múltiplos papéis.';
-
-COMMENT ON TABLE PEOPLE_FLOW_RH.PAPEL_PERMISSAO IS 
-'Associação entre papéis e permissões. Define o que cada papel pode fazer.';
-
+-- NOTA: Tabela USUARIO foi removida
+-- Dados de usuários são gerenciados 100% pelo Keycloak
+-- Colunas *_USUARIO_ID armazenam UUID do Keycloak diretamente (sem FK)
 -- ============================
 -- PESSOAS / COLABORADORES
 -- ============================
@@ -405,4 +382,41 @@ COMMENT ON TABLE PEOPLE_FLOW_RH.EXAME_AGENDAMENTO IS
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EXAME_AGENDAMENTO.TIPO_EXAME IS 'Tipo do exame (ex: admissional, audiometria, acuidade visual)';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EXAME_AGENDAMENTO.COMPARECEU IS 'Indica se o colaborador compareceu';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EXAME_AGENDAMENTO.STATUS IS 'Status: agendado, realizado, faltou, cancelado';
+
+-- ============================
+-- KEYCLOAK ACCESS CONTROL
+-- ============================
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.KEYCLOAK_USER_ID IS 
+'UUID do usuário correspondente no Keycloak. Vínculo para SSO e controle de acesso.';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.CRIADO_POR IS 
+'Username do usuário que criou o registro (preferred_username do Keycloak)';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.ATUALIZADO_POR IS 
+'Username do usuário que atualizou o registro (preferred_username do Keycloak)';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.EXCLUIDO_POR IS 
+'Username do usuário que excluiu o registro - soft delete (preferred_username do Keycloak)';
+
+COMMENT ON TABLE PEOPLE_FLOW_RH.CARGO_ROLE IS 
+'Mapeamento entre cargos e roles do Keycloak. Usado para atribuição automática de permissões quando colaborador é criado.';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO_ROLE.CARGO_ID IS 
+'ID do cargo';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO_ROLE.ROLE_NAME IS 
+'Nome da role no formato recurso:acao (ex: colaborador:criar, folha:aprovar)';
+
+COMMENT ON TABLE PEOPLE_FLOW_RH.DEPARTAMENTO_GRUPO IS 
+'Mapeamento entre departamentos e grupos do Keycloak. Usado para organização automática de usuários por departamento.';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO_GRUPO.DEPARTAMENTO_ID IS 
+'ID do departamento';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO_GRUPO.KEYCLOAK_GROUP_ID IS 
+'UUID do grupo correspondente no Keycloak';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO_GRUPO.KEYCLOAK_GROUP_NAME IS 
+'Nome do grupo no Keycloak (para referência)';
 
