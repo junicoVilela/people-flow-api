@@ -15,6 +15,8 @@ import java.util.List;
  * Caches:
  * - keycloak-admin-token: Token de administrador (TTL gerenciado manualmente)
  * - keycloak-client-uuid: UUID do client (cache permanente)
+ * - cargo-roles: Mapeamento de cargo para roles (invalidado em mudanças)
+ * - departamento-grupos: Mapeamento de departamento para grupos Keycloak (invalidado em mudanças)
  */
 @Configuration
 @EnableCaching
@@ -26,7 +28,9 @@ public class CacheConfiguration {
         
         cacheManager.setCaches(List.of(
             new ConcurrentMapCache("keycloak-admin-token"),
-            new ConcurrentMapCache("keycloak-client-uuid")
+            new ConcurrentMapCache("keycloak-client-uuid"),
+            new ConcurrentMapCache("cargo-roles"),
+            new ConcurrentMapCache("departamento-grupos")
         ));
         
         return cacheManager;

@@ -1,13 +1,17 @@
 package com.peopleflow.accesscontrol.inbound.events;
 
+import com.peopleflow.accesscontrol.core.application.AutoAtribuicaoService;
 import com.peopleflow.accesscontrol.core.application.UsuarioService;
+import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.domain.events.*;
+import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +27,8 @@ import java.util.Map;
 public class ColaboradorSincronizacaoListener {
 
     private final UsuarioService usuarioService;
+    private final AutoAtribuicaoService autoAtribuicaoService;
+    private final ColaboradorUseCase colaboradorUseCase;
 
     /**
      * Quando um colaborador é inativado, desativa o usuário no Keycloak
@@ -144,17 +150,99 @@ public class ColaboradorSincronizacaoListener {
     }
 
     /**
-     * Quando um colaborador é atualizado, sincroniza dados no Keycloak (se necessário)
+     * Quando um colaborador é atualizado, sincroniza dados no Keycloak
+     * - Atualiza nome e email se alterados
+     * - Re-atribui roles se cargo mudou
+     * - Re-atribui grupo se departamento mudou
      */
     @Async
     @EventListener
     public void handleColaboradorAtualizado(ColaboradorAtualizado event) {
-        log.debug("🎧 Recebido evento ColaboradorAtualizado: ID={}, Campos={}", 
+        log.info("🎧 Recebido evento ColaboradorAtualizado: ID={}, Campos={}", 
                 event.colaboradorId(), event.camposAlterados());
         
-        // Por enquanto, apenas log. Implementar sincronização de dados específicos
-        // (email, nome) se necessário no futuro
-        // Isso requer adicionar mais informações ao evento ColaboradorAtualizado
+        String userId = buscarUsuarioIdPorColaborador(event.colaboradorId());
+        if (userId == null) {
+            log.debug("Colaborador {} não possui usuário vinculado", event.colaboradorId());
+            return;
+        }
+        
+        try {
+            // Buscar colaborador atualizado para obter dados completos
+            Colaborador colaborador = colaboradorUseCase.buscarPorId(event.colaboradorId());
+            
+            // Atualizar nome e email no Keycloak
+            Map<String, Object> updateData = new HashMap<>();
+            if (colaborador.getEmail() != null) {
+                String[] nomes = colaborador.getNome().split(" ", 2);
+                updateData.put("firstName", nomes[0]);
+                updateData.put("lastName", nomes.length > 1 ? nomes[1] : "");
+                updateData.put("email", colaborador.getEmail().getValor());
+            }
+            
+            if (!updateData.isEmpty()) {
+                usuarioService.atualizar(userId, updateData);
+                log.info("✅ Dados do usuário {} atualizados no Keycloak", userId);
+            }
+            
+            // Re-atribuir roles se cargo mudou
+            if (colaborador.getCargoId() != null) {
+                try {
+                    autoAtribuicaoService.atribuirRolesPorCargo(userId, colaborador.getCargoId());
+                    log.info("✅ Roles re-atribuídas para userId={}, cargoId={}", 
+                            userId, colaborador.getCargoId());
+                } catch (Exception e) {
+                    log.warn("⚠️ Erro ao re-atribuir roles: {}", e.getMessage());
+                }
+            }
+            
+            // Re-atribuir grupo se departamento mudou
+            if (colaborador.getDepartamentoId() != null) {
+                try {
+                    autoAtribuicaoService.atribuirGrupoPorDepartamento(userId, colaborador.getDepartamentoId());
+                    log.info("✅ Grupo re-atribuído para userId={}, departamentoId={}", 
+                            userId, colaborador.getDepartamentoId());
+                } catch (Exception e) {
+                    log.warn("⚠️ Erro ao re-atribuir grupo: {}", e.getMessage());
+                }
+            }
+            
+        } catch (Exception e) {
+            log.error("❌ Erro ao sincronizar atualização do colaborador {}: {}", 
+                    event.colaboradorId(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Quando um colaborador é transferido, atualiza grupo no Keycloak
+     */
+    @Async
+    @EventListener
+    public void handleColaboradorTransferido(ColaboradorTransferido event) {
+        log.info("🎧 Recebido evento ColaboradorTransferido: ID={}, NovoDept={}", 
+                event.colaboradorId(), event.novoDepartamentoId());
+        
+        String userId = buscarUsuarioIdPorColaborador(event.colaboradorId());
+        if (userId == null) {
+            log.debug("Colaborador {} não possui usuário vinculado", event.colaboradorId());
+            return;
+        }
+        
+        try {
+            // Atualizar atributos de empresa e departamento
+            usuarioService.atualizarAtributo(userId, "empresaId", 
+                    event.novaEmpresaId().toString());
+            
+            // Re-atribuir grupo se departamento mudou
+            if (event.novoDepartamentoId() != null) {
+                autoAtribuicaoService.atribuirGrupoPorDepartamento(userId, event.novoDepartamentoId());
+                log.info("✅ Grupo atualizado para userId={}, novoDepartamentoId={}", 
+                        userId, event.novoDepartamentoId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Erro ao processar transferência do usuário {}: {}", 
+                    userId, e.getMessage());
+        }
     }
 
     /**

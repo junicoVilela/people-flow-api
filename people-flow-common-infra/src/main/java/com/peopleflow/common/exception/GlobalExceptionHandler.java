@@ -101,6 +101,37 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    @ExceptionHandler(KeycloakException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakException(KeycloakException ex, HttpServletRequest request) {
+        log.error("Keycloak error: {}", ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse("KEYCLOAK_ERROR", ex.getMessage());
+        error.setPath(request.getRequestURI());
+        
+        HttpStatus status = determineKeycloakHttpStatus(ex);
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(KeycloakNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakNotFoundException(KeycloakNotFoundException ex, HttpServletRequest request) {
+        log.warn("Keycloak resource not found: {}", ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse("KEYCLOAK_NOT_FOUND", ex.getMessage());
+        error.setPath(request.getRequestURI());
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(KeycloakConflictException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakConflictException(KeycloakConflictException ex, HttpServletRequest request) {
+        log.warn("Keycloak conflict: {}", ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse("KEYCLOAK_CONFLICT", ex.getMessage());
+        error.setPath(request.getRequestURI());
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
         log.error("Unexpected error occurred", ex);
@@ -119,6 +150,26 @@ public class GlobalExceptionHandler {
             case "ACESSO_NEGADO" -> HttpStatus.FORBIDDEN;
             default -> HttpStatus.BAD_REQUEST;
         };
+    }
+
+    private HttpStatus determineKeycloakHttpStatus(KeycloakException ex) {
+        String message = ex.getMessage().toLowerCase();
+        if (message.contains("401") || message.contains("não autorizado") || message.contains("autenticação")) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+        if (message.contains("403") || message.contains("sem permissão") || message.contains("autorização")) {
+            return HttpStatus.FORBIDDEN;
+        }
+        if (message.contains("404") || message.contains("não encontrado")) {
+            return HttpStatus.NOT_FOUND;
+        }
+        if (message.contains("409") || message.contains("conflito")) {
+            return HttpStatus.CONFLICT;
+        }
+        if (message.contains("500") || message.contains("servidor")) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return HttpStatus.BAD_GATEWAY; // Keycloak como serviço externo
     }
 
     private ErrorResponse.FieldError mapFieldError(FieldError fieldError) {

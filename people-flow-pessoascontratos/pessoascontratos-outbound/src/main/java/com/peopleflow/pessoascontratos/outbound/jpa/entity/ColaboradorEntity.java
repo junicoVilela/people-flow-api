@@ -68,4 +68,10 @@ public class ColaboradorEntity extends AuditableEntity {
 
     @Column(name = "CENTRO_CUSTO_ID")
     private Long centroCustoId;
+
+    @Column(name = "CARGO_ID")
+    private Long cargoId;
+
+    @Column(name = "KEYCLOAK_USER_ID", length = 36)
+    private String keycloakUserId;
 }

@@ -26,6 +26,12 @@
             <artifactId>people-flow-common-infra</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Outbound (para acesso ao repository de auditoria) -->
+        <dependency>
+            <groupId>com.peopleflow</groupId>
+            <artifactId>pessoascontratos-outbound</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

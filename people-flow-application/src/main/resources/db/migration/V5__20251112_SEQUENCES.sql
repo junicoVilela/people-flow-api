@@ -394,16 +394,6 @@ ALTER SEQUENCE PEOPLE_FLOW_RH.LOG_WORKFLOW_ID_SEQ
     CACHE 100
     NO CYCLE;
 
--- ============================
--- AUDITORIA
--- ============================
-
-ALTER SEQUENCE PEOPLE_FLOW_RH.EVENTO_AUDITORIA_ID_SEQ
-    INCREMENT BY 1
-    MINVALUE 1
-    NO MAXVALUE
-    CACHE 100
-    NO CYCLE;
 
 -- ============================
 -- NOTIFICAÇÕES

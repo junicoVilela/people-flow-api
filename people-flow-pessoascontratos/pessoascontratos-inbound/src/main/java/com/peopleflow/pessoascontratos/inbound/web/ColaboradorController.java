@@ -8,6 +8,7 @@ import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
+import com.peopleflow.common.validation.MultiTenancyValidator;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DemissaoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ColaboradorWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,11 +39,15 @@ public class ColaboradorController {
 
     private final ColaboradorUseCase colaboradorUseCase;
     private final ColaboradorWebMapper mapper;
+    private final MultiTenancyValidator multiTenancyValidator;
 
     @PostMapping
     @PreAuthorize("hasRole('colaborador:criar')")
     @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")
     public ResponseEntity<ColaboradorResponse> criar(@Valid @RequestBody ColaboradorRequest request) {
+        // Validação de multi-tenancy antes de criar
+        multiTenancyValidator.validarAcessoCompleto(request.getClienteId(), request.getEmpresaId());
+        
         Colaborador colaborador = mapper.toDomain(request);
         boolean requerAcesso = request.getRequerAcessoSistema() != null && request.getRequerAcessoSistema();
         
@@ -62,6 +67,9 @@ public class ColaboradorController {
     @Operation(summary = "Buscar colaborador por ID", description = "Retorna os dados de um colaborador específico")
     public ResponseEntity<ColaboradorResponse> buscarPorId(@PathVariable Long id) {
         Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
+        // Validação de multi-tenancy após buscar
+        multiTenancyValidator.validarAcessoCompleto(colaborador.getClienteId(), colaborador.getEmpresaId());
+        
         ColaboradorResponse response = mapper.toResponse(colaborador);
         return ResponseEntity.ok(response);
     }
@@ -102,6 +110,13 @@ public class ColaboradorController {
     @PreAuthorize("hasRole('colaborador:atualizar')")
     @Operation(summary = "Atualizar colaborador", description = "Atualiza os dados de um colaborador existente")
     public ResponseEntity<ColaboradorResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ColaboradorRequest request) {
+        // Validação de multi-tenancy antes de atualizar
+        multiTenancyValidator.validarAcessoCompleto(request.getClienteId(), request.getEmpresaId());
+        
+        // Valida também o colaborador existente
+        Colaborador colaboradorExistente = colaboradorUseCase.buscarPorId(id);
+        multiTenancyValidator.validarAcessoCompleto(colaboradorExistente.getClienteId(), colaboradorExistente.getEmpresaId());
+        
         Colaborador colaborador = mapper.toDomain(request);
         Colaborador colaboradorAtualizado = colaboradorUseCase.atualizar(id, colaborador);
         ColaboradorResponse response = mapper.toResponse(colaboradorAtualizado);
@@ -113,6 +128,10 @@ public class ColaboradorController {
     @Operation(summary = "Demitir colaborador", description = "Registra a demissão de um colaborador")
     public ResponseEntity<ColaboradorResponse> demitir(
             @PathVariable Long id, @RequestBody @Valid DemissaoRequest demissaoRequest) {
+        // Validação de multi-tenancy antes de demitir
+        Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
+        multiTenancyValidator.validarAcessoCompleto(colaborador.getClienteId(), colaborador.getEmpresaId());
+        
         Colaborador demitido = colaboradorUseCase.demitir(id, demissaoRequest.getDataDemissao());
         return ResponseEntity.ok(mapper.toResponse(demitido));
     }
@@ -121,6 +140,10 @@ public class ColaboradorController {
     @PreAuthorize("hasRole('colaborador:atualizar')")
     @Operation(summary = "Ativar colaborador", description = "Altera o status do colaborador para ATIVO")
     public ResponseEntity<ColaboradorResponse> ativar(@PathVariable Long id) {
+        // Validação de multi-tenancy antes de ativar
+        Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
+        multiTenancyValidator.validarAcessoCompleto(colaborador.getClienteId(), colaborador.getEmpresaId());
+        
         Colaborador ativado = colaboradorUseCase.ativar(id);
         return ResponseEntity.ok(mapper.toResponse(ativado));
     }
@@ -129,6 +152,10 @@ public class ColaboradorController {
     @PreAuthorize("hasRole('colaborador:atualizar')")
     @Operation(summary = "Inativar colaborador", description = "Altera o status do colaborador para INATIVO")
     public ResponseEntity<ColaboradorResponse> inativar(@PathVariable Long id) {
+        // Validação de multi-tenancy antes de inativar
+        Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
+        multiTenancyValidator.validarAcessoCompleto(colaborador.getClienteId(), colaborador.getEmpresaId());
+        
         Colaborador inativado = colaboradorUseCase.inativar(id);
         return ResponseEntity.ok(mapper.toResponse(inativado));
     }
@@ -137,6 +164,10 @@ public class ColaboradorController {
     @PreAuthorize("hasRole('colaborador:demitir')")
     @Operation(summary = "Excluir colaborador", description = "Marca o colaborador como excluído (soft delete)")
     public ResponseEntity<ColaboradorResponse> excluir(@PathVariable Long id) {
+        // Validação de multi-tenancy antes de excluir
+        Colaborador colaborador = colaboradorUseCase.buscarPorId(id);
+        multiTenancyValidator.validarAcessoCompleto(colaborador.getClienteId(), colaborador.getEmpresaId());
+        
         Colaborador excluido = colaboradorUseCase.excluir(id);
         return ResponseEntity.ok(mapper.toResponse(excluido));
     }

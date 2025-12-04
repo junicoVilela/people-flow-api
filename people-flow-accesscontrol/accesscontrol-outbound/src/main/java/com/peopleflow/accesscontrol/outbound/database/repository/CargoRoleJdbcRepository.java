@@ -12,9 +12,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Repositório JDBC para operações na tabela cargo_role
- */
 @Slf4j
 @Repository
 @RequiredArgsConstructor

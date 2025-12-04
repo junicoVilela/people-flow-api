@@ -53,6 +53,7 @@ COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.MATRICULA IS 'Matrícula única por
 COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.DATA_ADMISSAO IS 'Data de admissão do colaborador';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.DATA_DEMISSAO IS 'Data de demissão (NULL se ativo)';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.STATUS IS 'Status: ativo, inativo, afastado, demitido, aposentado';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.COLABORADOR.CARGO_ID IS 'Cargo atual do colaborador (referência ao histórico em COLABORADOR_CARGO)';
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.DEPENDENTE IS 
 'Dependentes dos colaboradores para fins de benefícios e imposto de renda.';
@@ -332,14 +333,8 @@ COMMENT ON TABLE PEOPLE_FLOW_RH.LOG_WORKFLOW IS
 -- ============================
 -- AUDITORIA
 -- ============================
-
-COMMENT ON TABLE PEOPLE_FLOW_RH.EVENTO_AUDITORIA IS 
-'Log de auditoria de todas as operações do sistema. Alto volume de dados.';
-
-COMMENT ON COLUMN PEOPLE_FLOW_RH.EVENTO_AUDITORIA.ENTIDADE IS 'Nome da tabela/entidade';
-COMMENT ON COLUMN PEOPLE_FLOW_RH.EVENTO_AUDITORIA.ENTIDADE_ID IS 'ID do registro afetado';
-COMMENT ON COLUMN PEOPLE_FLOW_RH.EVENTO_AUDITORIA.ACAO IS 'Ação realizada: create, update, delete';
-COMMENT ON COLUMN PEOPLE_FLOW_RH.EVENTO_AUDITORIA.DADOS IS 'Dados da operação em formato JSONB';
+-- Tabela AUDITORIA substitui EVENTO_AUDITORIA
+-- Mantém separação de dados antigos/novos, IP, User-Agent e multi-tenancy completo
 
 -- ============================
 -- NOTIFICAÇÕES

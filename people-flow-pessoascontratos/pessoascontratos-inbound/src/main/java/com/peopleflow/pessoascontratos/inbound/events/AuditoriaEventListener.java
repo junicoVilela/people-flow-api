@@ -1,6 +1,12 @@
 package com.peopleflow.pessoascontratos.inbound.events;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.peopleflow.common.security.SecurityContextHelper;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorEvent;
+import com.peopleflow.pessoascontratos.outbound.jpa.entity.AuditoriaEntity;
+import com.peopleflow.pessoascontratos.outbound.jpa.repository.AuditoriaJpaRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -8,6 +14,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.time.LocalDateTime;
 
 /**
  * Listener dedicado à auditoria de eventos de Colaborador
@@ -21,9 +31,13 @@ import org.springframework.transaction.event.TransactionPhase;
  */
 @Component
 @Order(1) // Executa antes dos outros listeners
+@RequiredArgsConstructor
 public class AuditoriaEventListener {
     
     private static final Logger log = LoggerFactory.getLogger(AuditoriaEventListener.class);
+    private final AuditoriaJpaRepository auditoriaRepository;
+    private final SecurityContextHelper securityHelper;
+    private final ObjectMapper objectMapper;
     
     /**
      * Captura QUALQUER evento de Colaborador para auditoria
@@ -44,21 +58,49 @@ public class AuditoriaEventListener {
                  event.nomeColaborador(),
                  event.ocorridoEm());
         
-        // TODO: Aqui você deve:
-        // 1. Salvar em tabela de auditoria
-        // auditoriaRepository.save(new RegistroAuditoria(
-        //     entidade: "COLABORADOR",
-        //     entidadeId: event.colaboradorId(),
-        //     acao: tipoEvento,
-        //     timestamp: event.ocorridoEm(),
-        //     usuario: SecurityContextHolder.getContext().getAuthentication().getName()
-        // ));
-        
-        // 2. Enviar para sistema de log centralizado (ELK, Splunk, etc)
-        // elkService.registrar(event);
-        
-        // 3. Compliance e LGPD
-        // lgpdService.registrarOperacao(event);
+        try {
+            AuditoriaEntity auditoria = new AuditoriaEntity();
+            auditoria.setEntidade("COLABORADOR");
+            auditoria.setEntidadeId(event.colaboradorId());
+            auditoria.setAcao(tipoEvento);
+            auditoria.setUsuarioId(securityHelper.getSubject());
+            auditoria.setTimestamp(event.ocorridoEm());
+            
+            // Obter IP e User-Agent se disponível
+            ServletRequestAttributes attributes = 
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                auditoria.setIpAddress(obterIpAddress(request));
+                auditoria.setUserAgent(request.getHeader("User-Agent"));
+            }
+            
+            // Serializar dados do evento como JSON
+            try {
+                String dadosJson = objectMapper.writeValueAsString(event);
+                auditoria.setDadosNovos(dadosJson);
+            } catch (Exception e) {
+                log.warn("Erro ao serializar dados do evento: {}", e.getMessage());
+            }
+            
+            auditoriaRepository.save(auditoria);
+            log.debug("✅ Registro de auditoria salvo: ID={}", auditoria.getId());
+            
+        } catch (Exception e) {
+            log.error("❌ Erro ao salvar auditoria: {}", e.getMessage(), e);
+            // Não lançar exceção para não afetar o fluxo principal
+        }
+    }
+    
+    private String obterIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
     
     /**
