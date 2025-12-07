@@ -18,8 +18,10 @@ public class EmpresaSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (filter == null) {
-                return criteriaBuilder.conjunction();
+                return criteriaBuilder.isNull(root.get("excluidoEm"));
             }
+
+            predicates.add(criteriaBuilder.isNull(root.get("excluidoEm")));
 
             if (filter.getNome() != null && !filter.getNome().trim().isEmpty()) {
                 predicates.add(

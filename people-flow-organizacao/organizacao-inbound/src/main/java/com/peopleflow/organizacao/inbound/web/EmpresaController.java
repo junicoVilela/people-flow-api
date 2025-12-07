@@ -7,7 +7,6 @@ import com.peopleflow.organizacao.core.ports.input.EmpresaUseCase;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 import com.peopleflow.organizacao.inbound.web.dto.EmpresaFilterRequest;
 import com.peopleflow.organizacao.inbound.web.dto.EmpresaRequest;
-import com.peopleflow.common.validation.MultiTenancyValidator;
 import com.peopleflow.organizacao.inbound.web.dto.EmpresaResponse;
 import com.peopleflow.organizacao.inbound.web.mapper.EmpresaWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,14 +36,10 @@ public class EmpresaController {
 
     private final EmpresaUseCase empresaUseCase;
     private final EmpresaWebMapper mapper;
-    private final MultiTenancyValidator multiTenancyValidator;
 
     @PostMapping
     @Operation(summary = "Criar nova empresa", description = "Cadastra uma nova empresa")
     public ResponseEntity<EmpresaResponse> criar(@Valid @RequestBody EmpresaRequest request) {
-        // Validação de multi-tenancy antes de criar
-        multiTenancyValidator.validarAcessoCliente(request.getClienteId());
-        
         Empresa empresa = mapper.toDomain(request);
         Empresa empresaCriado = empresaUseCase.criar(empresa);
         EmpresaResponse response = mapper.toResponse(empresaCriado);
@@ -54,13 +49,6 @@ public class EmpresaController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar empresa", description = "Atualiza os dados de uma empresa existente")
     public ResponseEntity<EmpresaResponse> atualizar(@PathVariable Long id, @Valid @RequestBody EmpresaRequest request) {
-        // Validação de multi-tenancy antes de atualizar
-        multiTenancyValidator.validarAcessoCliente(request.getClienteId());
-        
-        // Valida também a empresa existente
-        Empresa empresaExistente = empresaUseCase.buscarPorId(id);
-        multiTenancyValidator.validarAcessoCompleto(empresaExistente.getClienteId(), empresaExistente.getId());
-        
         Empresa empresa = mapper.toDomain(request);
         Empresa empresaAtualizada = empresaUseCase.atualizar(id, empresa);
         EmpresaResponse response = mapper.toResponse(empresaAtualizada);
@@ -71,9 +59,6 @@ public class EmpresaController {
     @Operation(summary = "Buscar empresa por ID", description = "Retorna os dados de uma empresa específico")
     public ResponseEntity<EmpresaResponse> buscarPorId(@PathVariable Long id) {
         Empresa empresa = empresaUseCase.buscarPorId(id);
-        // Validação de multi-tenancy após buscar
-        multiTenancyValidator.validarAcessoCompleto(empresa.getClienteId(), empresa.getId());
-        
         EmpresaResponse response = mapper.toResponse(empresa);
         return ResponseEntity.ok(response);
     }
@@ -112,10 +97,6 @@ public class EmpresaController {
     @PatchMapping("/{id}/ativar")
     @Operation(summary = "Ativar empresa", description = "Altera o status do empresa para ATIVO")
     public ResponseEntity<EmpresaResponse> ativar(@PathVariable Long id) {
-        // Validação de multi-tenancy antes de ativar
-        Empresa empresa = empresaUseCase.buscarPorId(id);
-        multiTenancyValidator.validarAcessoCompleto(empresa.getClienteId(), empresa.getId());
-        
         Empresa ativado = empresaUseCase.ativar(id);
         return ResponseEntity.ok(mapper.toResponse(ativado));
     }
@@ -123,10 +104,6 @@ public class EmpresaController {
     @PatchMapping("/{id}/inativar")
     @Operation(summary = "Inativar empresa", description = "Altera o status da empresa para INATIVO")
     public ResponseEntity<EmpresaResponse> inativar(@PathVariable Long id) {
-        // Validação de multi-tenancy antes de inativar
-        Empresa empresa = empresaUseCase.buscarPorId(id);
-        multiTenancyValidator.validarAcessoCompleto(empresa.getClienteId(), empresa.getId());
-        
         Empresa inativado = empresaUseCase.inativar(id);
         return ResponseEntity.ok(mapper.toResponse(inativado));
     }
@@ -135,10 +112,6 @@ public class EmpresaController {
     @PatchMapping("/{id}/excluir")
     @Operation(summary = "Excluir empresa", description = "Marca a empresa como excluído (soft delete)")
     public ResponseEntity<EmpresaResponse> excluir(@PathVariable Long id) {
-        // Validação de multi-tenancy antes de excluir
-        Empresa empresa = empresaUseCase.buscarPorId(id);
-        multiTenancyValidator.validarAcessoCompleto(empresa.getClienteId(), empresa.getId());
-        
         Empresa excluido = empresaUseCase.excluir(id);
         return ResponseEntity.ok(mapper.toResponse(excluido));
     }

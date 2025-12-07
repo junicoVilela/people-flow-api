@@ -1,7 +1,9 @@
 package com.peopleflow.accesscontrol.outbound.keycloak.client;
 
 import feign.Logger;
+import feign.Request;
 import feign.RequestInterceptor;
+import feign.Retryer;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +31,23 @@ public class KeycloakFeignConfiguration {
             requestTemplate.header("Content-Type", "application/json");
             requestTemplate.header("Accept", "application/json");
         };
+    }
+
+    @Bean
+    public Request.Options requestOptions() {
+        return new Request.Options(
+            5000,  // connectTimeout: 5 segundos
+            10000  // readTimeout: 10 segundos
+        );
+    }
+
+    @Bean
+    public Retryer retryer() {
+        return new Retryer.Default(
+            1000,   // period: intervalo inicial entre tentativas (1s)
+            2000,   // maxPeriod: intervalo máximo (2s)
+            3       // maxAttempts: máximo de 3 tentativas
+        );
     }
 
     @Bean

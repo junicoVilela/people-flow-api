@@ -12,8 +12,6 @@ public class ColaboradorFilterRequest {
     private String email;
     private String matricula;
     private String status;
-    private Long clienteId;
-    private Long empresaId;
     private Long departamentoId;
     private Long centroCustoId;
     private LocalDate dataAdmissaoInicio;

@@ -45,3 +45,19 @@ keycloak:
   admin:
     username: admin
     password: admin
+
+# Configuração Feign para Keycloak
+feign:
+  client:
+    config:
+      keycloak-admin:
+        connectTimeout: 5000
+        readTimeout: 10000
+        retryer:
+          period: 1000
+          maxPeriod: 2000
+          maxAttempts: 3
+  httpclient:
+    enabled: true
+    connection-timeout: 5000
+    time-to-live: 900000
