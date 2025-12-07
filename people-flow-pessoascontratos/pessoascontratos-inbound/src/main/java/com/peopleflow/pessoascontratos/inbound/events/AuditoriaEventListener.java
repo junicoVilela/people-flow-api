@@ -3,8 +3,7 @@ package com.peopleflow.pessoascontratos.inbound.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peopleflow.common.security.SecurityContextHelper;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorEvent;
-import com.peopleflow.pessoascontratos.outbound.jpa.entity.AuditoriaEntity;
-import com.peopleflow.pessoascontratos.outbound.jpa.repository.AuditoriaJpaRepository;
+import com.peopleflow.pessoascontratos.core.ports.output.AuditoriaPort;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,7 +34,7 @@ import java.time.LocalDateTime;
 public class AuditoriaEventListener {
     
     private static final Logger log = LoggerFactory.getLogger(AuditoriaEventListener.class);
-    private final AuditoriaJpaRepository auditoriaRepository;
+    private final AuditoriaPort auditoriaPort;
     private final SecurityContextHelper securityHelper;
     private final ObjectMapper objectMapper;
     
@@ -59,32 +58,46 @@ public class AuditoriaEventListener {
                  event.ocorridoEm());
         
         try {
-            AuditoriaEntity auditoria = new AuditoriaEntity();
-            auditoria.setEntidade("COLABORADOR");
-            auditoria.setEntidadeId(event.colaboradorId());
-            auditoria.setAcao(tipoEvento);
-            auditoria.setUsuarioId(securityHelper.getSubject());
-            auditoria.setTimestamp(event.ocorridoEm());
+            String usuarioId = securityHelper.getSubject();
+            String ipAddress = null;
+            String userAgent = null;
             
             // Obter IP e User-Agent se disponível
             ServletRequestAttributes attributes = 
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
-                auditoria.setIpAddress(obterIpAddress(request));
-                auditoria.setUserAgent(request.getHeader("User-Agent"));
+                ipAddress = obterIpAddress(request);
+                userAgent = request.getHeader("User-Agent");
             }
             
             // Serializar dados do evento como JSON
+            String dadosJson = null;
             try {
-                String dadosJson = objectMapper.writeValueAsString(event);
-                auditoria.setDadosNovos(dadosJson);
+                dadosJson = objectMapper.writeValueAsString(event);
             } catch (Exception e) {
                 log.warn("Erro ao serializar dados do evento: {}", e.getMessage());
             }
             
-            auditoriaRepository.save(auditoria);
-            log.debug("✅ Registro de auditoria salvo: ID={}", auditoria.getId());
+            // Obter clienteId e empresaId do contexto de segurança se disponível
+            Long clienteId = securityHelper.getClienteId();
+            Long empresaId = securityHelper.getEmpresaId();
+            
+            auditoriaPort.registrar(
+                "COLABORADOR",
+                event.colaboradorId(),
+                tipoEvento,
+                usuarioId,
+                event.ocorridoEm(),
+                dadosJson,
+                null, // dadosAntigos - não disponível neste contexto
+                ipAddress,
+                userAgent,
+                clienteId,
+                empresaId
+            );
+            
+            log.debug("✅ Registro de auditoria salvo para colaborador ID={}", event.colaboradorId());
             
         } catch (Exception e) {
             log.error("❌ Erro ao salvar auditoria: {}", e.getMessage(), e);
