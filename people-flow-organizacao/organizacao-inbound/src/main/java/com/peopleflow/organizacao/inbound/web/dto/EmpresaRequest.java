@@ -27,7 +27,4 @@ public class EmpresaRequest {
             message = "Status deve ser: ativo, inativo ou excluido"
     )
     private String status;
-
-    @NotNull(message = "Cliente ID é obrigatório")
-    private Long clienteId;
 }

@@ -14,8 +14,6 @@ public interface AuditoriaJpaRepository extends JpaRepository<AuditoriaEntity, L
     
     List<AuditoriaEntity> findByUsuarioId(String usuarioId);
     
-    List<AuditoriaEntity> findByClienteId(Long clienteId);
-    
     List<AuditoriaEntity> findByTimestampBetween(LocalDateTime inicio, LocalDateTime fim);
 }
 

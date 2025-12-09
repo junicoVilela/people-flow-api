@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ColaboradorResponse {
     private Long id;
-    private Long clienteId;
     private Long empresaId;
     private Long departamentoId;
     private Long centroCustoId;

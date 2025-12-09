@@ -42,7 +42,4 @@ public class CargoEntity extends AuditableEntity {
 
     @Column(name = "NIVEL", nullable = false)
     private String nivel;
-
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
 }

@@ -10,14 +10,8 @@
 -- ORGANIZAÇÃO / NÚCLEO
 -- ============================
 
-COMMENT ON TABLE PEOPLE_FLOW_RH.CLIENTE IS 
-'Tabela principal de clientes multi-tenant. Representa empresas/organizações que utilizam o sistema.';
-
-COMMENT ON COLUMN PEOPLE_FLOW_RH.CLIENTE.CNPJ IS 'CNPJ no formato 99.999.999/9999-99';
-COMMENT ON COLUMN PEOPLE_FLOW_RH.CLIENTE.STATUS IS 'Status do cliente: ativo, inativo, suspenso';
-
 COMMENT ON TABLE PEOPLE_FLOW_RH.EMPRESA IS 
-'Empresas pertencentes a um cliente. Um cliente pode ter múltiplas empresas (holdings, filiais).';
+'Empresa principal do sistema. Sistema single-tenant.';
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EMPRESA.CNPJ IS 'CNPJ da empresa no formato 99.999.999/9999-99';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EMPRESA.INSCRICAO_ESTADUAL IS 'Inscrição estadual da empresa';
@@ -35,7 +29,7 @@ COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.UNIDADE_ID IS 'Unidade à qual o d
 COMMENT ON TABLE PEOPLE_FLOW_RH.CENTRO_CUSTO IS 
 'Centros de custo para controle financeiro e contábil.';
 
-COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.CODIGO IS 'Código do centro de custo (único por cliente)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.CODIGO IS 'Código do centro de custo (único no sistema)';
 
 -- ============================
 -- NOTA: Tabela USUARIO foi removida

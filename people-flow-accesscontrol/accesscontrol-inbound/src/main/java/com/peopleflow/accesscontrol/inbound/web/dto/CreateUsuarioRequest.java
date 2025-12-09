@@ -27,7 +27,7 @@ public class CreateUsuarioRequest {
     
     /**
      * Atributos customizados do usuário
-     * Ex: clienteId, empresaId, departamento, etc
+     * Ex: empresaId, departamento, etc
      */
     private Map<String, List<String>> attributes;
 }

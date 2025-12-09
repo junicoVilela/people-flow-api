@@ -50,9 +50,6 @@ public class AuditoriaEntity {
     @Column(name = "USER_AGENT", columnDefinition = "TEXT")
     private String userAgent;
 
-    @Column(name = "CLIENTE_ID")
-    private Long clienteId;
-
     @Column(name = "EMPRESA_ID")
     private Long empresaId;
 }

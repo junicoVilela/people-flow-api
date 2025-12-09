@@ -49,9 +49,6 @@ public class DocumentoColaboradorEntity extends AuditableEntity {
     @Column(name = "VERSAO", nullable = false)
     private Integer versao;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
     @Column(name = "COLABORADOR_ID", nullable = false)
     private Long colaboradorId;
 }

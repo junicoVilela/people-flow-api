@@ -39,7 +39,4 @@ public class CentroCustoEntity extends AuditableEntity {
 
     @Column(name = "NOME", nullable = false)
     private String nome;
-
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
 }

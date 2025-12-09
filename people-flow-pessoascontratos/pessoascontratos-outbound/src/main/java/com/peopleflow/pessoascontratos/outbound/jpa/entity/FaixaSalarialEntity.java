@@ -45,9 +45,6 @@ public class FaixaSalarialEntity extends AuditableEntity {
     @Column(name = "MOEDA", nullable = false)
     private String moeda;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
     @Column(name = "CARGO_ID", nullable = false)
-    private Long colaboradorId;
+    private Long cargoId;
 }

@@ -41,9 +41,6 @@ public class ColaboradorRequest {
         message = "Status deve ser: ativo, inativo, demitido ou excluido"
     )
     private String status;
-
-    @NotNull(message = "Cliente ID é obrigatório")
-    private Long clienteId;
     
     @NotNull(message = "Empresa ID é obrigatória")
     private Long empresaId;

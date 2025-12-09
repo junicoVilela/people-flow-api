@@ -57,9 +57,6 @@ public class ColaboradorEntity extends AuditableEntity {
     @Column(name = "STATUS", nullable = false)
     private String status;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
     @Column(name = "EMPRESA_ID", nullable = false)
     private Long empresaId;
 

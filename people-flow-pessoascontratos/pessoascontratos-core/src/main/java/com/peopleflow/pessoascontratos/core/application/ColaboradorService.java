@@ -39,8 +39,8 @@ public class ColaboradorService implements ColaboradorUseCase {
      * @return Colaborador criado
      */
     public Colaborador criar(Colaborador colaborador, boolean requerAcessoSistema) {
-        log.info("Iniciando criação de colaborador: nome={}, clienteId={}, empresaId={}, requerAcesso={}", 
-                 colaborador.getNome(), colaborador.getClienteId(), colaborador.getEmpresaId(), requerAcessoSistema);
+        log.info("Iniciando criação de colaborador: nome={}, empresaId={}, requerAcesso={}", 
+                 colaborador.getNome(), colaborador.getEmpresaId(), requerAcessoSistema);
         
         try {
             validarUnicidadeParaCriacao(colaborador);
@@ -55,7 +55,6 @@ public class ColaboradorService implements ColaboradorUseCase {
                     colaboradorCriado.getEmail().getValor(),
                     colaboradorCriado.getCargoId(),
                     colaboradorCriado.getDepartamentoId(),
-                    colaboradorCriado.getClienteId(),
                     colaboradorCriado.getEmpresaId(),
                     requerAcessoSistema
                 )
@@ -118,7 +117,6 @@ public class ColaboradorService implements ColaboradorUseCase {
                     colaborador.getEmail(),
                     colaborador.getMatricula(),
                     colaborador.getDataAdmissao(),
-                    colaborador.getClienteId(),
                     colaborador.getEmpresaId(),
                     colaborador.getDepartamentoId(),
                     colaborador.getCentroCustoId(),
@@ -164,7 +162,6 @@ public class ColaboradorService implements ColaboradorUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "matricula", original.getMatricula(), atualizado.getMatricula());
         ServiceUtils.compararEAdicionar(camposAlterados, "email", original.getEmail(), atualizado.getEmail());
         ServiceUtils.compararEAdicionar(camposAlterados, "dataAdmissao", original.getDataAdmissao(), atualizado.getDataAdmissao());
-        ServiceUtils.compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
         ServiceUtils.compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
         ServiceUtils.compararEAdicionar(camposAlterados, "departamentoId", original.getDepartamentoId(), atualizado.getDepartamentoId());
         ServiceUtils.compararEAdicionar(camposAlterados, "centroCustoId", original.getCentroCustoId(), atualizado.getCentroCustoId());

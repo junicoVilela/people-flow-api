@@ -16,7 +16,6 @@ import org.mapstruct.Named;
 public interface ColaboradorWebMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "clienteId", ignore = true)
     @Mapping(target = "empresaId", ignore = true)
     @Mapping(target = "departamentoId", ignore = true)
     @Mapping(target = "centroCustoId", ignore = true)

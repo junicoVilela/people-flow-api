@@ -52,9 +52,6 @@ public class ContratoEntity extends AuditableEntity {
     @Column(name = "FIM")
     private LocalDate fim;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
     @Column(name = "COLABORADOR_ID", nullable = false)
     private Long colaboradorId;
 

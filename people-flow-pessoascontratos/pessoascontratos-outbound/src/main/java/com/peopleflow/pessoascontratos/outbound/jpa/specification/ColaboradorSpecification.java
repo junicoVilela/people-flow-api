@@ -66,12 +66,6 @@ public class ColaboradorSpecification {
                 );
             }
 
-            if (filter.getClienteId() != null) {
-                predicates.add(
-                    criteriaBuilder.equal(root.get("clienteId"), filter.getClienteId())
-                );
-            }
-
             if (filter.getEmpresaId() != null) {
                 predicates.add(
                     criteriaBuilder.equal(root.get("empresaId"), filter.getEmpresaId())

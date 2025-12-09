@@ -25,7 +25,6 @@ public class Colaborador {
     private LocalDate dataAdmissao;
     private LocalDate dataDemissao;
     private StatusColaborador status;
-    private Long clienteId;
     private Long empresaId;
     private Long departamentoId;
     private Long centroCustoId;
@@ -47,7 +46,6 @@ public class Colaborador {
                 dataAdmissao,
                 dataDemissao,
                 status,
-                clienteId,
                 empresaId,
                 departamentoId,
                 centroCustoId,
@@ -75,11 +73,6 @@ public class Colaborador {
         
         if (email == null) {
             throw new BusinessException("EMAIL_OBRIGATORIO", "Email é obrigatório");
-        }
-
-        if (clienteId == null) {
-            throw new BusinessException("CLIENTE_ID_OBRIGATORIO", 
-                "Cliente ID é obrigatório");
         }
         
         if (empresaId == null) {
@@ -149,14 +142,13 @@ public class Colaborador {
 
 
     public Colaborador atualizar(String nome, Cpf cpf, Email email, String matricula, LocalDate dataAdmissao,
-                                  Long clienteId, Long empresaId, Long departamentoId, Long centroCustoId, Long cargoId) {
+                                  Long empresaId, Long departamentoId, Long centroCustoId, Long cargoId) {
         return this.toBuilder()
             .nome(nome)
             .cpf(cpf)
             .email(email)
             .matricula(matricula)
             .dataAdmissao(dataAdmissao)
-            .clienteId(clienteId)
             .empresaId(empresaId)
             .departamentoId(departamentoId)
             .centroCustoId(centroCustoId)
@@ -216,8 +208,7 @@ public class Colaborador {
      * @param emailString Email (será validado e convertido para Value Object)
      * @param matricula Matrícula do colaborador
      * @param dataAdmissao Data de admissão (se null, usa a data atual)
-     * @param clienteId ID do cliente (contexto de segurança)
-     * @param empresaId ID da empresa (contexto de segurança)
+     * @param empresaId ID da empresa
      * @param departamentoId ID do departamento (opcional)
      * @param centroCustoId ID do centro de custo (opcional)
      * @return Colaborador criado e validado
@@ -228,7 +219,6 @@ public class Colaborador {
             String emailString,
             String matricula,
             LocalDate dataAdmissao,
-            Long clienteId,
             Long empresaId,
             Long departamentoId,
             Long centroCustoId) {
@@ -248,7 +238,6 @@ public class Colaborador {
             .matricula(matricula)
             .dataAdmissao(dataAdmissaoFinal)
             .status(StatusColaborador.ATIVO)
-            .clienteId(clienteId)
             .empresaId(empresaId)
             .departamentoId(departamentoId)
             .centroCustoId(centroCustoId)
@@ -319,7 +308,7 @@ public class Colaborador {
             .empresaId(novaEmpresaId)
             .departamentoId(novoDepartamentoId)
             .centroCustoId(novoCentroCustoId)
-            // Mantém: nome, cpf, email, matricula, dataAdmissao, clienteId, status
+            // Mantém: nome, cpf, email, matricula, dataAdmissao, status
             .build();
     }
     
@@ -340,7 +329,6 @@ public class Colaborador {
      * @param matriculaLegado Matrícula do sistema antigo
      * @param dataAdmissao Data de admissão histórica (obrigatória)
      * @param statusLegado Status no sistema legado (será traduzido)
-     * @param clienteId ID do cliente
      * @param empresaId ID da empresa
      * @param departamentoId ID do departamento (opcional)
      * @param centroCustoId ID do centro de custo (opcional)
@@ -354,7 +342,6 @@ public class Colaborador {
             String matriculaLegado,
             LocalDate dataAdmissao,
             String statusLegado,
-            Long clienteId,
             Long empresaId,
             Long departamentoId,
             Long centroCustoId) {
@@ -389,7 +376,6 @@ public class Colaborador {
             .matricula(novaMatricula)
             .dataAdmissao(dataAdmissao)
             .status(statusTraduzido)
-            .clienteId(clienteId)
             .empresaId(empresaId)
             .departamentoId(departamentoId)
             .centroCustoId(centroCustoId)

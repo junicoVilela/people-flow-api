@@ -48,9 +48,6 @@ public class DependenteEntity extends AuditableEntity {
     @Column(name = "CPF")
     private String cpf;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
     @Column(name = "COLABORADOR_ID", nullable = false)
     private Long colaboradorId;
 }

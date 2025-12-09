@@ -31,7 +31,6 @@ public class AuditoriaAdapter implements AuditoriaPort {
             String dadosAntigos,
             String ipAddress,
             String userAgent,
-            Long clienteId,
             Long empresaId) {
         
         AuditoriaEntity entity = new AuditoriaEntity();
@@ -44,7 +43,6 @@ public class AuditoriaAdapter implements AuditoriaPort {
         entity.setDadosAntigos(dadosAntigos);
         entity.setIpAddress(ipAddress);
         entity.setUserAgent(userAgent);
-        entity.setClienteId(clienteId);
         entity.setEmpresaId(empresaId);
         
         repository.save(entity);

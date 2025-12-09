@@ -18,7 +18,6 @@ public class ColaboradorFilter {
     private String email;
     private String matricula;
     private String status;
-    private Long clienteId;
     private Long empresaId;
     private Long departamentoId;
     private Long centroCustoId;
@@ -33,7 +32,6 @@ public class ColaboradorFilter {
                email != null || 
                matricula != null || 
                status != null ||
-               clienteId != null || 
                empresaId != null || 
                departamentoId != null || 
                centroCustoId != null ||

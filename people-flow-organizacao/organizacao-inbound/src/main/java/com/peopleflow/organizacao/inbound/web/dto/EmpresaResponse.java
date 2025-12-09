@@ -17,5 +17,4 @@ public class EmpresaResponse {
     private String cnpj;
     private String inscricaoEstadual;
     private String status;
-    private Long clienteId;
 }

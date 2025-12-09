@@ -36,7 +36,7 @@ public class ColaboradorEventListener {
      * - username = email do colaborador
      * - firstName = nome
      * - lastName = sobrenome
-     * - atributos customizados: clienteId, empresaId, colaboradorId
+     * - atributos customizados: empresaId, colaboradorId
      */
     @Async
     @EventListener
@@ -82,7 +82,6 @@ public class ColaboradorEventListener {
             Map<String, List<String>> attributes = Map.of(
                 "colaboradorId", List.of(event.colaboradorId().toString()),
                 "cpf", List.of(event.cpf()),
-                "clienteId", List.of(event.clienteId().toString()),
                 "empresaId", List.of(event.empresaId().toString())
             );
             

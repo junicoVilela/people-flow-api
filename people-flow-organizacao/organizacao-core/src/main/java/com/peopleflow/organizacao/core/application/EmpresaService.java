@@ -25,23 +25,20 @@ public class EmpresaService implements EmpresaUseCase {
 
     @Override
     public Empresa criar(Empresa empresa) {
-        log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}, status={}, clienteId={}",
+        log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}, status={}",
                 empresa.getNome(),
                 empresa.getCnpj(),
                 empresa.getInscricaoEstadual(),
-                empresa.getStatus(),
-                empresa.getClienteId());
+                empresa.getStatus());
 
         validarUnicidadeCriacao(empresa);
 
         Empresa empresaCriar = empresaRepository.salvar(empresa);
 
-        log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}, status={}, clienteId={}",
+        log.info("Empresa criada com sucesso: nome={}, cnpj={}, id={}",
                 empresa.getNome(),
                 empresa.getCnpj(),
-                empresa.getInscricaoEstadual(),
-                empresa.getStatus(),
-                empresa.getClienteId());
+                empresaCriar.getId());
 
         return empresaCriar;
     }
@@ -62,8 +59,7 @@ public class EmpresaService implements EmpresaUseCase {
             Empresa empresaAtualizar = original.atualizar(
                     empresa.getNome(),
                     empresa.getCnpj(),
-                    empresa.getInscricaoEstadual(),
-                    empresa.getClienteId()
+                    empresa.getInscricaoEstadual()
                     ).toBuilder()
                     .id(id)
                     .build();
@@ -173,7 +169,6 @@ public class EmpresaService implements EmpresaUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
         ServiceUtils.compararEAdicionar(camposAlterados, "cnpj", original.getCnpj(), atualizado.getCnpj());
         ServiceUtils.compararEAdicionar(camposAlterados, "inscricaoEstadual", original.getInscricaoEstadual(), atualizado.getInscricaoEstadual());
-        ServiceUtils.compararEAdicionar(camposAlterados, "clienteId", original.getClienteId(), atualizado.getClienteId());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }

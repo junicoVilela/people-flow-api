@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  * Informações disponíveis:
  * - Username (preferred_username)
  * - Email
- * - ClienteId (atributo customizado)
  * - EmpresaId (atributo customizado)
  * - Subject (ID do usuário no Keycloak)
  * - Roles/Permissões
@@ -61,28 +60,6 @@ public class SecurityContextHelper {
                         return givenName + " " + familyName;
                     }
                     return jwt.getClaimAsString("name");
-                })
-                .orElse(null);
-    }
-
-    /**
-     * Obtém o clienteId do contexto do usuário
-     * Este é um atributo customizado configurado no Keycloak
-     * @return clienteId ou null se não disponível
-     */
-    public Long getClienteId() {
-        return getJwt()
-                .map(jwt -> {
-                    Object clienteId = jwt.getClaim("clienteId");
-                    if (clienteId == null) {
-                        return null;
-                    }
-                    if (clienteId instanceof String) {
-                        return Long.parseLong((String) clienteId);
-                    } else if (clienteId instanceof Number) {
-                        return ((Number) clienteId).longValue();
-                    }
-                    return null;
                 })
                 .orElse(null);
     }

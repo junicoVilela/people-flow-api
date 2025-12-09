@@ -79,8 +79,7 @@ public class AuditoriaEventListener {
                 log.warn("Erro ao serializar dados do evento: {}", e.getMessage());
             }
             
-            // Obter clienteId e empresaId do contexto de segurança se disponível
-            Long clienteId = securityHelper.getClienteId();
+            // Obter empresaId do contexto de segurança se disponível
             Long empresaId = securityHelper.getEmpresaId();
             
             auditoriaPort.registrar(
@@ -93,7 +92,6 @@ public class AuditoriaEventListener {
                 null, // dadosAntigos - não disponível neste contexto
                 ipAddress,
                 userAgent,
-                clienteId,
                 empresaId
             );
             

@@ -18,13 +18,7 @@
 -- ============================
 -- ORGANIZAÇÃO / NÚCLEO
 -- ============================
-
-ALTER SEQUENCE PEOPLE_FLOW_RH.CLIENTE_ID_SEQ
-    INCREMENT BY 1
-    MINVALUE 1
-    NO MAXVALUE
-    CACHE 20
-    NO CYCLE;
+-- NOTA: Sequence CLIENTE_ID_SEQ removida - sistema single-tenant
 
 ALTER SEQUENCE PEOPLE_FLOW_RH.EMPRESA_ID_SEQ
     INCREMENT BY 1
@@ -455,11 +449,11 @@ ALTER SEQUENCE PEOPLE_FLOW_RH.EXAME_AGENDAMENTO_ID_SEQ
 -- ORDER BY sequencename;
 
 -- Resetar uma sequence específica (exemplo):
--- SELECT setval('people_flow_rh.cliente_id_seq', 1, false);
+-- SELECT setval('people_flow_rh.empresa_id_seq', 1, false);
 
 -- Resetar sequence para o próximo valor após o último ID usado:
--- SELECT setval('people_flow_rh.cliente_id_seq', 
---               (SELECT COALESCE(MAX(id), 0) + 1 FROM people_flow_rh.cliente), 
+-- SELECT setval('people_flow_rh.empresa_id_seq', 
+--               (SELECT COALESCE(MAX(id), 0) + 1 FROM people_flow_rh.empresa), 
 --               false);
 
 -- Ver uso de sequences (queries ativas):

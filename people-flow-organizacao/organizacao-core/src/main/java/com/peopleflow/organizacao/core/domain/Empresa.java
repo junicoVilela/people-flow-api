@@ -21,7 +21,6 @@ public class Empresa {
     private Cnpj cnpj;
     private InscricaoEstadual inscricaoEstadual;
     private StatusEmpresa status;
-    private Long clienteId;
 
     public static class EmpresaBuilder {
         public Empresa build() {
@@ -34,8 +33,7 @@ public class Empresa {
                     nome,
                     cnpj,
                     inscricaoEstadual,
-                    status,
-                    clienteId
+                    status
             );
 
             if (empresa.nome != null) {
@@ -54,20 +52,13 @@ public class Empresa {
         if (cnpj == null) {
             throw new BusinessException("CNPJ_OBRIGATORIO", "CPF é obrigatório");
         }
-
-        if (clienteId == null) {
-            throw new BusinessException("CLIENTE_ID_OBRIGATORIO",
-                    "Cliente ID é obrigatório");
-        }
-
     }
 
-    public Empresa atualizar(String nome, Cnpj cnpj, InscricaoEstadual inscricaoEstadual, Long clienteId) {
+    public Empresa atualizar(String nome, Cnpj cnpj, InscricaoEstadual inscricaoEstadual) {
         return this.toBuilder()
                 .nome(nome)
                 .cnpj(cnpj)
                 .inscricaoEstadual(inscricaoEstadual)
-                .clienteId(clienteId)
                 .build();
     }
 
@@ -104,8 +95,7 @@ public class Empresa {
     public static Empresa nova(
             String nome,
             String cnpjString,
-            String inscricaoEstadualString,
-            Long clienteId) {
+            String inscricaoEstadualString) {
         
         // Validar e criar Value Objects (lança exceção se inválido)
         Cnpj cnpj = new Cnpj(cnpjString);
@@ -117,7 +107,6 @@ public class Empresa {
             .cnpj(cnpj)
             .inscricaoEstadual(inscricaoEstadual)
             .status(StatusEmpresa.ATIVO)
-            .clienteId(clienteId)
             .build();
     }
 }

@@ -22,7 +22,6 @@ public interface AuditoriaPort {
      * @param dadosAntigos Dados antigos em formato JSON (opcional)
      * @param ipAddress Endereço IP do cliente (opcional)
      * @param userAgent User-Agent do cliente (opcional)
-     * @param clienteId ID do cliente (opcional)
      * @param empresaId ID da empresa (opcional)
      */
     void registrar(
@@ -35,7 +34,6 @@ public interface AuditoriaPort {
         String dadosAntigos,
         String ipAddress,
         String userAgent,
-        Long clienteId,
         Long empresaId
     );
 }

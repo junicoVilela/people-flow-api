@@ -49,9 +49,6 @@ public class ContaBancariaEntity extends AuditableEntity {
     @Column(name = "PIX", nullable = false)
     private String pix;
 
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
-
     @Column(name = "COLABORADOR_ID", nullable = false)
     private Long colaboradorId;
 }

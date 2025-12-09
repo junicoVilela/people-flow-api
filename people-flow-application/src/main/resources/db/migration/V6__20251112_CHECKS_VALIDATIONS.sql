@@ -13,12 +13,6 @@
 -- ORGANIZAÇÃO / NÚCLEO
 -- ============================
 
-ALTER TABLE PEOPLE_FLOW_RH.CLIENTE
-    ADD CONSTRAINT CHK_CLIENTE_STATUS CHECK (STATUS IN ('ativo', 'inativo', 'suspenso'));
-
-ALTER TABLE PEOPLE_FLOW_RH.CLIENTE
-    ADD CONSTRAINT CHK_CLIENTE_CNPJ_LENGTH CHECK (CNPJ IS NULL OR LENGTH(CNPJ) = 18);
-
 -- ============================
 -- PESSOAS / COLABORADORES
 -- ============================

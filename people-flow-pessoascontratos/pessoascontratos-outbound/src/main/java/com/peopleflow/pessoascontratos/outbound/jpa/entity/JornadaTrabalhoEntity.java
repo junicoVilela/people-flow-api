@@ -41,7 +41,4 @@ public class JornadaTrabalhoEntity extends AuditableEntity {
 
     @Column(name = "DESCRICAO")
     private String descricao;
-
-    @Column(name = "CLIENTE_ID", nullable = false)
-    private Long clienteId;
 }
