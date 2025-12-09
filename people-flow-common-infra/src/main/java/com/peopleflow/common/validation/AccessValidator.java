@@ -8,13 +8,11 @@ import org.springframework.stereotype.Component;
 /**
  * Validador de acesso para garantir que usuários
  * acessem apenas dados de sua própria empresa
- * 
- * NOTA: Sistema single-tenant - validações de clienteId removidas
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MultiTenancyValidator {
+public class AccessValidator {
 
     private final SecurityContextHelper securityHelper;
 
@@ -22,22 +20,22 @@ public class MultiTenancyValidator {
      * Valida se o usuário tem acesso à empresaId especificada
      * 
      * @param empresaId ID da empresa a ser validada
-     * @throws MultiTenancyViolationException se o usuário não tiver acesso
+     * @throws AccessViolationException se o usuário não tiver acesso
      */
     public void validarAcessoEmpresa(Long empresaId) {
         Long userEmpresaId = securityHelper.getEmpresaId();
         
         if (userEmpresaId == null) {
             log.warn("⚠️ Usuário sem empresaId atribuído: {}", securityHelper.getUsername());
-            throw new MultiTenancyViolationException(
+            throw new AccessViolationException(
                 "Usuário não possui empresaId atribuído. Contate o administrador."
             );
         }
 
         if (!userEmpresaId.equals(empresaId)) {
-            log.error("🚨 VIOLAÇÃO DE MULTI-TENANCY: Usuário {} (empresaId={}) tentou acessar dados da empresaId={}",
+            log.error("🚨 VIOLAÇÃO DE ACESSO: Usuário {} (empresaId={}) tentou acessar dados da empresaId={}",
                     securityHelper.getUsername(), userEmpresaId, empresaId);
-            throw new MultiTenancyViolationException(
+            throw new AccessViolationException(
                 String.format("Acesso negado: você não tem permissão para acessar dados da empresa %d", empresaId)
             );
         }

@@ -15,10 +15,8 @@
 --   - 100: Alto volume de inserções (logs, marcações)
 --
 
--- ============================
--- ORGANIZAÇÃO / NÚCLEO
--- ============================
--- NOTA: Sequence CLIENTE_ID_SEQ removida - sistema single-tenant
+COMMENT ON TABLE PEOPLE_FLOW_RH.EMPRESA IS 
+'Empresa principal do sistema.';
 
 ALTER SEQUENCE PEOPLE_FLOW_RH.EMPRESA_ID_SEQ
     INCREMENT BY 1

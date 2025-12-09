@@ -11,7 +11,7 @@
 -- ============================
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.EMPRESA IS 
-'Empresa principal do sistema. Sistema single-tenant.';
+'Empresa principal do sistema.';
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EMPRESA.CNPJ IS 'CNPJ da empresa no formato 99.999.999/9999-99';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.EMPRESA.INSCRICAO_ESTADUAL IS 'Inscrição estadual da empresa';
@@ -328,7 +328,7 @@ COMMENT ON TABLE PEOPLE_FLOW_RH.LOG_WORKFLOW IS
 -- AUDITORIA
 -- ============================
 -- Tabela AUDITORIA substitui EVENTO_AUDITORIA
--- Mantém separação de dados antigos/novos, IP, User-Agent e multi-tenancy completo
+-- Mantém separação de dados antigos/novos, IP, User-Agent e controle de acesso completo
 
 -- ============================
 -- NOTIFICAÇÕES
