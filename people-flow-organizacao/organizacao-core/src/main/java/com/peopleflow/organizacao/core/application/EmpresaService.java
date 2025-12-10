@@ -3,6 +3,7 @@ package com.peopleflow.organizacao.core.application;
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.util.ServiceUtils;
+import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
@@ -22,6 +23,7 @@ public class EmpresaService implements EmpresaUseCase {
     private static final Logger log = LoggerFactory.getLogger(EmpresaService.class);
 
     private final EmpresaRepositoryPort empresaRepository;
+    private final AccessValidatorPort accessValidator;
 
     @Override
     public Empresa criar(Empresa empresa) {
@@ -55,6 +57,11 @@ public class EmpresaService implements EmpresaUseCase {
             }
 
             Empresa original = buscarPorId(id);
+            
+            // Valida acesso à empresa antes de atualizar
+            if (!accessValidator.isAdmin()) {
+                accessValidator.validarAcessoEmpresa(original.getId());
+            }
 
             Empresa empresaAtualizar = original.atualizar(
                     empresa.getNome(),
@@ -93,6 +100,11 @@ public class EmpresaService implements EmpresaUseCase {
                     return new ResourceNotFoundException("Empresa", id);
                 });
 
+        // Valida acesso à empresa
+        if (!accessValidator.isAdmin()) {
+            accessValidator.validarAcessoEmpresa(empresa.getId());
+        }
+
         return empresa;
     }
 
@@ -112,6 +124,11 @@ public class EmpresaService implements EmpresaUseCase {
         log.info("Ativando empresa: id={}", id);
 
         Empresa empresa = buscarPorId(id);
+        
+        // Valida acesso à empresa antes de ativar
+        if (!accessValidator.isAdmin()) {
+            accessValidator.validarAcessoEmpresa(empresa.getId());
+        }
         Empresa empresaAtivado = empresa.ativar();
         Empresa resultado = empresaRepository.salvar(empresaAtivado);
 
@@ -125,6 +142,11 @@ public class EmpresaService implements EmpresaUseCase {
         log.info("Inativando empresa: id={}", id);
 
         Empresa empresa = buscarPorId(id);
+        
+        // Valida acesso à empresa antes de inativar
+        if (!accessValidator.isAdmin()) {
+            accessValidator.validarAcessoEmpresa(empresa.getId());
+        }
         Empresa empresaInativado = empresa.inativar();
         Empresa resultado = empresaRepository.salvar(empresaInativado);
 
@@ -138,6 +160,11 @@ public class EmpresaService implements EmpresaUseCase {
         log.info("Excluindo empresa (soft delete): id={}", id);
 
         Empresa empresa = buscarPorId(id);
+        
+        // Valida acesso à empresa antes de excluir
+        if (!accessValidator.isAdmin()) {
+            accessValidator.validarAcessoEmpresa(empresa.getId());
+        }
         Empresa empresaExcluido = empresa.excluir();
         Empresa resultado = empresaRepository.salvar(empresaExcluido);
 

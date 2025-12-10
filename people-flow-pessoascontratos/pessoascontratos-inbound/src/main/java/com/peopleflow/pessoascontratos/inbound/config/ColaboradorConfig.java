@@ -2,6 +2,7 @@ package com.peopleflow.pessoascontratos.inbound.config;
 
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
+import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.pessoascontratos.core.application.ColaboradorService;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
@@ -22,8 +23,9 @@ public class ColaboradorConfig {
     @Bean
     public ColaboradorUseCase colaboradorUseCase(
             ColaboradorRepositoryPort repository,
-            DomainEventPublisher eventPublisher) {
-        ColaboradorService service = new ColaboradorService(repository, eventPublisher);
+            DomainEventPublisher eventPublisher,
+            AccessValidatorPort accessValidator) {
+        ColaboradorService service = new ColaboradorService(repository, eventPublisher, accessValidator);
         return new TransactionalColaboradorUseCase(service);
     }
 

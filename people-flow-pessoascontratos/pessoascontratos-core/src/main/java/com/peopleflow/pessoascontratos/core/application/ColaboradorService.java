@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.application;
 import com.peopleflow.common.exception.BusinessException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.util.ServiceUtils;
+import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.domain.events.*;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
@@ -26,6 +27,7 @@ public class ColaboradorService implements ColaboradorUseCase {
 
     private final ColaboradorRepositoryPort colaboradorRepository;
     private final DomainEventPublisher eventPublisher;
+    private final AccessValidatorPort accessValidator;
 
     @Override
     public Colaborador criar(Colaborador colaborador) {
@@ -43,6 +45,11 @@ public class ColaboradorService implements ColaboradorUseCase {
                  colaborador.getNome(), colaborador.getEmpresaId(), requerAcessoSistema);
         
         try {
+            // Valida acesso à empresa antes de criar
+            if (colaborador.getEmpresaId() != null && !accessValidator.isAdmin()) {
+                accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
+            }
+            
             validarUnicidadeParaCriacao(colaborador);
             
             Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
@@ -84,6 +91,11 @@ public class ColaboradorService implements ColaboradorUseCase {
                     return new ResourceNotFoundException("Colaborador", id);
                 });
         
+        // Valida acesso à empresa do colaborador
+        if (colaborador.getEmpresaId() != null && !accessValidator.isAdmin()) {
+            accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
+        }
+        
         return colaborador;
     }
 
@@ -92,10 +104,59 @@ public class ColaboradorService implements ColaboradorUseCase {
         log.debug("Buscando colaboradores com filtros: page={}, size={}", 
                   pagination.page(), pagination.size());
         
-        PagedResult<Colaborador> result = colaboradorRepository.buscarPorFiltros(filter, pagination);
+        // Aplica filtro automático de empresaId se não for admin
+        ColaboradorFilter filterComSeguranca = aplicarFiltrosDeSeguranca(filter);
+        
+        PagedResult<Colaborador> result = colaboradorRepository.buscarPorFiltros(filterComSeguranca, pagination);
         
         log.debug("Encontrados {} colaboradores", result.totalElements());
         return result;
+    }
+    
+    /**
+     * Aplica filtros de segurança automaticamente baseado no contexto do usuário
+     */
+    private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
+        if (accessValidator.isAdmin()) {
+            // Admin vê tudo
+            return filter;
+        }
+        
+        Long empresaIdUsuario = accessValidator.getEmpresaIdUsuario();
+        if (empresaIdUsuario == null) {
+            log.warn("Usuário sem empresaId - bloqueando acesso a todos os colaboradores");
+            // Retorna filtro que não retornará resultados
+            return ColaboradorFilter.builder()
+                    .empresaId(-1L) // ID inválido que não retornará resultados
+                    .build();
+        }
+        
+        // Se o filtro já tem empresaId, valida se corresponde ao do usuário
+        if (filter.getEmpresaId() != null && !filter.getEmpresaId().equals(empresaIdUsuario)) {
+            log.warn("Tentativa de filtrar por empresaId diferente do usuário: filtro={}, usuario={}", 
+                    filter.getEmpresaId(), empresaIdUsuario);
+            accessValidator.validarAcessoEmpresa(filter.getEmpresaId());
+        }
+        
+        // Aplica empresaId do usuário se não foi especificado
+        if (filter.getEmpresaId() == null) {
+            return ColaboradorFilter.builder()
+                    .nome(filter.getNome())
+                    .cpf(filter.getCpf())
+                    .email(filter.getEmail())
+                    .matricula(filter.getMatricula())
+                    .status(filter.getStatus())
+                    .empresaId(empresaIdUsuario)
+                    .departamentoId(filter.getDepartamentoId())
+                    .centroCustoId(filter.getCentroCustoId())
+                    .dataAdmissaoInicio(filter.getDataAdmissaoInicio())
+                    .dataAdmissaoFim(filter.getDataAdmissaoFim())
+                    .dataDemissaoInicio(filter.getDataDemissaoInicio())
+                    .dataDemissaoFim(filter.getDataDemissaoFim())
+                    .build();
+        }
+        
+        return filter;
     }
 
     @Override
@@ -110,6 +171,16 @@ public class ColaboradorService implements ColaboradorUseCase {
             }
 
             Colaborador original = buscarPorId(id);
+            
+            // Valida acesso à empresa antes de atualizar
+            if (colaborador.getEmpresaId() != null && !accessValidator.isAdmin()) {
+                accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
+                // Garante que não está tentando mudar a empresa
+                if (!colaborador.getEmpresaId().equals(original.getEmpresaId())) {
+                    throw new BusinessException("EMPRESA_NAO_PODE_SER_ALTERADA",
+                            "Não é permitido alterar a empresa de um colaborador");
+                }
+            }
 
             Colaborador colaboradorParaAtualizar = original.atualizar(
                     colaborador.getNome(),

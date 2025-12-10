@@ -12,16 +12,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AccessValidator {
+public class AccessValidator implements AccessValidatorPort {
 
     private final SecurityContextHelper securityHelper;
 
-    /**
-     * Valida se o usuário tem acesso à empresaId especificada
-     * 
-     * @param empresaId ID da empresa a ser validada
-     * @throws AccessViolationException se o usuário não tiver acesso
-     */
+    @Override
     public void validarAcessoEmpresa(Long empresaId) {
         Long userEmpresaId = securityHelper.getEmpresaId();
         
@@ -43,20 +38,12 @@ public class AccessValidator {
         log.debug("✅ Acesso à empresaId {} validado para usuário {}", empresaId, securityHelper.getUsername());
     }
 
-    /**
-     * Retorna a empresaId do usuário autenticado
-     * 
-     * @return empresaId ou null se não atribuído
-     */
+    @Override
     public Long getEmpresaIdUsuario() {
         return securityHelper.getEmpresaId();
     }
 
-    /**
-     * Verifica se o usuário é admin (bypass de validações)
-     * 
-     * @return true se o usuário tem role 'admin'
-     */
+    @Override
     public boolean isAdmin() {
         return securityHelper.hasRole("admin");
     }

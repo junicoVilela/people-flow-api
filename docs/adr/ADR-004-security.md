@@ -6,7 +6,7 @@
 ## Contexto
 O projeto precisa:
 - Autenticar usuários via OAuth2/JWT
-- Controlar acesso por cliente/empresa
+- Controlar acesso por empresa
 - Validar permissões em operações de negócio
 - Manter auditoria de operações
 
@@ -35,7 +35,6 @@ O projeto precisa:
 ```java
 // Core (interface)
 public interface SecurityContext {
-    boolean canAccessCliente(Long clienteId);
     boolean canAccessEmpresa(Long empresaId);
     boolean isGlobalAdmin();
 }
@@ -60,10 +59,7 @@ public class SpringSecurityContextAdapter implements SecurityContext {
 ```java
 public Colaborador criar(Colaborador colaborador) {
     // Valida permissão antes de criar
-    validarPermissaoDeAcesso(
-        colaborador.getClienteId(), 
-        colaborador.getEmpresaId()
-    );
+    accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
     // ... resto da lógica
 }
 ```
@@ -80,11 +76,12 @@ public Colaborador criar(Colaborador colaborador) {
 **Exemplo:**
 ```java
 private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
-    if (securityContext.isGlobalAdmin()) {
+    if (accessValidator.isAdmin()) {
         return filter; // Admin vê tudo
     }
-    // Usuário comum só vê seus clientes/empresas
-    return filter.withClienteIds(securityContext.getAllowedClienteIds());
+    // Usuário comum só vê dados de sua empresa
+    Long empresaIdUsuario = accessValidator.getEmpresaIdUsuario();
+    return filter.toBuilder().empresaId(empresaIdUsuario).build();
 }
 ```
 

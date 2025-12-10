@@ -1,11 +1,12 @@
 package com.peopleflow.organizacao.inbound.config;
 
+import com.peopleflow.common.pagination.PagedResult;
+import com.peopleflow.common.pagination.Pagination;
+import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.core.application.EmpresaService;
 import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.ports.input.EmpresaUseCase;
 import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
-import com.peopleflow.common.pagination.PagedResult;
-import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmpresaConfig {
 
     @Bean
-    public EmpresaUseCase empresaUseCase(EmpresaRepositoryPort repository) {
-        EmpresaService service = new EmpresaService(repository);
+    public EmpresaUseCase empresaUseCase(
+            EmpresaRepositoryPort repository,
+            AccessValidatorPort accessValidator) {
+        EmpresaService service = new EmpresaService(repository, accessValidator);
         return new TransactionalEmpresaUseCase(service);
     }
 

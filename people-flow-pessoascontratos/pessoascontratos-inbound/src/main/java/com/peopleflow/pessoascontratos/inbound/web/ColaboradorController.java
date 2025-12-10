@@ -2,6 +2,7 @@ package com.peopleflow.pessoascontratos.inbound.web;
 
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
+import com.peopleflow.common.security.SecurityContextHelper;
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
@@ -38,12 +39,20 @@ public class ColaboradorController {
 
     private final ColaboradorUseCase colaboradorUseCase;
     private final ColaboradorWebMapper mapper;
+    private final SecurityContextHelper securityHelper;
 
     @PostMapping
     @PreAuthorize("hasRole('colaborador:criar')")
     @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")
     public ResponseEntity<ColaboradorResponse> criar(@Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
+        
+        if (colaborador.getEmpresaId() == null) {
+            Long empresaId = securityHelper.getEmpresaId();
+            if (empresaId != null) {
+                colaborador = colaborador.toBuilder().empresaId(empresaId).build();
+            }
+        }
 
         Colaborador colaboradorCriado = colaboradorUseCase.criar(colaborador);
         
@@ -97,6 +106,14 @@ public class ColaboradorController {
     @Operation(summary = "Atualizar colaborador", description = "Atualiza os dados de um colaborador existente")
     public ResponseEntity<ColaboradorResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
+        
+        if (colaborador.getEmpresaId() == null) {
+            Long empresaId = securityHelper.getEmpresaId();
+            if (empresaId != null) {
+                colaborador = colaborador.toBuilder().empresaId(empresaId).build();
+            }
+        }
+        
         Colaborador colaboradorAtualizado = colaboradorUseCase.atualizar(id, colaborador);
         ColaboradorResponse response = mapper.toResponse(colaboradorAtualizado);
         return ResponseEntity.ok(response);
