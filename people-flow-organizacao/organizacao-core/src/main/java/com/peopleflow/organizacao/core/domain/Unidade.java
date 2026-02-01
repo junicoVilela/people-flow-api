@@ -1,8 +1,6 @@
 package com.peopleflow.organizacao.core.domain;
 
 import com.peopleflow.common.exception.BusinessException;
-import com.peopleflow.common.valueobject.Cnpj;
-import com.peopleflow.common.valueobject.InscricaoEstadual;
 import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,33 +12,32 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Empresa {
+public class Unidade {
 
     private Long id;
     private String nome;
-    private Cnpj cnpj;
-    private InscricaoEstadual inscricaoEstadual;
+    private String codigo;
+    private Long empresaId;
     private StatusOrganizacao status;
 
-    public static class EmpresaBuilder {
-        public Empresa build() {
+    public static class UnidadeBuilder {
+        public Unidade build() {
             if (status == null) {
                 status = StatusOrganizacao.ATIVO;
             }
-
-            Empresa empresa = new Empresa(
+            Unidade unidade = new Unidade(
                     id,
                     nome,
-                    cnpj,
-                    inscricaoEstadual,
+                    codigo,
+                    empresaId,
                     status
             );
 
-            if (empresa.nome != null) {
-                empresa.validarInvariantes();
+            if (unidade.nome != null) {
+                unidade.validarInvariantes();
             }
 
-            return empresa;
+            return unidade;
         }
     }
 
@@ -49,57 +46,57 @@ public class Empresa {
             throw new BusinessException("NOME_OBRIGATORIO", "Nome é obrigatório");
         }
 
-        if (cnpj == null) {
-            throw new BusinessException("CNPJ_OBRIGATORIO", "CNPJ é obrigatório");
+        if (codigo == null || codigo.trim().isEmpty()) {
+            throw new BusinessException("CODIGO_OBRIGATORIO", "Código é obrigatório");
+        }
+
+        if (empresaId == null) {
+            throw new BusinessException("EMPRESA_ID_OBRIGATORIO",
+                    "Empresa ID é obrigatória");
         }
     }
 
-    public static Empresa nova(
+    public static Unidade nova(
             String nome,
-            String cnpjString,
-            String inscricaoEstadualString,
+            String codigo,
+            Long empresaId,
             StatusOrganizacao status) {
 
-        Cnpj cnpj = new Cnpj(cnpjString);
-        InscricaoEstadual inscricaoEstadual = InscricaoEstadual.of(inscricaoEstadualString);
-
-        return Empresa.builder()
+        return Unidade.builder()
                 .nome(nome)
-                .cnpj(cnpj)
-                .inscricaoEstadual(inscricaoEstadual)
+                .codigo(codigo)
+                .empresaId(empresaId)
                 .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 
-    public Empresa atualizar(String nome, Cnpj cnpj, InscricaoEstadual inscricaoEstadual) {
+    public Unidade atualizar(String nome, String codigo, Long empresaId) {
         return this.toBuilder()
                 .nome(nome)
-                .cnpj(cnpj)
-                .inscricaoEstadual(inscricaoEstadual)
+                .codigo(codigo)
+                .empresaId(empresaId)
                 .build();
     }
 
-    public Empresa ativar() {
+    public Unidade ativar() {
         if (isExcluido()) {
-            throw new BusinessException("EMPRESA_EXCLUIDA", "Não é possível ativar empresa excluída");
+            throw new BusinessException("UNIDADE_EXCLUIDA", "Não é possível ativar unidade excluída");
         }
-
         return this.toBuilder()
                 .status(StatusOrganizacao.ATIVO)
                 .build();
     }
 
-    public Empresa inativar() {
+    public Unidade inativar() {
         return this.toBuilder()
                 .status(StatusOrganizacao.INATIVO)
                 .build();
     }
 
-    public Empresa excluir() {
+    public Unidade excluir() {
         if (isExcluido()) {
-            throw new BusinessException("EMPRESA_JA_EXCLUIDA", "Empresa já está excluída");
+            throw new BusinessException("UNIDADE_JA_EXCLUIDA", "Unidade já está excluída");
         }
-
         return this.toBuilder()
                 .status(StatusOrganizacao.EXCLUIDO)
                 .build();

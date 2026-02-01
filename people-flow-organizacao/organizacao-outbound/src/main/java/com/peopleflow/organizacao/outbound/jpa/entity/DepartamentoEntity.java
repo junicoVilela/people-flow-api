@@ -45,4 +45,7 @@ public class DepartamentoEntity extends AuditableEntity {
 
     @Column(name = "UNIDADE_ID")
     private Long unidadeId;
+
+    @Column(name = "STATUS", nullable = false)
+    private String status;
 }

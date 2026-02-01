@@ -5,21 +5,25 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Status de entidades da organização (Empresa, Unidade, Departamento, CentroCusto).
+ * Valores: ativo, inativo, excluido.
+ */
 @Getter
 @EqualsAndHashCode
 @ToString
-public class StatusEmpresa {
-    public static final StatusEmpresa ATIVO = new StatusEmpresa("ativo");
-    public static final StatusEmpresa INATIVO = new StatusEmpresa("inativo");
-    public static final StatusEmpresa EXCLUIDO = new StatusEmpresa("excluido");
+public class StatusOrganizacao {
+    public static final StatusOrganizacao ATIVO = new StatusOrganizacao("ativo");
+    public static final StatusOrganizacao INATIVO = new StatusOrganizacao("inativo");
+    public static final StatusOrganizacao EXCLUIDO = new StatusOrganizacao("excluido");
 
     private final String valor;
 
-    private StatusEmpresa(String status) {
+    private StatusOrganizacao(String status) {
         this.valor = status;
     }
 
-    public static StatusEmpresa of(String status) {
+    public static StatusOrganizacao of(String status) {
         if (status == null || status.trim().isEmpty()) {
             return ATIVO;
         }

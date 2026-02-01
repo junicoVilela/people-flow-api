@@ -4,31 +4,33 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.valueobject.Cnpj;
 import com.peopleflow.common.valueobject.InscricaoEstadual;
 import com.peopleflow.organizacao.core.domain.Empresa;
+import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
+import com.peopleflow.organizacao.core.query.UnidadeFilter;
 import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
 import com.peopleflow.organizacao.inbound.web.dto.EmpresaFilterRequest;
 import com.peopleflow.organizacao.inbound.web.dto.EmpresaRequest;
 import com.peopleflow.organizacao.inbound.web.dto.EmpresaResponse;
+import com.peopleflow.organizacao.inbound.web.dto.UnidadeFilterRequest;
+import com.peopleflow.organizacao.inbound.web.dto.UnidadeRequest;
+import com.peopleflow.organizacao.inbound.web.dto.UnidadeResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+
 @Mapper(componentModel = "spring")
-public interface EmpresaWebMapper {
+public interface UnidadeWebMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "stringToCnpj")
-    @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "stringToInscricaoEstadual")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
-    Empresa toDomain(EmpresaRequest request);
+    Unidade toDomain(UnidadeRequest request);
 
-    @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "cnpjToString")
-    @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "inscricaoEstadualToString")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    EmpresaResponse toResponse(Empresa empresa);
+    UnidadeResponse toResponse(Unidade unidade);
 
-    EmpresaFilter toDomain(EmpresaFilterRequest request);
+    UnidadeFilter toDomain(UnidadeFilterRequest request);
 
-    default PagedResult<EmpresaResponse> toPagedResponse(PagedResult<Empresa> pagedResult) {
+    default PagedResult<UnidadeResponse> toPagedResponse(PagedResult<Unidade> pagedResult) {
         if (pagedResult == null) return null;
 
         return new PagedResult<>(
@@ -42,29 +44,9 @@ public interface EmpresaWebMapper {
         );
     }
 
-    @Named("stringToCnpj")
-    default Cnpj stringToCnpj(String cnpj) {
-        return cnpj != null ? new Cnpj(cnpj) : null;
-    }
-
-    @Named("stringToInscricaoEstadual")
-    default InscricaoEstadual stringToInscricaoEstadual(String ie) {
-        return InscricaoEstadual.of(ie);
-    }
-
     @Named("stringToStatus")
     default StatusOrganizacao stringToStatus(String status) {
         return status != null ? StatusOrganizacao.of(status) : null;
-    }
-
-    @Named("cnpjToString")
-    default String cnpjToString(Cnpj cnpj) {
-        return cnpj != null ? cnpj.getValor() : null;
-    }
-
-    @Named("inscricaoEstadualToString")
-    default String inscricaoEstadualToString(InscricaoEstadual ie) {
-        return ie != null ? ie.getValor() : null;
     }
 
     @Named("statusToString")

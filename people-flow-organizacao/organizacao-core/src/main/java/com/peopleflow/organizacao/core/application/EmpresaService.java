@@ -27,19 +27,26 @@ public class EmpresaService implements EmpresaUseCase {
 
     @Override
     public Empresa criar(Empresa empresa) {
-        log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}, status={}",
+        log.info("Iniciando criação de Empresa: nome={}, cnpj={}, inscricaoEstadual={}",
                 empresa.getNome(),
                 empresa.getCnpj(),
-                empresa.getInscricaoEstadual(),
-                empresa.getStatus());
+                empresa.getInscricaoEstadual());
 
         validarUnicidadeCriacao(empresa);
 
-        Empresa empresaCriar = empresaRepository.salvar(empresa);
+        String inscricaoEstadualString = empresa.getInscricaoEstadual() != null
+                ? empresa.getInscricaoEstadual().getValor()
+                : null;
+        Empresa empresaParaSalvar = Empresa.nova(
+                empresa.getNome(),
+                empresa.getCnpj().getValor(),
+                inscricaoEstadualString,
+                empresa.getStatus());
+        Empresa empresaCriar = empresaRepository.salvar(empresaParaSalvar);
 
         log.info("Empresa criada com sucesso: nome={}, cnpj={}, id={}",
-                empresa.getNome(),
-                empresa.getCnpj(),
+                empresaCriar.getNome(),
+                empresaCriar.getCnpj(),
                 empresaCriar.getId());
 
         return empresaCriar;
@@ -58,7 +65,6 @@ public class EmpresaService implements EmpresaUseCase {
 
             Empresa original = buscarPorId(id);
             
-            // Valida acesso à empresa antes de atualizar
             if (!accessValidator.isAdmin()) {
                 accessValidator.validarAcessoEmpresa(original.getId());
             }
@@ -77,8 +83,8 @@ public class EmpresaService implements EmpresaUseCase {
 
             List<String> camposAlterados = detectarCamposAlterados(original, empresaAtualizado);
 
-            log.info("Empresa atualizado com sucesso: id={}, nome={}, cnpj={}, camposAlterados={}",
-                    id, empresa.getNome(), empresa.getCnpj(), camposAlterados);
+            log.info("Empresa atualizada com sucesso: id={}, nome={}, cnpj={}, camposAlterados={}",
+                    id, empresaAtualizado.getNome(), empresaAtualizado.getCnpj(), camposAlterados);
 
             return empresaAtualizado;
         } catch (BusinessException e) {
@@ -96,11 +102,10 @@ public class EmpresaService implements EmpresaUseCase {
         log.debug("Buscando empresa por ID: {}", id);
         Empresa empresa = empresaRepository.buscarPorId(id)
                 .orElseThrow(() -> {
-                    log.warn("Empresa não encontrado: id={}", id);
+                    log.warn("Empresa não encontrada: id={}", id);
                     return new ResourceNotFoundException("Empresa", id);
                 });
 
-        // Valida acesso à empresa
         if (!accessValidator.isAdmin()) {
             accessValidator.validarAcessoEmpresa(empresa.getId());
         }
@@ -132,7 +137,7 @@ public class EmpresaService implements EmpresaUseCase {
         Empresa empresaAtivado = empresa.ativar();
         Empresa resultado = empresaRepository.salvar(empresaAtivado);
 
-        log.info("Empresa ativado com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Empresa ativada com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }
@@ -150,7 +155,7 @@ public class EmpresaService implements EmpresaUseCase {
         Empresa empresaInativado = empresa.inativar();
         Empresa resultado = empresaRepository.salvar(empresaInativado);
 
-        log.info("Empresa inativado com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Empresa inativada com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }
@@ -168,7 +173,7 @@ public class EmpresaService implements EmpresaUseCase {
         Empresa empresaExcluido = empresa.excluir();
         Empresa resultado = empresaRepository.salvar(empresaExcluido);
 
-        log.info("Empresa excluído com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Empresa excluída com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }

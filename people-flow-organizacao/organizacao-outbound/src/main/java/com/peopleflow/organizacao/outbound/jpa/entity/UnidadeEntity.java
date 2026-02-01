@@ -42,4 +42,7 @@ public class UnidadeEntity extends AuditableEntity {
 
     @Column(name = "EMPRESA_ID", nullable = false)
     private Long empresaId;
+
+    @Column(name = "STATUS", nullable = false)
+    private String status;
 }

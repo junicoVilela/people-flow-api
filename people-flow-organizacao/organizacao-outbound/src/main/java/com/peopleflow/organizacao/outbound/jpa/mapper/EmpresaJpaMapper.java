@@ -3,7 +3,7 @@ package com.peopleflow.organizacao.outbound.jpa.mapper;
 import com.peopleflow.common.valueobject.Cnpj;
 import com.peopleflow.common.valueobject.InscricaoEstadual;
 import com.peopleflow.organizacao.core.domain.Empresa;
-import com.peopleflow.organizacao.core.valueobjects.StatusEmpresa;
+import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
 import com.peopleflow.organizacao.outbound.jpa.entity.EmpresaEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,8 +33,8 @@ public interface EmpresaJpaMapper {
     }
 
     @Named("stringToStatus")
-    default StatusEmpresa stringToStatus(String status) {
-        return status != null ? StatusEmpresa.of(status) : null;
+    default StatusOrganizacao stringToStatus(String status) {
+        return status != null ? StatusOrganizacao.of(status) : null;
     }
 
     @Named("cnpjToString")
@@ -48,7 +48,7 @@ public interface EmpresaJpaMapper {
     }
 
     @Named("statusToString")
-    default String statusToString(StatusEmpresa status) {
+    default String statusToString(StatusOrganizacao status) {
         return status != null ? status.getValor() : null;
     }
 

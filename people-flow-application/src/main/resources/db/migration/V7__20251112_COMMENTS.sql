@@ -20,16 +20,19 @@ COMMENT ON TABLE PEOPLE_FLOW_RH.UNIDADE IS
 'Unidades/filiais de uma empresa. Representa locais físicos ou operacionais.';
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.UNIDADE.CODIGO IS 'Código interno da unidade';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.UNIDADE.STATUS IS 'Status: ativo, inativo, excluido';
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.DEPARTAMENTO IS 
 'Departamentos organizacionais. Podem estar vinculados a uma unidade específica ou serem corporativos.';
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.UNIDADE_ID IS 'Unidade à qual o departamento pertence (NULL = departamento corporativo)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.STATUS IS 'Status: ativo, inativo, excluido';
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.CENTRO_CUSTO IS 
 'Centros de custo para controle financeiro e contábil.';
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.CODIGO IS 'Código do centro de custo (único no sistema)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.STATUS IS 'Status: ativo, inativo, excluido';
 
 -- ============================
 -- NOTA: Tabela USUARIO foi removida

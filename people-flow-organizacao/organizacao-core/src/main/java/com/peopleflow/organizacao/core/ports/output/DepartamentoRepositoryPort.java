@@ -1,17 +1,15 @@
-package com.peopleflow.organizacao.core.ports.input;
+package com.peopleflow.organizacao.core.ports.output;
 
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 
-public interface EmpresaUseCase {
+import java.util.Optional;
 
-    Empresa criar(Empresa empresa);
-    Empresa atualizar(Long id, Empresa empresa);
-    Empresa buscarPorId(Long id);
+public interface DepartamentoRepositoryPort {
+
+    Empresa salvar(Empresa empresa);
+    Optional<Empresa> buscarPorId(Long id);
     PagedResult<Empresa> buscarPorFiltros(EmpresaFilter filter, Pagination pagination);
-    Empresa excluir(Long id);
-    Empresa ativar(Long id);
-    Empresa inativar(Long id);
 }
