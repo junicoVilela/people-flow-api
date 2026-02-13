@@ -129,7 +129,7 @@ public class UnidadeService implements UnidadeUseCase {
         Unidade unidade = buscarPorId(id);
 
         if (!accessValidator.isAdmin()) {
-            accessValidator.validarAcessoEmpresa(unidade.getId());
+            accessValidator.validarAcessoEmpresa(unidade.getEmpresaId());
         }
         Unidade unidadeAtivado = unidade.ativar();
         Unidade resultado = unidadeRepository.salvar(unidadeAtivado);
@@ -146,7 +146,7 @@ public class UnidadeService implements UnidadeUseCase {
         Unidade unidade = buscarPorId(id);
 
         if (!accessValidator.isAdmin()) {
-            accessValidator.validarAcessoEmpresa(unidade.getId());
+            accessValidator.validarAcessoEmpresa(unidade.getEmpresaId());
         }
         Unidade unidadeInativado = unidade.inativar();
         Unidade resultado = unidadeRepository.salvar(unidadeInativado);

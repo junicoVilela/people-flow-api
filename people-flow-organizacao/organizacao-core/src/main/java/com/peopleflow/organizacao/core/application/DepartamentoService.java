@@ -97,7 +97,7 @@ public class DepartamentoService implements DepartamentoUseCase {
             log.warn("Erro ao atualizar departamento: id={}, erro={}", id, e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Erro inesperado ao atualizar departamentp: id={}", id, e);
+            log.error("Erro inesperado ao atualizar departamento: id={}", id, e);
             throw e;
         }
 
@@ -205,6 +205,7 @@ public class DepartamentoService implements DepartamentoUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
         ServiceUtils.compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
         ServiceUtils.compararEAdicionar(camposAlterados, "unidadeId", original.getUnidadeId(), atualizado.getUnidadeId());
+        ServiceUtils.compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }
