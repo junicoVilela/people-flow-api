@@ -1,29 +1,29 @@
 package com.peopleflow.organizacao.inbound.web.mapper;
 
 import com.peopleflow.common.pagination.PagedResult;
-import com.peopleflow.organizacao.core.domain.Unidade;
-import com.peopleflow.organizacao.core.query.UnidadeFilter;
+import com.peopleflow.organizacao.core.domain.CentroCusto;
+import com.peopleflow.organizacao.core.query.CentroCustoFilter;
 import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
-import com.peopleflow.organizacao.inbound.web.dto.UnidadeFilterRequest;
-import com.peopleflow.organizacao.inbound.web.dto.UnidadeRequest;
-import com.peopleflow.organizacao.inbound.web.dto.UnidadeResponse;
+import com.peopleflow.organizacao.inbound.web.dto.CentroCustoFilterRequest;
+import com.peopleflow.organizacao.inbound.web.dto.CentroCustoRequest;
+import com.peopleflow.organizacao.inbound.web.dto.CentroCustoResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
-public interface UnidadeWebMapper {
+public interface CentroCustoWebMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
-    Unidade toDomain(UnidadeRequest request);
+    CentroCusto toDomain(CentroCustoRequest request);
 
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    UnidadeResponse toResponse(Unidade unidade);
+    CentroCustoResponse toResponse(CentroCusto centroCusto);
 
-    UnidadeFilter toDomain(UnidadeFilterRequest request);
+    CentroCustoFilter toDomain(CentroCustoFilterRequest request);
 
-    default PagedResult<UnidadeResponse> toPagedResponse(PagedResult<Unidade> pagedResult) {
+    default PagedResult<CentroCustoResponse> toPagedResponse(PagedResult<CentroCusto> pagedResult) {
         if (pagedResult == null) return null;
 
         return new PagedResult<>(

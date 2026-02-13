@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmpresaResponse {
+public class CentroCustoResponse {
     private Long id;
     private String nome;
-    private String cnpj;
-    private String inscricaoEstadual;
+    private String codigo;
+    private Long empresaId;
     private String status;
 }

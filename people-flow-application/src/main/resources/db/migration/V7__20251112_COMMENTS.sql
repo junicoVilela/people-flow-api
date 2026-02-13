@@ -31,7 +31,8 @@ COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.STATUS IS 'Status: ativo, inativo,
 COMMENT ON TABLE PEOPLE_FLOW_RH.CENTRO_CUSTO IS 
 'Centros de custo para controle financeiro e contábil.';
 
-COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.CODIGO IS 'Código do centro de custo (único no sistema)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.EMPRESA_ID IS 'Empresa à qual o centro de custo pertence';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.CODIGO IS 'Código do centro de custo (único por empresa)';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.CENTRO_CUSTO.STATUS IS 'Status: ativo, inativo, excluido';
 
 -- ============================

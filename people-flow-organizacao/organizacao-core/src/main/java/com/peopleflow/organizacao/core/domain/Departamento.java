@@ -63,21 +63,35 @@ public class Departamento {
         }
     }
 
-    public static Departamento nova(String nome, String codigo, Long empresaId, Long unidadeId) {
+    public static Departamento nova(
+            String nome,
+            String codigo,
+            Long empresaId,
+            Long unidadeId,
+            StatusOrganizacao status) {
+
         return Departamento.builder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
                 .unidadeId(unidadeId)
+                .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 
-    public Departamento atualizar(String nome, String codigo, Long empresaId, Long unidadeId) {
+    public Departamento atualizar(
+            String nome,
+            String codigo,
+            Long empresaId,
+            Long unidadeId,
+            StatusOrganizacao status) {
+
         return this.toBuilder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
                 .unidadeId(unidadeId)
+                .status(status)
                 .build();
     }
 

@@ -6,7 +6,6 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.common.validation.AccessValidatorPort;
-import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.ports.input.UnidadeUseCase;
 import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;

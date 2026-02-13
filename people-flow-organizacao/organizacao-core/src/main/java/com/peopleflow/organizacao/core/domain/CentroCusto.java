@@ -17,6 +17,7 @@ public class CentroCusto {
     private Long id;
     private String nome;
     private String codigo;
+    private Long empresaId;
     private StatusOrganizacao status;
 
     public static class CentroCustoBuilder {
@@ -28,6 +29,7 @@ public class CentroCusto {
                     id,
                     nome,
                     codigo,
+                    empresaId,
                     status
             );
 
@@ -47,19 +49,38 @@ public class CentroCusto {
         if (codigo == null || codigo.trim().isEmpty()) {
             throw new BusinessException("CODIGO_OBRIGATORIO", "Código é obrigatório");
         }
+
+        if (empresaId == null) {
+            throw new BusinessException("EMPRESA_ID_OBRIGATORIO",
+                    "Empresa ID é obrigatória");
+        }
     }
 
-    public static CentroCusto nova(String nome, String codigo) {
+    public static CentroCusto nova(
+            String nome,
+            String codigo,
+            Long empresaId,
+            StatusOrganizacao status) {
+
         return CentroCusto.builder()
                 .nome(nome)
                 .codigo(codigo)
+                .empresaId(empresaId)
+                .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 
-    public CentroCusto atualizar(String nome, String codigo) {
+    public CentroCusto atualizar(
+            String nome,
+            String codigo,
+            Long empresaId,
+            StatusOrganizacao status) {
+
         return this.toBuilder()
                 .nome(nome)
                 .codigo(codigo)
+                .empresaId(empresaId)
+                .status(status)
                 .build();
     }
 

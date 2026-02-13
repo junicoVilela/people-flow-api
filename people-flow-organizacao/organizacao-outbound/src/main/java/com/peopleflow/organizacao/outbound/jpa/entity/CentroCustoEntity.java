@@ -34,6 +34,9 @@ public class CentroCustoEntity extends AuditableEntity {
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
+    @Column(name = "EMPRESA_ID", nullable = false)
+    private Long empresaId;
+
     @Column(name = "NOME", nullable = false)
     private String nome;
 

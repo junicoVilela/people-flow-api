@@ -1,29 +1,29 @@
 package com.peopleflow.organizacao.inbound.web.mapper;
 
 import com.peopleflow.common.pagination.PagedResult;
-import com.peopleflow.organizacao.core.domain.Unidade;
-import com.peopleflow.organizacao.core.query.UnidadeFilter;
+import com.peopleflow.organizacao.core.domain.Departamento;
+import com.peopleflow.organizacao.core.query.DepartamentoFilter;
 import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
-import com.peopleflow.organizacao.inbound.web.dto.UnidadeFilterRequest;
-import com.peopleflow.organizacao.inbound.web.dto.UnidadeRequest;
-import com.peopleflow.organizacao.inbound.web.dto.UnidadeResponse;
+import com.peopleflow.organizacao.inbound.web.dto.DepartamentoFilterRequest;
+import com.peopleflow.organizacao.inbound.web.dto.DepartamentoRequest;
+import com.peopleflow.organizacao.inbound.web.dto.DepartamentoResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
-public interface UnidadeWebMapper {
+public interface DepartamentoWebMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
-    Unidade toDomain(UnidadeRequest request);
+    Departamento toDomain(DepartamentoRequest request);
 
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    UnidadeResponse toResponse(Unidade unidade);
+    DepartamentoResponse toResponse(Departamento departamento);
 
-    UnidadeFilter toDomain(UnidadeFilterRequest request);
+    DepartamentoFilter toDomain(DepartamentoFilterRequest request);
 
-    default PagedResult<UnidadeResponse> toPagedResponse(PagedResult<Unidade> pagedResult) {
+    default PagedResult<DepartamentoResponse> toPagedResponse(PagedResult<Departamento> pagedResult) {
         if (pagedResult == null) return null;
 
         return new PagedResult<>(
