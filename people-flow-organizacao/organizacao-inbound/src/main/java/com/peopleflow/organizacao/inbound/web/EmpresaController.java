@@ -56,7 +56,7 @@ public class EmpresaController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar empresa por ID", description = "Retorna os dados de uma empresa específico")
+    @Operation(summary = "Buscar empresa por ID", description = "Retorna os dados de uma empresa específica")
     public ResponseEntity<EmpresaResponse> buscarPorId(@PathVariable Long id) {
         Empresa empresa = empresaUseCase.buscarPorId(id);
         EmpresaResponse response = mapper.toResponse(empresa);
@@ -66,9 +66,8 @@ public class EmpresaController {
     @GetMapping
     @Operation(
             summary = "Listar empresas com filtros e paginação",
-            description = "Busca empresas aplicando filtros opcionais e paginação. " +
-                    "Sempre retorna resultados paginados para garantir performance. " +
-                    "Use parâmetros de query para filtrar e ordenar os resultados."
+            description = "Lista empresas com filtros opcionais (nome, status) e paginação. " +
+                    "Parâmetros de query: nome, status (ativo/inativo/excluido)."
     )
     public ResponseEntity<PagedResult<EmpresaResponse>> buscarPorFiltros(
             @ModelAttribute EmpresaFilterRequest filtrosRequest,
@@ -95,7 +94,7 @@ public class EmpresaController {
     }
 
     @PatchMapping("/{id}/ativar")
-    @Operation(summary = "Ativar empresa", description = "Altera o status do empresa para ATIVO")
+    @Operation(summary = "Ativar empresa", description = "Altera o status da empresa para ATIVO")
     public ResponseEntity<EmpresaResponse> ativar(@PathVariable Long id) {
         Empresa ativado = empresaUseCase.ativar(id);
         return ResponseEntity.ok(mapper.toResponse(ativado));
@@ -110,7 +109,7 @@ public class EmpresaController {
 
 
     @PatchMapping("/{id}/excluir")
-    @Operation(summary = "Excluir empresa", description = "Marca a empresa como excluído (soft delete)")
+    @Operation(summary = "Excluir empresa", description = "Marca a empresa como excluída (soft delete). Em cascata, exclui também Departamentos, Unidades e Centros de Custo da empresa.")
     public ResponseEntity<EmpresaResponse> excluir(@PathVariable Long id) {
         Empresa excluido = empresaUseCase.excluir(id);
         return ResponseEntity.ok(mapper.toResponse(excluido));

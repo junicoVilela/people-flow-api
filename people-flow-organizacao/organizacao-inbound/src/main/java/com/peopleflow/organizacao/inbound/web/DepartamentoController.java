@@ -7,6 +7,7 @@ import com.peopleflow.organizacao.core.ports.input.DepartamentoUseCase;
 import com.peopleflow.organizacao.core.query.DepartamentoFilter;
 import com.peopleflow.organizacao.inbound.web.dto.DepartamentoFilterRequest;
 import com.peopleflow.organizacao.inbound.web.dto.DepartamentoRequest;
+import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.inbound.web.dto.DepartamentoResponse;
 import com.peopleflow.organizacao.inbound.web.mapper.DepartamentoWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,7 @@ public class DepartamentoController {
 
     private final DepartamentoUseCase departamentoUseCase;
     private final DepartamentoWebMapper mapper;
+    private final AccessValidatorPort accessValidator;
 
     @PostMapping
     @Operation(summary = "Criar novo departamento", description = "Cadastra um novo departamento")
@@ -66,14 +68,17 @@ public class DepartamentoController {
     @GetMapping
     @Operation(
             summary = "Listar departamentos com filtros e paginação",
-            description = "Busca departamentos aplicando filtros opcionais e paginação. " +
-                    "Sempre retorna resultados paginados para garantir performance. " +
-                    "Use parâmetros de query para filtrar e ordenar os resultados."
+            description = "Lista departamentos com filtros opcionais (empresaId, unidadeId, nome, codigo, status) e paginação. " +
+                    "Parâmetros de query: empresaId, unidadeId, nome, codigo, status (ativo/inativo/excluido). " +
+                    "Para usuário não-admin, recomenda-se enviar empresaId do escopo permitido."
     )
     public ResponseEntity<PagedResult<DepartamentoResponse>> buscarPorFiltros(
             @ModelAttribute DepartamentoFilterRequest filtrosRequest,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
+        if (!accessValidator.isAdmin() && filtrosRequest.getEmpresaId() == null && accessValidator.getEmpresaIdUsuario() != null) {
+            filtrosRequest.setEmpresaId(accessValidator.getEmpresaIdUsuario());
+        }
         DepartamentoFilter filtros = mapper.toDomain(filtrosRequest);
 
         Pagination pagination = Pagination.of( pageable.getPageNumber(),
@@ -102,7 +107,7 @@ public class DepartamentoController {
     }
 
     @PatchMapping("/{id}/inativar")
-    @Operation(summary = "Inativar departamento", description = "Altera o status da departamento para INATIVO")
+    @Operation(summary = "Inativar departamento", description = "Altera o status do departamento para INATIVO")
     public ResponseEntity<DepartamentoResponse> inativar(@PathVariable Long id) {
         Departamento inativado = departamentoUseCase.inativar(id);
         return ResponseEntity.ok(mapper.toResponse(inativado));
@@ -110,7 +115,7 @@ public class DepartamentoController {
 
 
     @PatchMapping("/{id}/excluir")
-    @Operation(summary = "Excluir departamento", description = "Marca a departamento como excluído (soft delete)")
+    @Operation(summary = "Excluir departamento", description = "Marca o departamento como excluído (soft delete)")
     public ResponseEntity<DepartamentoResponse> excluir(@PathVariable Long id) {
         Departamento excluido = departamentoUseCase.excluir(id);
         return ResponseEntity.ok(mapper.toResponse(excluido));

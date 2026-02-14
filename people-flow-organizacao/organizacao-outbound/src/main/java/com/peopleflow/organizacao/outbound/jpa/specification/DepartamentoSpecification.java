@@ -49,6 +49,15 @@ public class DepartamentoSpecification {
                 );
             }
 
+            if (filter.getStatus() != null && !filter.getStatus().trim().isEmpty()) {
+                predicates.add(
+                        criteriaBuilder.equal(
+                                criteriaBuilder.lower(root.get("status")),
+                                filter.getStatus().toLowerCase().trim()
+                        )
+                );
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

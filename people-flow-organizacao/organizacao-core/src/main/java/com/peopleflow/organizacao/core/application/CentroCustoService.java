@@ -30,7 +30,7 @@ public class CentroCustoService implements CentroCustoUseCase {
 
     @Override
     public CentroCusto criar(CentroCusto centroCusto) {
-        log.info("Iniciando criação de Centro Custo: nome={}, codigo={}, empresaId={}, status={}",
+        log.info("Iniciando criação de Centro de Custo: nome={}, codigo={}, empresaId={}, status={}",
                 centroCusto.getNome(),
                 centroCusto.getCodigo(),
                 centroCusto.getEmpresaId(),
@@ -47,7 +47,7 @@ public class CentroCustoService implements CentroCustoUseCase {
 
         CentroCusto centroCustoCriar = centroCustoRepository.salvar(centroCustoSalvar);
 
-        log.info("Centro Custo criado com sucesso: nome={}, codigo={}, empresaId={}, status={}, id={}",
+        log.info("Centro de Custo criado com sucesso: nome={}, codigo={}, empresaId={}, status={}, id={}",
                 centroCustoCriar.getNome(),
                 centroCustoCriar.getCodigo(),
                 centroCustoCriar.getEmpresaId(),
@@ -59,7 +59,7 @@ public class CentroCustoService implements CentroCustoUseCase {
 
     @Override
     public CentroCusto atualizar(Long id, CentroCusto centroCusto) {
-        log.info("Iniciando atualização de Centro Custo: id={}", id);
+        log.info("Iniciando atualização de Centro de Custo: id={}", id);
 
         try {
             if (centroCusto.getId() != null && !centroCusto.getId().equals(id)) {
@@ -91,15 +91,15 @@ public class CentroCustoService implements CentroCustoUseCase {
 
             List<String> camposAlterados = detectarCamposAlterados(original, centroCustoAtualizado);
 
-            log.info("Centro Custo atualizado com sucesso: id={}, codigo={},nome={}, empresaId={}, status={} camposAlterados={}",
+            log.info("Centro de Custo atualizado com sucesso: id={}, codigo={},nome={}, empresaId={}, status={} camposAlterados={}",
                     id, centroCusto.getCodigo(), centroCusto.getNome(), centroCusto.getStatus(), camposAlterados);
 
             return centroCustoAtualizado;
         } catch (BusinessException e) {
-            log.warn("Erro ao atualizar Centro Custo: id={}, erro={}", id, e.getMessage());
+            log.warn("Erro ao atualizar Centro de Custo: id={}, erro={}", id, e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Erro inesperado ao atualizar Centro Custo: id={}", id, e);
+            log.error("Erro inesperado ao atualizar Centro de Custo: id={}", id, e);
             throw e;
         }
 
@@ -107,10 +107,10 @@ public class CentroCustoService implements CentroCustoUseCase {
 
     @Override
     public CentroCusto buscarPorId(Long id) {
-        log.debug("Buscando Centro Custo por ID: {}", id);
+        log.debug("Buscando Centro de Custo por ID: {}", id);
         CentroCusto centroCusto = centroCustoRepository.buscarPorId(id)
                 .orElseThrow(() -> {
-                    log.warn("Centro Custo não encontrado: id={}", id);
+                    log.warn("Centro de Custo não encontrado: id={}", id);
                     return new ResourceNotFoundException("Centro Custo", id);
                 });
 
@@ -123,18 +123,18 @@ public class CentroCustoService implements CentroCustoUseCase {
 
     @Override
     public PagedResult<CentroCusto> buscarPorFiltros(CentroCustoFilter filter, Pagination pagination) {
-        log.debug("Buscando Centro Custo com filtros: page={}, size={}",
+        log.debug("Buscando Centros de Custo com filtros: page={}, size={}",
                 pagination.page(), pagination.size());
 
         PagedResult<CentroCusto> result = centroCustoRepository.buscarPorFiltros(filter, pagination);
 
-        log.debug("Encontrados {} Centro Custo", result.totalElements());
+        log.debug("Encontrados {} centros de custo", result.totalElements());
         return result;
     }
 
     @Override
     public CentroCusto ativar(Long id) {
-        log.info("Ativando Centro Custo: id={}", id);
+        log.info("Ativando Centro de Custo: id={}", id);
 
         CentroCusto centroCusto = buscarPorId(id);
 
@@ -144,14 +144,14 @@ public class CentroCustoService implements CentroCustoUseCase {
         CentroCusto centroCustoAtivado = centroCusto.ativar();
         CentroCusto resultado = centroCustoRepository.salvar(centroCustoAtivado);
 
-        log.info("Centro Custo ativado com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Centro de Custo ativado com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }
 
     @Override
     public CentroCusto inativar(Long id) {
-        log.info("Inativando Centro Custo: id={}", id);
+        log.info("Inativando Centro de Custo: id={}", id);
 
         CentroCusto centroCusto = buscarPorId(id);
 
@@ -161,14 +161,14 @@ public class CentroCustoService implements CentroCustoUseCase {
         CentroCusto centroCustoInativado = centroCusto.inativar();
         CentroCusto resultado = centroCustoRepository.salvar(centroCustoInativado);
 
-        log.info("Centro Custo inativada com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Centro de Custo inativado com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }
 
     @Override
     public CentroCusto excluir(Long id) {
-        log.info("Excluindo Centro Custo (soft delete): id={}", id);
+        log.info("Excluindo Centro de Custo (soft delete): id={}", id);
 
         CentroCusto centroCusto = buscarPorId(id);
         
@@ -178,7 +178,7 @@ public class CentroCustoService implements CentroCustoUseCase {
         CentroCusto centroCustoExcluido = centroCusto.excluir();
         CentroCusto resultado = centroCustoRepository.salvar(centroCustoExcluido);
 
-        log.info("Centro Custo excluído com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Centro de Custo excluído com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }

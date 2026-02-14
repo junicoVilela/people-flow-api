@@ -11,6 +11,7 @@ import com.peopleflow.organizacao.core.ports.input.EmpresaUseCase;
 import com.peopleflow.organizacao.core.ports.output.CentroCustoRepositoryPort;
 import com.peopleflow.organizacao.core.ports.output.DepartamentoRepositoryPort;
 import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.ExisteColaboradorPorEmpresaPort;
 import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class EmpresaService implements EmpresaUseCase {
     private final DepartamentoRepositoryPort departamentoRepository;
     private final UnidadeRepositoryPort unidadeRepository;
     private final CentroCustoRepositoryPort centroCustoRepository;
+    private final ExisteColaboradorPorEmpresaPort existeColaboradorPorEmpresaPort;
     private final AccessValidatorPort accessValidator;
 
     @Override
@@ -175,6 +177,11 @@ public class EmpresaService implements EmpresaUseCase {
 
         if (!accessValidator.isAdmin()) {
             accessValidator.validarAcessoEmpresa(empresaId);
+        }
+
+        if (existeColaboradorPorEmpresaPort.existePorEmpresaId(empresaId)) {
+            throw new BusinessException("EMPRESA_POSSUI_COLABORADORES",
+                    "Não é possível excluir empresa com colaboradores vinculados. Remova ou transfira os colaboradores antes.");
         }
 
         // Cascata soft delete: Departamentos → Unidades → Centros de Custo → Empresa

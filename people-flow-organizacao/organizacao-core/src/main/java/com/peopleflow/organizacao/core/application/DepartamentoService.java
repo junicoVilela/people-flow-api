@@ -170,7 +170,7 @@ public class DepartamentoService implements DepartamentoUseCase {
         Departamento departamentoInativado = departamento.inativar();
         Departamento resultado = departamentoRepository.salvar(departamentoInativado);
 
-        log.info("Departamento inativada com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Departamento inativado com sucesso: id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }

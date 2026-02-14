@@ -11,12 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DepartamentoFilter {
 
-    private Long empresaId;
-    private Long unidadeId;
     private String nome;
     private String codigo;
+    private String status;
+    private Long empresaId;
+    private Long unidadeId;
 
     public boolean hasAnyCriteria() {
-        return empresaId != null || unidadeId != null || nome != null || codigo != null;
+        return empresaId != null || unidadeId != null || nome != null || codigo != null || status != null;
     }
 }

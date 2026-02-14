@@ -13,9 +13,10 @@ public class UnidadeFilter {
 
     private String nome;
     private String codigo;
+    private String status;
     private Long empresaId;
 
     public boolean hasAnyCriteria() {
-        return empresaId != null || nome != null || codigo != null;
+        return empresaId != null || nome != null || codigo != null || status != null;
     }
 }

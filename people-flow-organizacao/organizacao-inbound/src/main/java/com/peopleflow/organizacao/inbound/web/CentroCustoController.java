@@ -7,6 +7,7 @@ import com.peopleflow.organizacao.core.ports.input.CentroCustoUseCase;
 import com.peopleflow.organizacao.core.query.CentroCustoFilter;
 import com.peopleflow.organizacao.inbound.web.dto.CentroCustoFilterRequest;
 import com.peopleflow.organizacao.inbound.web.dto.CentroCustoRequest;
+import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.inbound.web.dto.CentroCustoResponse;
 import com.peopleflow.organizacao.inbound.web.mapper.CentroCustoWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,7 @@ public class CentroCustoController {
 
     private final CentroCustoUseCase centroCustoUseCase;
     private final CentroCustoWebMapper mapper;
+    private final AccessValidatorPort accessValidator;
 
     @PostMapping
     @Operation(summary = "Criar novo centro de custo", description = "Cadastra um novo centro de custo")
@@ -56,7 +58,7 @@ public class CentroCustoController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar centro de custo por ID", description = "Retorna os dados de uma centro de custo específico")
+    @Operation(summary = "Buscar centro de custo por ID", description = "Retorna os dados de um centro de custo específico")
     public ResponseEntity<CentroCustoResponse> buscarPorId(@PathVariable Long id) {
         CentroCusto centroCusto = centroCustoUseCase.buscarPorId(id);
         CentroCustoResponse response = mapper.toResponse(centroCusto);
@@ -65,15 +67,18 @@ public class CentroCustoController {
 
     @GetMapping
     @Operation(
-            summary = "Listar centro de custo com filtros e paginação",
-            description = "Busca centro de custo aplicando filtros opcionais e paginação. " +
-                    "Sempre retorna resultados paginados para garantir performance. " +
-                    "Use parâmetros de query para filtrar e ordenar os resultados."
+            summary = "Listar centros de custo com filtros e paginação",
+            description = "Lista centros de custo com filtros opcionais (empresaId, nome, codigo, status) e paginação. " +
+                    "Parâmetros de query: empresaId, nome, codigo, status (ativo/inativo/excluido). " +
+                    "Para usuário não-admin, recomenda-se enviar empresaId do escopo permitido."
     )
     public ResponseEntity<PagedResult<CentroCustoResponse>> buscarPorFiltros(
             @ModelAttribute CentroCustoFilterRequest filtrosRequest,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
+        if (!accessValidator.isAdmin() && filtrosRequest.getEmpresaId() == null && accessValidator.getEmpresaIdUsuario() != null) {
+            filtrosRequest.setEmpresaId(accessValidator.getEmpresaIdUsuario());
+        }
         CentroCustoFilter filtros = mapper.toDomain(filtrosRequest);
 
         Pagination pagination = Pagination.of( pageable.getPageNumber(),
@@ -102,7 +107,7 @@ public class CentroCustoController {
     }
 
     @PatchMapping("/{id}/inativar")
-    @Operation(summary = "Inativar centro de custo", description = "Altera o status da centro de custo para INATIVO")
+    @Operation(summary = "Inativar centro de custo", description = "Altera o status do centro de custo para INATIVO")
     public ResponseEntity<CentroCustoResponse> inativar(@PathVariable Long id) {
         CentroCusto inativado = centroCustoUseCase.inativar(id);
         return ResponseEntity.ok(mapper.toResponse(inativado));
@@ -110,7 +115,7 @@ public class CentroCustoController {
 
 
     @PatchMapping("/{id}/excluir")
-    @Operation(summary = "Excluir centro de custo", description = "Marca a centro de custo como excluído (soft delete)")
+    @Operation(summary = "Excluir centro de custo", description = "Marca o centro de custo como excluído (soft delete)")
     public ResponseEntity<CentroCustoResponse> excluir(@PathVariable Long id) {
         CentroCusto excluido = centroCustoUseCase.excluir(id);
         return ResponseEntity.ok(mapper.toResponse(excluido));
