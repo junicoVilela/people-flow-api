@@ -63,12 +63,17 @@ public class UnidadeRepositoryAdapter implements UnidadeRepositoryPort {
     }
 
     @Override
-    public boolean existePorCodigo(String codigo) {
-        return unidadeJpaRepository.existsByCodigoAndStatusNot(codigo, "excluido");
+    public boolean existePorCodigoEEmpresa(String codigo, Long empresaId) {
+        return unidadeJpaRepository.existsByCodigoAndEmpresaIdAndStatusNot(codigo, empresaId, "excluido");
     }
 
     @Override
-    public boolean existePorCodigoExcluindoId(String codigo, Long id) {
-        return unidadeJpaRepository.existsByCodigoAndIdNotAndStatusNot(codigo, id, "excluido");
+    public boolean existePorCodigoEEmpresaExcluindoId(String codigo, Long empresaId, Long id) {
+        return unidadeJpaRepository.existsByCodigoAndEmpresaIdAndIdNotAndStatusNot(codigo, empresaId, id, "excluido");
+    }
+
+    @Override
+    public void excluirTodosPorEmpresaId(Long empresaId) {
+        unidadeJpaRepository.excluirTodosPorEmpresaId(empresaId);
     }
 }

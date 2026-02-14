@@ -13,6 +13,8 @@ public interface DepartamentoRepositoryPort {
     Optional<Departamento> buscarPorId(Long id);
     PagedResult<Departamento> buscarPorFiltros(DepartamentoFilter filter, Pagination pagination);
 
-    boolean existePorCodigo(String codigo);
-    boolean existePorCodigoExcluindoId(String codigo, Long id);
+    boolean existePorCodigoEEmpresa(String codigo, Long empresaId);
+    boolean existePorCodigoEEmpresaExcluindoId(String codigo, Long empresaId, Long id);
+
+    void excluirTodosPorEmpresaId(Long empresaId);
 }

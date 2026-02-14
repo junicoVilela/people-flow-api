@@ -8,7 +8,10 @@ import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.core.domain.Empresa;
 import com.peopleflow.organizacao.core.ports.input.EmpresaUseCase;
+import com.peopleflow.organizacao.core.ports.output.CentroCustoRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.DepartamentoRepositoryPort;
 import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.EmpresaFilter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +26,9 @@ public class EmpresaService implements EmpresaUseCase {
     private static final Logger log = LoggerFactory.getLogger(EmpresaService.class);
 
     private final EmpresaRepositoryPort empresaRepository;
+    private final DepartamentoRepositoryPort departamentoRepository;
+    private final UnidadeRepositoryPort unidadeRepository;
+    private final CentroCustoRepositoryPort centroCustoRepository;
     private final AccessValidatorPort accessValidator;
 
     @Override
@@ -162,18 +168,24 @@ public class EmpresaService implements EmpresaUseCase {
 
     @Override
     public Empresa excluir(Long id) {
-        log.info("Excluindo empresa (soft delete): id={}", id);
+        log.info("Excluindo empresa (soft delete) em cascata: id={}", id);
 
         Empresa empresa = buscarPorId(id);
-        
-        // Valida acesso à empresa antes de excluir
+        Long empresaId = empresa.getId();
+
         if (!accessValidator.isAdmin()) {
-            accessValidator.validarAcessoEmpresa(empresa.getId());
+            accessValidator.validarAcessoEmpresa(empresaId);
         }
+
+        // Cascata soft delete: Departamentos → Unidades → Centros de Custo → Empresa
+        departamentoRepository.excluirTodosPorEmpresaId(empresaId);
+        unidadeRepository.excluirTodosPorEmpresaId(empresaId);
+        centroCustoRepository.excluirTodosPorEmpresaId(empresaId);
+
         Empresa empresaExcluido = empresa.excluir();
         Empresa resultado = empresaRepository.salvar(empresaExcluido);
 
-        log.info("Empresa excluída com sucesso: id={}, nome={}", id, resultado.getNome());
+        log.info("Empresa e vínculos excluídos com sucesso (soft delete): id={}, nome={}", id, resultado.getNome());
 
         return resultado;
     }

@@ -1,14 +1,18 @@
 package com.peopleflow.organizacao.core.application;
 
 import com.peopleflow.common.exception.BusinessException;
+import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.core.domain.Departamento;
+import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.ports.input.DepartamentoUseCase;
 import com.peopleflow.organizacao.core.ports.output.DepartamentoRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.DepartamentoFilter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +27,8 @@ public class DepartamentoService implements DepartamentoUseCase {
     private static final Logger log = LoggerFactory.getLogger(DepartamentoService.class);
 
     private final DepartamentoRepositoryPort departamentoRepository;
+    private final EmpresaRepositoryPort empresaRepository;
+    private final UnidadeRepositoryPort unidadeRepository;
     private final AccessValidatorPort accessValidator;
 
     @Override
@@ -34,6 +40,8 @@ public class DepartamentoService implements DepartamentoUseCase {
                 departamento.getUnidadeId(),
                 departamento.getStatus());
 
+        validarEmpresaExiste(departamento.getEmpresaId());
+        validarUnidadePertenceAEmpresa(departamento.getUnidadeId(), departamento.getEmpresaId());
         validarUnicidadeCriacao(departamento);
 
         Departamento departamentoSalvar = Departamento.nova(
@@ -72,6 +80,9 @@ public class DepartamentoService implements DepartamentoUseCase {
             if (!accessValidator.isAdmin()) {
                 accessValidator.validarAcessoEmpresa(original.getEmpresaId());
             }
+
+            validarEmpresaExiste(departamento.getEmpresaId());
+            validarUnidadePertenceAEmpresa(departamento.getUnidadeId(), departamento.getEmpresaId());
 
             Departamento departamentoAtualizar = original.atualizar(
                     departamento.getNome(),
@@ -182,20 +193,15 @@ public class DepartamentoService implements DepartamentoUseCase {
     }
 
     private void validarUnicidadeCriacao(Departamento departamento) {
-        ServiceUtils.validarUnicidadeCampo(
-                "Código",
-                departamento.getCodigo(),
-                departamentoRepository::existePorCodigo
-        );
+        if (departamentoRepository.existePorCodigoEEmpresa(departamento.getCodigo(), departamento.getEmpresaId())) {
+            throw new DuplicateResourceException("Código", departamento.getCodigo());
+        }
     }
 
     private void validarUnicidadeParaAtualizacao(Departamento departamento, Long id) {
-        ServiceUtils.validarUnicidadeCampoComExclusao(
-                "Código",
-                departamento.getCodigo(),
-                id,
-                departamentoRepository::existePorCodigoExcluindoId
-        );
+        if (departamentoRepository.existePorCodigoEEmpresaExcluindoId(departamento.getCodigo(), departamento.getEmpresaId(), id)) {
+            throw new DuplicateResourceException("Código", departamento.getCodigo());
+        }
     }
 
     private List<String> detectarCamposAlterados(Departamento original, Departamento atualizado) {
@@ -208,5 +214,20 @@ public class DepartamentoService implements DepartamentoUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
+    }
+
+    private void validarEmpresaExiste(Long empresaId) {
+        empresaRepository.buscarPorId(empresaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa", empresaId));
+    }
+
+    private void validarUnidadePertenceAEmpresa(Long unidadeId, Long empresaId) {
+        Unidade unidade = unidadeRepository.buscarPorId(unidadeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Unidade", unidadeId));
+
+        if (!unidade.getEmpresaId().equals(empresaId)) {
+            throw new BusinessException("UNIDADE_NAO_PERTENCE_EMPRESA",
+                    String.format("A unidade %d não pertence à empresa %d", unidadeId, empresaId));
+        }
     }
 }

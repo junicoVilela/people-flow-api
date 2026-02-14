@@ -7,6 +7,8 @@ import com.peopleflow.organizacao.core.application.DepartamentoService;
 import com.peopleflow.organizacao.core.domain.Departamento;
 import com.peopleflow.organizacao.core.ports.input.DepartamentoUseCase;
 import com.peopleflow.organizacao.core.ports.output.DepartamentoRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.DepartamentoFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +22,10 @@ public class DepartamentoConfig {
     @Bean
     public DepartamentoUseCase departamentoUseCase(
             DepartamentoRepositoryPort repository,
+            EmpresaRepositoryPort empresaRepository,
+            UnidadeRepositoryPort unidadeRepository,
             AccessValidatorPort accessValidator) {
-        DepartamentoService service = new DepartamentoService(repository, accessValidator);
+        DepartamentoService service = new DepartamentoService(repository, empresaRepository, unidadeRepository, accessValidator);
         return new TransactionalDepartamentoUseCase(service);
     }
 

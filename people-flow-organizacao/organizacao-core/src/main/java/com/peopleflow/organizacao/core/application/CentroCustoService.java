@@ -1,6 +1,7 @@
 package com.peopleflow.organizacao.core.application;
 
 import com.peopleflow.common.exception.BusinessException;
+import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
@@ -9,6 +10,7 @@ import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.core.domain.CentroCusto;
 import com.peopleflow.organizacao.core.ports.input.CentroCustoUseCase;
 import com.peopleflow.organizacao.core.ports.output.CentroCustoRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
 import com.peopleflow.organizacao.core.query.CentroCustoFilter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ public class CentroCustoService implements CentroCustoUseCase {
     private static final Logger log = LoggerFactory.getLogger(CentroCustoService.class);
 
     private final CentroCustoRepositoryPort centroCustoRepository;
+    private final EmpresaRepositoryPort empresaRepository;
     private final AccessValidatorPort accessValidator;
 
     @Override
@@ -33,6 +36,7 @@ public class CentroCustoService implements CentroCustoUseCase {
                 centroCusto.getEmpresaId(),
                 centroCusto.getStatus());
 
+        validarEmpresaExiste(centroCusto.getEmpresaId());
         validarUnicidadeCriacao(centroCusto);
 
         CentroCusto centroCustoSalvar = CentroCusto.nova(
@@ -69,6 +73,8 @@ public class CentroCustoService implements CentroCustoUseCase {
             if (!accessValidator.isAdmin()) {
                 accessValidator.validarAcessoEmpresa(original.getEmpresaId());
             }
+
+            validarEmpresaExiste(centroCusto.getEmpresaId());
 
             CentroCusto centroCustoAtualizar = original.atualizar(
                     centroCusto.getNome(),
@@ -178,20 +184,15 @@ public class CentroCustoService implements CentroCustoUseCase {
     }
 
     private void validarUnicidadeCriacao(CentroCusto centroCusto) {
-        ServiceUtils.validarUnicidadeCampo(
-                "Código",
-                centroCusto.getCodigo(),
-                centroCustoRepository::existePorCodigo
-        );
+        if (centroCustoRepository.existePorCodigoEEmpresa(centroCusto.getCodigo(), centroCusto.getEmpresaId())) {
+            throw new DuplicateResourceException("Código", centroCusto.getCodigo());
+        }
     }
 
     private void validarUnicidadeParaAtualizacao(CentroCusto centroCusto, Long id) {
-        ServiceUtils.validarUnicidadeCampoComExclusao(
-                "Código",
-                centroCusto.getCodigo(),
-                id,
-                centroCustoRepository::existePorCodigoExcluindoId
-        );
+        if (centroCustoRepository.existePorCodigoEEmpresaExcluindoId(centroCusto.getCodigo(), centroCusto.getEmpresaId(), id)) {
+            throw new DuplicateResourceException("Código", centroCusto.getCodigo());
+        }
     }
 
     private List<String> detectarCamposAlterados(CentroCusto original, CentroCusto atualizado) {
@@ -203,5 +204,10 @@ public class CentroCustoService implements CentroCustoUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
+    }
+
+    private void validarEmpresaExiste(Long empresaId) {
+        empresaRepository.buscarPorId(empresaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa", empresaId));
     }
 }

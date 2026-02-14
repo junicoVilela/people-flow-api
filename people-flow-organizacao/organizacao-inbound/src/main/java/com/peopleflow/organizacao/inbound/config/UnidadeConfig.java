@@ -6,6 +6,7 @@ import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.core.application.UnidadeService;
 import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.ports.input.UnidadeUseCase;
+import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
 import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.UnidadeFilter;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +21,9 @@ public class UnidadeConfig {
     @Bean
     public UnidadeUseCase unidadeUseCase(
             UnidadeRepositoryPort repository,
+            EmpresaRepositoryPort empresaRepository,
             AccessValidatorPort accessValidator) {
-        UnidadeService service = new UnidadeService(repository, accessValidator);
+        UnidadeService service = new UnidadeService(repository, empresaRepository, accessValidator);
         return new TransactionalUnidadeUseCase(service);
     }
 

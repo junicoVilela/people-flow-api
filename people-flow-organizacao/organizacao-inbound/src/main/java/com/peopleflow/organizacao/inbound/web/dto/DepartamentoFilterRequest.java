@@ -5,11 +5,13 @@ import lombok.Data;
 @Data
 public class DepartamentoFilterRequest {
 
+    private Long empresaId;
+    private Long unidadeId;
     private String nome;
     private String codigo;
     private String status;
 
     public boolean hasFilters() {
-        return nome != null || codigo != null || status != null;
+        return empresaId != null || unidadeId != null || nome != null || codigo != null || status != null;
     }
 }

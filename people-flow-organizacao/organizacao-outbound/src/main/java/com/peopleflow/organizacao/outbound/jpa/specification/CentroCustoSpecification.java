@@ -23,6 +23,10 @@ public class CentroCustoSpecification {
 
             predicates.add(criteriaBuilder.notEqual(root.get("status"), "excluido"));
 
+            if (filter.getEmpresaId() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("empresaId"), filter.getEmpresaId()));
+            }
+
             if (filter.getNome() != null && !filter.getNome().trim().isEmpty()) {
                 predicates.add(
                     criteriaBuilder.like(

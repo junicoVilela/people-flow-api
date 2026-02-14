@@ -10,11 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CentroCustoFilter {
-    
+
     private String nome;
     private String codigo;
+    private Long empresaId;
 
     public boolean hasAnyCriteria() {
-        return nome != null || codigo != null;
+        return empresaId != null || nome != null || codigo != null;
     }
 }

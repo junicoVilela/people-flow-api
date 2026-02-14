@@ -1,6 +1,7 @@
 package com.peopleflow.organizacao.core.application;
 
 import com.peopleflow.common.exception.BusinessException;
+import com.peopleflow.common.exception.DuplicateResourceException;
 import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
@@ -8,6 +9,7 @@ import com.peopleflow.common.util.ServiceUtils;
 import com.peopleflow.common.validation.AccessValidatorPort;
 import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.ports.input.UnidadeUseCase;
+import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
 import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.UnidadeFilter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class UnidadeService implements UnidadeUseCase {
     private static final Logger log = LoggerFactory.getLogger(UnidadeService.class);
 
     private final UnidadeRepositoryPort unidadeRepository;
+    private final EmpresaRepositoryPort empresaRepository;
     private final AccessValidatorPort accessValidator;
 
     @Override
@@ -32,6 +35,7 @@ public class UnidadeService implements UnidadeUseCase {
                 unidade.getCodigo(),
                 unidade.getEmpresaId());
 
+        validarEmpresaExiste(unidade.getEmpresaId());
         validarUnicidadeCriacao(unidade);
 
         Unidade unidadeParaSalvar = Unidade.nova(
@@ -66,6 +70,8 @@ public class UnidadeService implements UnidadeUseCase {
             if (!accessValidator.isAdmin()) {
                 accessValidator.validarAcessoEmpresa(original.getEmpresaId());
             }
+
+            validarEmpresaExiste(unidade.getEmpresaId());
 
             Unidade unidadeAtualizar = original.atualizar(
                     unidade.getNome(),
@@ -174,20 +180,15 @@ public class UnidadeService implements UnidadeUseCase {
     }
 
     private void validarUnicidadeCriacao(Unidade unidade) {
-        ServiceUtils.validarUnicidadeCampo(
-                "Código",
-                unidade.getCodigo(),
-                unidadeRepository::existePorCodigo
-        );
+        if (unidadeRepository.existePorCodigoEEmpresa(unidade.getCodigo(), unidade.getEmpresaId())) {
+            throw new DuplicateResourceException("Código", unidade.getCodigo());
+        }
     }
 
     private void validarUnicidadeParaAtualizacao(Unidade unidade, Long id) {
-        ServiceUtils.validarUnicidadeCampoComExclusao(
-                "Código",
-                unidade.getCodigo(),
-                id,
-                unidadeRepository::existePorCodigoExcluindoId
-        );
+        if (unidadeRepository.existePorCodigoEEmpresaExcluindoId(unidade.getCodigo(), unidade.getEmpresaId(), id)) {
+            throw new DuplicateResourceException("Código", unidade.getCodigo());
+        }
     }
 
     private List<String> detectarCamposAlterados(Unidade original, Unidade atualizado) {
@@ -198,5 +199,10 @@ public class UnidadeService implements UnidadeUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
+    }
+
+    private void validarEmpresaExiste(Long empresaId) {
+        empresaRepository.buscarPorId(empresaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa", empresaId));
     }
 }

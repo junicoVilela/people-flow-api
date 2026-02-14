@@ -63,12 +63,17 @@ public class CentroCustoRepositoryAdapter implements CentroCustoRepositoryPort {
     }
 
     @Override
-    public boolean existePorCodigo(String codigo) {
-        return centroCustoJpaRepository.existsByCodigoAndStatusNot(codigo, "excluido");
+    public boolean existePorCodigoEEmpresa(String codigo, Long empresaId) {
+        return centroCustoJpaRepository.existsByCodigoAndEmpresaIdAndStatusNot(codigo, empresaId, "excluido");
     }
 
     @Override
-    public boolean existePorCodigoExcluindoId(String codigo, Long id) {
-        return centroCustoJpaRepository.existsByCodigoAndIdNotAndStatusNot(codigo, id, "excluido");
+    public boolean existePorCodigoEEmpresaExcluindoId(String codigo, Long empresaId, Long id) {
+        return centroCustoJpaRepository.existsByCodigoAndEmpresaIdAndIdNotAndStatusNot(codigo, empresaId, id, "excluido");
+    }
+
+    @Override
+    public void excluirTodosPorEmpresaId(Long empresaId) {
+        centroCustoJpaRepository.excluirTodosPorEmpresaId(empresaId);
     }
 }

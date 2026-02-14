@@ -1,6 +1,7 @@
 package com.peopleflow.organizacao.inbound.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -22,6 +23,9 @@ public class DepartamentoRequest {
     )
     private String status;
 
-    @NotBlank(message = "Empresa ID é obrigatório")
+    @NotNull(message = "Empresa ID é obrigatório")
     private Long empresaId;
+
+    @NotNull(message = "Unidade ID é obrigatório")
+    private Long unidadeId;
 }

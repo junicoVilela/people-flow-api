@@ -3,19 +3,12 @@ package com.peopleflow.organizacao.outbound.jpa.adapter;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Departamento;
-import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.ports.output.DepartamentoRepositoryPort;
-import com.peopleflow.organizacao.core.ports.output.UnidadeRepositoryPort;
 import com.peopleflow.organizacao.core.query.DepartamentoFilter;
-import com.peopleflow.organizacao.core.query.UnidadeFilter;
 import com.peopleflow.organizacao.outbound.jpa.entity.DepartamentoEntity;
-import com.peopleflow.organizacao.outbound.jpa.entity.UnidadeEntity;
 import com.peopleflow.organizacao.outbound.jpa.mapper.DepartamentoJpaMapper;
-import com.peopleflow.organizacao.outbound.jpa.mapper.UnidadeJpaMapper;
 import com.peopleflow.organizacao.outbound.jpa.repository.DepartamentoJpaRepository;
-import com.peopleflow.organizacao.outbound.jpa.repository.UnidadeJpaRepository;
 import com.peopleflow.organizacao.outbound.jpa.specification.DepartamentoSpecification;
-import com.peopleflow.organizacao.outbound.jpa.specification.UnidadeSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -70,12 +63,17 @@ public class DepartamentoRepositoryAdapter implements DepartamentoRepositoryPort
     }
 
     @Override
-    public boolean existePorCodigo(String codigo) {
-        return departamentoJpaRepository.existsByCodigoAndStatusNot(codigo, "excluido");
+    public boolean existePorCodigoEEmpresa(String codigo, Long empresaId) {
+        return departamentoJpaRepository.existsByCodigoAndEmpresaIdAndStatusNot(codigo, empresaId, "excluido");
     }
 
     @Override
-    public boolean existePorCodigoExcluindoId(String codigo, Long id) {
-        return departamentoJpaRepository.existsByCodigoAndIdNotAndStatusNot(codigo, id, "excluido");
+    public boolean existePorCodigoEEmpresaExcluindoId(String codigo, Long empresaId, Long id) {
+        return departamentoJpaRepository.existsByCodigoAndEmpresaIdAndIdNotAndStatusNot(codigo, empresaId, id, "excluido");
+    }
+
+    @Override
+    public void excluirTodosPorEmpresaId(Long empresaId) {
+        departamentoJpaRepository.excluirTodosPorEmpresaId(empresaId);
     }
 }

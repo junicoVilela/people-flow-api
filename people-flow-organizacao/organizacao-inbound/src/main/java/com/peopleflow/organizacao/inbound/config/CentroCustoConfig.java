@@ -7,6 +7,7 @@ import com.peopleflow.organizacao.core.application.CentroCustoService;
 import com.peopleflow.organizacao.core.domain.CentroCusto;
 import com.peopleflow.organizacao.core.ports.input.CentroCustoUseCase;
 import com.peopleflow.organizacao.core.ports.output.CentroCustoRepositoryPort;
+import com.peopleflow.organizacao.core.ports.output.EmpresaRepositoryPort;
 import com.peopleflow.organizacao.core.query.CentroCustoFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +21,9 @@ public class CentroCustoConfig {
     @Bean
     public CentroCustoUseCase centroCustoUseCase(
             CentroCustoRepositoryPort repository,
+            EmpresaRepositoryPort empresaRepository,
             AccessValidatorPort accessValidator) {
-        CentroCustoService service = new CentroCustoService(repository, accessValidator);
+        CentroCustoService service = new CentroCustoService(repository, empresaRepository, accessValidator);
         return new TransactionalCentroCustoUseCase(service);
     }
 

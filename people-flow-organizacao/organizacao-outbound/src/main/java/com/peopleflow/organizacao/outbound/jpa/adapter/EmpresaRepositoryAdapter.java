@@ -29,8 +29,8 @@ public class EmpresaRepositoryAdapter implements EmpresaRepositoryPort {
     }
 
     @Override
-    public Empresa salvar(Empresa colaborador) {
-        EmpresaEntity entity = mapper.toEntity(colaborador);
+    public Empresa salvar(Empresa empresa) {
+        EmpresaEntity entity = mapper.toEntity(empresa);
         EmpresaEntity savedEntity = empresaJpaRepository.save(entity);
         return mapper.toDomain(savedEntity);
     }
