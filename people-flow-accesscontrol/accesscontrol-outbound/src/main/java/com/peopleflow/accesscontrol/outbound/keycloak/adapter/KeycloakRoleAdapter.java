@@ -35,9 +35,13 @@ public class KeycloakRoleAdapter implements KeycloakRolePort {
 
     @Cacheable(value = "keycloak-admin-token", unless = "#result == null")
     protected String getAdminToken() {
-        Map<String, Object> tokenResponse = keycloakClient.getAdminToken(
-            "admin-cli", adminUsername, adminPassword, "password"
+        Map<String, ?> form = Map.of(
+            "client_id", "admin-cli",
+            "username", adminUsername,
+            "password", adminPassword,
+            "grant_type", "password"
         );
+        Map<String, Object> tokenResponse = keycloakClient.getAdminToken(form);
         return "Bearer " + tokenResponse.get("access_token");
     }
 

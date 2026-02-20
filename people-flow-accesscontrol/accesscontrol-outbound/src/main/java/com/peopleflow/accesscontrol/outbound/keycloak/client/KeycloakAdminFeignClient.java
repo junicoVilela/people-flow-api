@@ -19,16 +19,16 @@ import java.util.Map;
 )
 public interface KeycloakAdminFeignClient {
 
+    /**
+     * Obtém token de admin no realm master. Body deve ser application/x-www-form-urlencoded
+     * (client_id, username, password, grant_type=password).
+     */
     @PostMapping(
         value = "/realms/master/protocol/openid-connect/token",
-        consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+        consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
-    Map<String, Object> getAdminToken(
-        @RequestParam("client_id") String clientId,
-        @RequestParam("username") String username,
-        @RequestParam("password") String password,
-        @RequestParam("grant_type") String grantType
-    );
+    Map<String, Object> getAdminToken(@RequestBody Map<String, ?> formParams);
 
     @PostMapping("/admin/realms/{realm}/users")
     void createUser(

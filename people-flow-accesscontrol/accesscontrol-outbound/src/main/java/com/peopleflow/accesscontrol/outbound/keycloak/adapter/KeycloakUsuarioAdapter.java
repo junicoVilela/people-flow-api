@@ -33,14 +33,13 @@ public class KeycloakUsuarioAdapter implements KeycloakUsuarioPort {
     @Cacheable(value = "keycloak-admin-token", unless = "#result == null")
     private String getAdminToken() {
         log.debug("Obtendo token de administrador do Keycloak");
-        
-        Map<String, Object> tokenResponse = keycloakClient.getAdminToken(
-            "admin-cli",
-            adminUsername,
-            adminPassword,
-            "password"
+        Map<String, ?> form = Map.of(
+            "client_id", "admin-cli",
+            "username", adminUsername,
+            "password", adminPassword,
+            "grant_type", "password"
         );
-        
+        Map<String, Object> tokenResponse = keycloakClient.getAdminToken(form);
         String accessToken = (String) tokenResponse.get("access_token");
         return "Bearer " + accessToken;
     }

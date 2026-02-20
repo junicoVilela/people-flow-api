@@ -4,8 +4,13 @@ import feign.Logger;
 import feign.Request;
 import feign.RequestInterceptor;
 import feign.Retryer;
+import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
+import feign.form.spring.SpringFormEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,11 +30,24 @@ public class KeycloakFeignConfiguration {
         return Logger.Level.BASIC;
     }
 
+    /**
+     * Encoder que suporta application/x-www-form-urlencoded (token Keycloak) e JSON.
+     */
+    @Bean
+    public Encoder feignEncoder(ObjectFactory<HttpMessageConverters> messageConverters) {
+        return new SpringFormEncoder(new SpringEncoder(messageConverters));
+    }
+
     @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
-            requestTemplate.header("Content-Type", "application/json");
-            requestTemplate.header("Accept", "application/json");
+            // Só define Content-Type se ainda não foi definido (ex.: token usa form-urlencoded)
+            if (!requestTemplate.headers().containsKey("Content-Type")) {
+                requestTemplate.header("Content-Type", "application/json");
+            }
+            if (!requestTemplate.headers().containsKey("Accept")) {
+                requestTemplate.header("Accept", "application/json");
+            }
         };
     }
 
