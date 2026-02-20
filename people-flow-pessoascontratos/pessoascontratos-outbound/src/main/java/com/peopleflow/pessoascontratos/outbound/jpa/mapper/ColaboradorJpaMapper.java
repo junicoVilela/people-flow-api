@@ -24,7 +24,7 @@ public interface ColaboradorJpaMapper {
 
     @Named("stringToCpf")
     default Cpf stringToCpf(String cpf) {
-        return cpf != null ? new Cpf(cpf) : null;
+        return Cpf.fromStorage(cpf);
     }
 
     @Named("stringToEmail")

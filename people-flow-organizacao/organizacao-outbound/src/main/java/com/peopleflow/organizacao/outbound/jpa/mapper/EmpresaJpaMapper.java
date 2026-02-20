@@ -24,7 +24,7 @@ public interface EmpresaJpaMapper {
 
     @Named("stringToCnpj")
     default Cnpj stringToCnpj(String cnpj) {
-        return cnpj != null ? new Cnpj(cnpj) : null;
+        return Cnpj.fromStorage(cnpj);
     }
 
     @Named("stringToInscricaoEstadual")

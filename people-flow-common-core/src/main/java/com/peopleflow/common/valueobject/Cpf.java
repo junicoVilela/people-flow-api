@@ -15,14 +15,32 @@ public class Cpf {
         if (cpf == null || cpf.trim().isEmpty()) {
             throw new BusinessException("CPF_OBRIGATORIO", "CPF é obrigatório");
         }
-        
         String cpfLimpo = cpf.replaceAll("[^0-9]", "");
-        
         if (!isValidCpf(cpfLimpo)) {
             throw new BusinessException("CPF_INVALIDO", "CPF inválido: " + cpf);
         }
-        
         this.valor = formatarCpf(cpfLimpo);
+    }
+
+    private static final Object STORAGE = new Object();
+
+    /**
+     * Cria CPF a partir de valor já persistido (ex.: leitura do banco, listagem).
+     * Não valida dígitos verificadores — use apenas em fluxos de leitura (GET/list).
+     */
+    public static Cpf fromStorage(String cpf) {
+        if (cpf == null || cpf.trim().isEmpty()) {
+            return null;
+        }
+        String cpfLimpo = cpf.replaceAll("[^0-9]", "");
+        if (cpfLimpo.length() == 11) {
+            return new Cpf(formatarCpfStatic(cpfLimpo), STORAGE);
+        }
+        return new Cpf(cpf.trim(), STORAGE);
+    }
+
+    private Cpf(String valorJaFormatadoOuBruto, Object storageMarker) {
+        this.valor = valorJaFormatadoOuBruto;
     }
 
     public String getValorNumerico() {
@@ -61,6 +79,10 @@ public class Cpf {
     }
 
     private String formatarCpf(String cpf) {
+        return formatarCpfStatic(cpf);
+    }
+
+    private static String formatarCpfStatic(String cpf) {
         return cpf.substring(0, 3) + "." +
                cpf.substring(3, 6) + "." +
                cpf.substring(6, 9) + "-" +

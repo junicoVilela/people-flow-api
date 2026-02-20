@@ -1,4 +1,39 @@
 -- ============================
+-- SEED DATA: Empresas
+-- ============================
+INSERT INTO people_flow_rh.empresa (id, nome, cnpj, status) VALUES
+(1, 'People Flow Ltda', '11.222.333/0001-81', 'ativo'),
+(2, 'Acme Consultoria', '33.444.555/0001-81', 'ativo')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
+-- SEED DATA: Unidades (empresa 1)
+-- ============================
+INSERT INTO people_flow_rh.unidade (id, empresa_id, nome, codigo, status) VALUES
+(1, 1, 'Matriz São Paulo', 'MAT-SP', 'ativo'),
+(2, 1, 'Filial Rio de Janeiro', 'FIL-RJ', 'ativo')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
+-- SEED DATA: Centro de Custo (empresa 1)
+-- ============================
+INSERT INTO people_flow_rh.centro_custo (id, empresa_id, codigo, nome, status) VALUES
+(1, 1, 'CC-ADM', 'Administrativo', 'ativo'),
+(2, 1, 'CC-RH', 'Recursos Humanos', 'ativo'),
+(3, 1, 'CC-TI', 'Tecnologia', 'ativo')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
+-- SEED DATA: Departamentos (empresa 1, unidade 1)
+-- ============================
+INSERT INTO people_flow_rh.departamento (id, empresa_id, unidade_id, nome, codigo, status) VALUES
+(1, 1, 1, 'Recursos Humanos', 'RH', 'ativo'),
+(2, 1, 1, 'Tecnologia da Informação', 'TI', 'ativo'),
+(3, 1, 1, 'Financeiro', 'FIN', 'ativo'),
+(4, 1, 1, 'Comercial', 'COM', 'ativo')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
 -- SEED DATA: Cargos de exemplo (necessários para cargo_role)
 -- ============================
 -- Insere cargos 1 a 6 para que os mapeamentos cargo_role tenham FK válida.
@@ -125,6 +160,26 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (6, 'admin', 'Acesso administrativo completo ao sistema'),
 (6, '*:*', 'Todas as permissões')
 ON CONFLICT (cargo_id, role_name) DO NOTHING;
+
+-- ============================
+-- SEED DATA: Colaboradores (empresa 1, departamento, centro_custo, cargo)
+-- ============================
+INSERT INTO people_flow_rh.colaborador (id, empresa_id, departamento_id, centro_custo_id, nome, cpf, matricula, email, data_admissao, status, cargo_id) VALUES
+(1, 1, 1, 2, 'Maria Silva', '529.982.247-25', '001', 'maria.silva@peopleflow.com', '2023-01-15', 'ativo', 1),
+(2, 1, 1, 2, 'João Santos', '734.767.604-56', '002', 'joao.santos@peopleflow.com', '2023-03-01', 'ativo', 2),
+(3, 1, 1, 2, 'Ana Costa', '048.129.384-08', '003', 'ana.costa@peopleflow.com', '2023-06-10', 'ativo', 3),
+(4, 1, 2, 3, 'Pedro Oliveira', '423.738.230-39', '004', 'pedro.oliveira@peopleflow.com', '2023-02-20', 'ativo', 4),
+(5, 1, 2, 3, 'Carla Lima', '576.788.234-79', '005', 'carla.lima@peopleflow.com', '2023-04-01', 'ativo', 5),
+(6, 1, 3, 1, 'Roberto Alves', '123.456.789-00', '006', 'roberto.alves@peopleflow.com', '2022-11-01', 'ativo', 6),
+(7, 1, 4, 1, 'Fernanda Souza', '371.498.283-37', '007', 'fernanda.souza@peopleflow.com', '2024-01-08', 'ativo', 5)
+ON CONFLICT (id) DO NOTHING;
+
+-- Ajusta sequences para o próximo ID após os seeds (evita conflito em novas inserções)
+SELECT setval('people_flow_rh.empresa_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.empresa));
+SELECT setval('people_flow_rh.unidade_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.unidade));
+SELECT setval('people_flow_rh.centro_custo_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.centro_custo));
+SELECT setval('people_flow_rh.departamento_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.departamento));
+SELECT setval('people_flow_rh.colaborador_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.colaborador));
 
 -- ============================
 -- SEED DATA: Mapeamento Departamento → Grupo Keycloak

@@ -15,14 +15,32 @@ public class Cnpj {
         if (cnpj == null || cnpj.trim().isEmpty()) {
             throw new BusinessException("CNPJ_OBRIGATORIO", "CNPJ é obrigatório");
         }
-        
         String cnpjLimpo = cnpj.replaceAll("[^0-9]", "");
-        
         if (!isValidCnpj(cnpjLimpo)) {
             throw new BusinessException("CNPJ_INVALIDO", "CNPJ inválido: " + cnpj);
         }
-        
         this.valor = formatarCnpj(cnpjLimpo);
+    }
+
+    private static final Object STORAGE = new Object();
+
+    /**
+     * Cria CNPJ a partir de valor já persistido (ex.: leitura do banco, listagem).
+     * Não valida dígitos verificadores — use apenas em fluxos de leitura (GET/list).
+     */
+    public static Cnpj fromStorage(String cnpj) {
+        if (cnpj == null || cnpj.trim().isEmpty()) {
+            return null;
+        }
+        String cnpjLimpo = cnpj.replaceAll("[^0-9]", "");
+        if (cnpjLimpo.length() == 14) {
+            return new Cnpj(formatarCnpjStatic(cnpjLimpo), STORAGE);
+        }
+        return new Cnpj(cnpj.trim(), STORAGE);
+    }
+
+    private Cnpj(String valorJaFormatadoOuBruto, Object storageMarker) {
+        this.valor = valorJaFormatadoOuBruto;
     }
 
     public String getValorNumerico() {
@@ -68,6 +86,10 @@ public class Cnpj {
     }
 
     private String formatarCnpj(String cnpj) {
+        return formatarCnpjStatic(cnpj);
+    }
+
+    private static String formatarCnpjStatic(String cnpj) {
         return cnpj.substring(0, 2) + "." +
                cnpj.substring(2, 5) + "." +
                cnpj.substring(5, 8) + "/" +
