@@ -1,0 +1,92 @@
+{
+  "realm": "people-flow",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "resetPasswordAllowed": true,
+  "clients": [
+    {
+      "clientId": "people-flow-api",
+      "secret": "peopleflow-secret-change-in-production",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "attributes": { "oauth2.device.authorization.grant.enabled": "false" },
+      "defaultClientScopes": ["web-origins", "roles", "profile", "email"],
+      "protocolMappers": [
+        {
+          "name": "empresaId",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "empresaId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "empresaId",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [],
+    "client": {
+      "people-flow-api": [
+        { "name": "admin", "description": "Administrador do sistema" },
+        { "name": "colaborador:criar", "description": "Criar colaboradores" },
+        { "name": "colaborador:ler", "description": "Visualizar colaboradores" },
+        { "name": "colaborador:atualizar", "description": "Atualizar colaboradores" },
+        { "name": "colaborador:demitir", "description": "Demitir colaboradores" }
+      ]
+    }
+  },
+  "users": [
+    {
+      "username": "admin@peopleflow.com",
+      "email": "admin@peopleflow.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Admin",
+      "lastName": "Sistema",
+      "credentials": [
+        { "type": "password", "value": "admin123", "temporary": false }
+      ],
+      "clientRoles": {
+        "people-flow-api": ["admin", "colaborador:criar", "colaborador:ler", "colaborador:atualizar", "colaborador:demitir"]
+      }
+    },
+    {
+      "username": "gestor@peopleflow.com",
+      "email": "gestor@peopleflow.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Gestor",
+      "lastName": "RH",
+      "credentials": [
+        { "type": "password", "value": "gestor123", "temporary": false }
+      ],
+      "clientRoles": {
+        "people-flow-api": ["colaborador:criar", "colaborador:ler", "colaborador:atualizar", "colaborador:demitir"]
+      }
+    },
+    {
+      "username": "leitor@peopleflow.com",
+      "email": "leitor@peopleflow.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Leitor",
+      "lastName": "Consulta",
+      "credentials": [
+        { "type": "password", "value": "leitor123", "temporary": false }
+      ],
+      "clientRoles": {
+        "people-flow-api": ["colaborador:ler"]
+      }
+    }
+  ]
+}

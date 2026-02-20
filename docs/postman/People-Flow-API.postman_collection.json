@@ -1,0 +1,756 @@
+{
+  "info": {
+    "_postman_id": "people-flow-api-2025",
+    "name": "People Flow API",
+    "description": "Endpoints da API People Flow. Variaveis: baseUrl (ex: http://localhost:8080), token (JWT Keycloak).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "keycloakUrl", "value": "http://localhost:8081" },
+    { "key": "realm", "value": "people-flow" },
+    { "key": "clientId", "value": "people-flow-api" },
+    { "key": "clientSecret", "value": "peopleflow-secret-change-in-production" },
+    { "key": "refresh_token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Login",
+      "description": "Obter token JWT no Keycloak. Use um dos requests abaixo; apos executar, o token e salvo na variavel token da collection.",
+      "item": [
+        {
+          "name": "Login com usuario e senha",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "client_secret", "value": "{{clientSecret}}" },
+                { "key": "username", "value": "admin@peopleflow.com" },
+                { "key": "password", "value": "admin123" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", "protocol", "openid-connect", "token"]
+            },
+            "description": "Obter token com usuario e senha. Apos executar, o token e salvo na variavel token da collection.",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var json = pm.response.json();",
+                    "if (json.access_token) { pm.collectionVariables.set('token', json.access_token); }",
+                    "if (json.refresh_token) { pm.collectionVariables.set('refresh_token', json.refresh_token); }"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "Login com client credentials",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "client_credentials" },
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "client_secret", "value": "{{clientSecret}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", "protocol", "openid-connect", "token"]
+            },
+            "description": "Token para service account (maquina a maquina)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Keycloak - Auth",
+      "description": "Refresh, logout, userinfo e introspect. Para obter token, use a pasta Login acima.",
+      "item": [
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "refresh_token" },
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "client_secret", "value": "{{clientSecret}}" },
+                { "key": "refresh_token", "value": "{{refresh_token}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", "protocol", "openid-connect", "token"]
+            },
+            "description": "Troca refresh_token por novo access_token. Adicione a variavel refresh_token apos o login."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "client_secret", "value": "{{clientSecret}}" },
+                { "key": "refresh_token", "value": "{{refresh_token}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/logout",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", "protocol", "openid-connect", "logout"]
+            },
+            "description": "Invalida refresh_token e sessao."
+          }
+        },
+        {
+          "name": "Userinfo",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/userinfo",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", "protocol", "openid-connect", "userinfo"]
+            },
+            "description": "Retorna dados do usuario autenticado (sub, email, nome, etc.). Requer token valido."
+          }
+        },
+        {
+          "name": "Introspect token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "client_secret", "value": "{{clientSecret}}" },
+                { "key": "token", "value": "{{token}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token/introspect",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", "protocol", "openid-connect", "token", "introspect"]
+            },
+            "description": "Verifica se o token e valido e retorna claims (active, exp, sub, etc.)."
+          }
+        },
+        {
+          "name": "OpenID config",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/.well-known/openid-configuration",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{realm}}", ".well-known", "openid-configuration"]
+            },
+            "description": "Discovery: lista endpoints do realm (issuer, jwks_uri, token_endpoint, etc.)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Colaboradores",
+      "item": [
+        {
+          "name": "Criar colaborador",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nome do Colaborador\",\n  \"email\": \"email@empresa.com\",\n  \"cpf\": \"12345678900\",\n  \"empresaId\": 1,\n  \"cargoId\": 1,\n  \"departamentoId\": 1,\n  \"centroCustoId\": null,\n  \"requerAcessoSistema\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores"]
+            }
+          }
+        },
+        {
+          "name": "Listar colaboradores",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores?page=0&size=10&sort=nome",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "nome" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar colaborador por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores", "1"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar colaborador",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nome Atualizado\",\n  \"email\": \"email@empresa.com\",\n  \"cpf\": \"12345678900\",\n  \"empresaId\": 1,\n  \"cargoId\": 1,\n  \"departamentoId\": 1,\n  \"centroCustoId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores", "1"]
+            }
+          }
+        },
+        {
+          "name": "Demitir colaborador",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"dataDemissao\": \"2025-02-19\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores/1/demitir",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores", "1", "demitir"]
+            }
+          }
+        },
+        {
+          "name": "Ativar colaborador",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores/1/ativar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores", "1", "ativar"]
+            }
+          }
+        },
+        {
+          "name": "Inativar colaborador",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores/1/inativar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores", "1", "inativar"]
+            }
+          }
+        },
+        {
+          "name": "Excluir colaborador",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/colaboradores/1/excluir",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "colaboradores", "1", "excluir"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empresas",
+      "item": [
+        {
+          "name": "Criar empresa",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Empresa Exemplo\",\n  \"codigo\": \"EMP01\",\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/empresas", "host": ["{{baseUrl}}"], "path": ["api", "v1", "empresas"] }
+          }
+        },
+        {
+          "name": "Listar empresas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/empresas?page=0&size=10&sort=nome",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "empresas"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "nome" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar empresa por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/empresas/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "empresas", "1"] }
+          }
+        },
+        {
+          "name": "Atualizar empresa",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Empresa Atualizada\",\n  \"codigo\": \"EMP01\",\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/empresas/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "empresas", "1"] }
+          }
+        },
+        {
+          "name": "Ativar empresa",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/empresas/1/ativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "empresas", "1", "ativar"] }
+          }
+        },
+        {
+          "name": "Inativar empresa",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/empresas/1/inativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "empresas", "1", "inativar"] }
+          }
+        },
+        {
+          "name": "Excluir empresa",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/empresas/1/excluir", "host": ["{{baseUrl}}"], "path": ["api", "v1", "empresas", "1", "excluir"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unidades",
+      "item": [
+        {
+          "name": "Criar unidade",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Unidade SP\",\n  \"codigo\": \"UN01\",\n  \"empresaId\": 1,\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/unidades", "host": ["{{baseUrl}}"], "path": ["api", "v1", "unidades"] }
+          }
+        },
+        {
+          "name": "Listar unidades",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/unidades?page=0&size=10&sort=nome",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "unidades"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "nome" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar unidade por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/unidades/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "unidades", "1"] }
+          }
+        },
+        {
+          "name": "Atualizar unidade",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Unidade SP\",\n  \"codigo\": \"UN01\",\n  \"empresaId\": 1,\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/unidades/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "unidades", "1"] }
+          }
+        },
+        {
+          "name": "Ativar unidade",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/unidades/1/ativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "unidades", "1", "ativar"] }
+          }
+        },
+        {
+          "name": "Inativar unidade",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/unidades/1/inativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "unidades", "1", "inativar"] }
+          }
+        },
+        {
+          "name": "Excluir unidade",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/unidades/1/excluir", "host": ["{{baseUrl}}"], "path": ["api", "v1", "unidades", "1", "excluir"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Centro de Custo",
+      "item": [
+        {
+          "name": "Criar centro de custo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"CC Administrativo\",\n  \"codigo\": \"CC01\",\n  \"empresaId\": 1,\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/centrocusto", "host": ["{{baseUrl}}"], "path": ["api", "v1", "centrocusto"] }
+          }
+        },
+        {
+          "name": "Listar centros de custo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/centrocusto?page=0&size=10&sort=nome",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "centrocusto"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "nome" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar centro de custo por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/centrocusto/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "centrocusto", "1"] }
+          }
+        },
+        {
+          "name": "Atualizar centro de custo",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"CC Administrativo\",\n  \"codigo\": \"CC01\",\n  \"empresaId\": 1,\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/centrocusto/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "centrocusto", "1"] }
+          }
+        },
+        {
+          "name": "Ativar centro de custo",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/centrocusto/1/ativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "centrocusto", "1", "ativar"] }
+          }
+        },
+        {
+          "name": "Inativar centro de custo",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/centrocusto/1/inativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "centrocusto", "1", "inativar"] }
+          }
+        },
+        {
+          "name": "Excluir centro de custo",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/centrocusto/1/excluir", "host": ["{{baseUrl}}"], "path": ["api", "v1", "centrocusto", "1", "excluir"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Departamento",
+      "item": [
+        {
+          "name": "Criar departamento",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"RH\",\n  \"codigo\": \"DPT01\",\n  \"empresaId\": 1,\n  \"unidadeId\": 1,\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/departamento", "host": ["{{baseUrl}}"], "path": ["api", "v1", "departamento"] }
+          }
+        },
+        {
+          "name": "Listar departamentos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/departamento?page=0&size=10&sort=nome",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "departamento"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "nome" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar departamento por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/departamento/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "departamento", "1"] }
+          }
+        },
+        {
+          "name": "Atualizar departamento",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"RH\",\n  \"codigo\": \"DPT01\",\n  \"empresaId\": 1,\n  \"unidadeId\": 1,\n  \"status\": \"ativo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/departamento/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "departamento", "1"] }
+          }
+        },
+        {
+          "name": "Ativar departamento",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/departamento/1/ativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "departamento", "1", "ativar"] }
+          }
+        },
+        {
+          "name": "Inativar departamento",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/departamento/1/inativar", "host": ["{{baseUrl}}"], "path": ["api", "v1", "departamento", "1", "inativar"] }
+          }
+        },
+        {
+          "name": "Excluir departamento",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/departamento/1/excluir", "host": ["{{baseUrl}}"], "path": ["api", "v1", "departamento", "1", "excluir"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Usuarios",
+      "item": [
+        {
+          "name": "Criar usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuario@empresa.com\",\n  \"email\": \"usuario@empresa.com\",\n  \"firstName\": \"Nome\",\n  \"lastName\": \"Sobrenome\",\n  \"password\": \"senha-temporaria\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios"] }
+          }
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios"] }
+          }
+        },
+        {
+          "name": "Buscar usuario por username",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/usuario@empresa.com", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", "usuario@empresa.com"] }
+          }
+        },
+        {
+          "name": "Buscar usuario por colaborador",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/colaborador/1", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", "colaborador", "1"] }
+          }
+        },
+        {
+          "name": "Excluir usuario",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Ativar usuario",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId/ativar", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId", "ativar"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Desativar usuario",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId/desativar", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId", "desativar"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Resetar senha",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"novaSenha\": \"novaSenha123\",\n  \"temporaria\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId/reset-senha", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId", "reset-senha"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Atribuir roles",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "[\"colaborador:ler\", \"colaborador:criar\"]" },
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId/roles", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId", "roles"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Enviar email definir senha",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId/enviar-email-senha", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId", "enviar-email-senha"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Logout usuario",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/admin/usuarios/:userId/logout", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usuarios", ":userId", "logout"], "variable": [{ "key": "userId", "value": "" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Roles",
+      "item": [
+        {
+          "name": "Criar role",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"colaborador:ler\",\n  \"description\": \"Visualizar colaboradores\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/roles", "host": ["{{baseUrl}}"], "path": ["api", "admin", "roles"] }
+          }
+        },
+        {
+          "name": "Listar roles",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/roles", "host": ["{{baseUrl}}"], "path": ["api", "admin", "roles"] }
+          }
+        },
+        {
+          "name": "Buscar role por nome",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/roles/colaborador:ler", "host": ["{{baseUrl}}"], "path": ["api", "admin", "roles", "colaborador:ler"] }
+          }
+        },
+        {
+          "name": "Excluir role",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/admin/roles/colaborador:ler", "host": ["{{baseUrl}}"], "path": ["api", "admin", "roles", "colaborador:ler"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Grupos",
+      "item": [
+        {
+          "name": "Criar grupo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"RH\",\n  \"path\": \"/RH\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/grupos", "host": ["{{baseUrl}}"], "path": ["api", "admin", "grupos"] }
+          }
+        },
+        {
+          "name": "Listar grupos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/grupos", "host": ["{{baseUrl}}"], "path": ["api", "admin", "grupos"] }
+          }
+        },
+        {
+          "name": "Buscar grupo por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/grupos/:groupId", "host": ["{{baseUrl}}"], "path": ["api", "admin", "grupos", ":groupId"], "variable": [{ "key": "groupId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Excluir grupo",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/admin/grupos/:groupId", "host": ["{{baseUrl}}"], "path": ["api", "admin", "grupos", ":groupId"], "variable": [{ "key": "groupId", "value": "" }] }
+          }
+        },
+        {
+          "name": "Listar membros do grupo",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/admin/grupos/:groupId/membros", "host": ["{{baseUrl}}"], "path": ["api", "admin", "grupos", ":groupId", "membros"], "variable": [{ "key": "groupId", "value": "" }] }
+          }
+        }
+      ]
+    }
+  ]
+}

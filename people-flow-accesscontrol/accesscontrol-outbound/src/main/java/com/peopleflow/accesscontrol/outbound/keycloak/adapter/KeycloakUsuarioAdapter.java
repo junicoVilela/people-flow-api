@@ -20,7 +20,10 @@ public class KeycloakUsuarioAdapter implements KeycloakUsuarioPort {
     
     @Value("${keycloak.realm}")
     private String realm;
-    
+
+    @Value("${keycloak.client-id}")
+    private String keycloakClientId;
+
     @Value("${keycloak.admin.username:admin}")
     private String adminUsername;
     
@@ -250,11 +253,11 @@ public class KeycloakUsuarioAdapter implements KeycloakUsuarioPort {
         String token = getAdminToken();
         
         List<Map<String, Object>> clients = keycloakClient.findClientByClientId(
-            realm, "peopleflow-api", token
+            realm, keycloakClientId, token
         );
         
         if (clients.isEmpty()) {
-            throw new RuntimeException("Client peopleflow-api não encontrado");
+            throw new RuntimeException("Client " + keycloakClientId + " não encontrado");
         }
         
         String clientUuid = (String) clients.get(0).get("id");
@@ -289,7 +292,7 @@ public class KeycloakUsuarioAdapter implements KeycloakUsuarioPort {
         List<String> actions = List.of("UPDATE_PASSWORD");
         
         keycloakClient.executeActionsEmail(
-            realm, userId, "peopleflow-api", null, token, actions
+            realm, userId, keycloakClientId, null, token, actions
         );
         
         log.info("Email de configuração de senha enviado com sucesso");

@@ -35,6 +35,9 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
     private String jwkSetUri;
 
+    @Value("${keycloak.client-id}")
+    private String keycloakClientId;
+
     /**
      * Configura o filtro de segurança HTTP
      */
@@ -81,7 +84,8 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(new KeycloakGrantedAuthoritiesConverter());
+        converter.setJwtGrantedAuthoritiesConverter(
+                new KeycloakGrantedAuthoritiesConverter(keycloakClientId));
         return converter;
     }
 
@@ -90,19 +94,22 @@ public class SecurityConfig {
      * 
      * Extrai roles de duas fontes:
      * 1. Realm roles: roles globais do realm
-     * 2. Client roles: roles específicas do client (peopleflow-api)
+     * 2. Client roles: roles específicas do client (keycloak.client-id)
      */
     static class KeycloakGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
-        
+
+        private final String clientId;
+
+        KeycloakGrantedAuthoritiesConverter(String clientId) {
+            this.clientId = clientId;
+        }
+
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
             // Extrair roles do realm
             Collection<GrantedAuthority> realmRoles = extractRealmRoles(jwt);
-            
-            // Extrair roles do client (peopleflow-api)
-            Collection<GrantedAuthority> clientRoles = extractClientRoles(jwt, "peopleflow-api");
-            
-            // Combinar ambas as fontes
+            // Extrair roles do client (keycloak.client-id)
+            Collection<GrantedAuthority> clientRoles = extractClientRoles(jwt, clientId);
             return Stream.concat(realmRoles.stream(), clientRoles.stream())
                     .collect(Collectors.toList());
         }
@@ -129,7 +136,7 @@ public class SecurityConfig {
 
         /**
          * Extrai roles do client (roles específicas da aplicação)
-         * Formato no JWT: resource_access.peopleflow-api.roles
+         * Formato no JWT: resource_access.{clientId}.roles
          */
         private Collection<GrantedAuthority> extractClientRoles(Jwt jwt, String clientId) {
             Map<String, Object> resourceAccess = jwt.getClaim("resource_access");

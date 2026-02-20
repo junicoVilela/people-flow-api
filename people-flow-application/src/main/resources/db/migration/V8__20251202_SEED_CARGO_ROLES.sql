@@ -1,13 +1,19 @@
 -- ============================
+-- SEED DATA: Cargos de exemplo (necessários para cargo_role)
+-- ============================
+-- Insere cargos 1 a 6 para que os mapeamentos cargo_role tenham FK válida.
+INSERT INTO people_flow_rh.cargo (id, nome, descricao, nivel) VALUES
+(1, 'Gerente de RH', 'Gerente da área de Recursos Humanos', 'senior'),
+(2, 'Analista de RH', 'Analista de Recursos Humanos', 'pleno'),
+(3, 'Assistente de RH', 'Assistente administrativo de RH', 'junior'),
+(4, 'Gestor de Área', 'Gestor de equipe/departamento', 'senior'),
+(5, 'Colaborador Padrão', 'Colaborador operacional', 'junior'),
+(6, 'Administrador de Sistema', 'Acesso administrativo completo', 'senior')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
 -- SEED DATA: Mapeamento Cargo → Roles
 -- ============================
--- 
--- Este arquivo popula a tabela cargo_role com mapeamentos de exemplo.
--- IMPORTANTE: Ajuste os cargo_id conforme os IDs reais dos cargos cadastrados no sistema.
--- 
--- Para visualizar os cargos existentes:
---   SELECT id, nome FROM people_flow_rh.cargo ORDER BY id;
---
 
 -- ============================
 -- EXEMPLO: Cargo 1 - Gerente de RH
