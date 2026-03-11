@@ -41,8 +41,7 @@ public class UnidadeService implements UnidadeUseCase {
         Unidade unidadeParaSalvar = Unidade.nova(
                 unidade.getNome(),
                 unidade.getCodigo(),
-                unidade.getEmpresaId(),
-                unidade.getStatus());
+                unidade.getEmpresaId());
         Unidade unidadeCriar = unidadeRepository.salvar(unidadeParaSalvar);
 
         log.info("Unidade criada com sucesso: nome={}, codigo={}, empresaId={}, id={}",

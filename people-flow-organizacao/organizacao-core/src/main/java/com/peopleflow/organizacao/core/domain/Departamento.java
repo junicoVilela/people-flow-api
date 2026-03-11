@@ -67,15 +67,13 @@ public class Departamento {
             String nome,
             String codigo,
             Long empresaId,
-            Long unidadeId,
-            StatusOrganizacao status) {
+            Long unidadeId) {
 
         return Departamento.builder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
                 .unidadeId(unidadeId)
-                .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 
@@ -83,15 +81,13 @@ public class Departamento {
             String nome,
             String codigo,
             Long empresaId,
-            Long unidadeId,
-            StatusOrganizacao status) {
+            Long unidadeId) {
 
         return this.toBuilder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
                 .unidadeId(unidadeId)
-                .status(status)
                 .build();
     }
 

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 public interface ColaboradorUseCase {
     Colaborador criar(Colaborador colaborador);
+    Colaborador criar(Colaborador colaborador, boolean requerAcessoSistema);
     Colaborador atualizar(Long id, Colaborador colaborador);
     Colaborador buscarPorId(Long id);
     PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination);
@@ -16,5 +17,12 @@ public interface ColaboradorUseCase {
     Colaborador ativar(Long id);
     Colaborador inativar(Long id);
     Colaborador excluir(Long id);
+
+    Colaborador transferir(Long id, Long novaEmpresaId, Long novoDepartamentoId,
+                           Long novoCentroCustoId, LocalDate dataTransferencia);
+
+    Colaborador reativar(Long id, LocalDate novaDataAdmissao);
+
+    Colaborador vincularAcessoSistema(Long colaboradorId, String keycloakUserId);
 }
 

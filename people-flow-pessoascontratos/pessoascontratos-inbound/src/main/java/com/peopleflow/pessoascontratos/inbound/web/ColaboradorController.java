@@ -10,6 +10,8 @@ import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DemissaoRequest;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ReativacaoRequest;
+import com.peopleflow.pessoascontratos.inbound.web.dto.TransferenciaRequest;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ColaboradorWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,10 +45,14 @@ public class ColaboradorController {
 
     @PostMapping
     @PreAuthorize("hasRole('colaborador:criar')")
-    @Operation(summary = "Criar novo colaborador", description = "Cadastra um novo colaborador no sistema")
+    @Operation(
+        summary = "Criar novo colaborador",
+        description = "Cadastra um novo colaborador. Status inicial é sempre ATIVO. " +
+                      "Para alterar o status use os endpoints PATCH dedicados."
+    )
     public ResponseEntity<ColaboradorResponse> criar(@Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
-        
+
         if (colaborador.getEmpresaId() == null) {
             Long empresaId = securityHelper.getEmpresaId();
             if (empresaId != null) {
@@ -54,8 +60,9 @@ public class ColaboradorController {
             }
         }
 
-        Colaborador colaboradorCriado = colaboradorUseCase.criar(colaborador);
-        
+        boolean requerAcesso = Boolean.TRUE.equals(request.getRequerAcessoSistema());
+        Colaborador colaboradorCriado = colaboradorUseCase.criar(colaborador, requerAcesso);
+
         ColaboradorResponse response = mapper.toResponse(colaboradorCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -103,7 +110,12 @@ public class ColaboradorController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('colaborador:atualizar')")
-    @Operation(summary = "Atualizar colaborador", description = "Atualiza os dados de um colaborador existente")
+    @Operation(
+        summary = "Atualizar colaborador",
+        description = "Atualiza os dados cadastrais do colaborador. " +
+                      "empresaId é imutável — deve repetir o valor original. " +
+                      "Status não é alterado por este endpoint; use PATCH /ativar, /inativar, /demitir ou /excluir."
+    )
     public ResponseEntity<ColaboradorResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ColaboradorRequest request) {
         Colaborador colaborador = mapper.toDomain(request);
         
@@ -152,4 +164,38 @@ public class ColaboradorController {
         return ResponseEntity.ok(mapper.toResponse(excluido));
     }
 
-} 
+    @PatchMapping("/{id}/transferir")
+    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @Operation(
+        summary = "Transferir colaborador",
+        description = "Transfere o colaborador para outra empresa ou departamento. " +
+                      "O colaborador deve estar com status ATIVO."
+    )
+    public ResponseEntity<ColaboradorResponse> transferir(
+            @PathVariable Long id,
+            @Valid @RequestBody TransferenciaRequest request) {
+        Colaborador transferido = colaboradorUseCase.transferir(
+                id,
+                request.getNovaEmpresaId(),
+                request.getNovoDepartamentoId(),
+                request.getNovoCentroCustoId(),
+                request.getDataTransferencia()
+        );
+        return ResponseEntity.ok(mapper.toResponse(transferido));
+    }
+
+    @PatchMapping("/{id}/reativar")
+    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @Operation(
+        summary = "Reativar colaborador excluído",
+        description = "Reativa um colaborador com status EXCLUIDO, registrando nova data de admissão. " +
+                      "Diferente de /ativar, que apenas muda o status de inativo para ativo."
+    )
+    public ResponseEntity<ColaboradorResponse> reativar(
+            @PathVariable Long id,
+            @Valid @RequestBody ReativacaoRequest request) {
+        Colaborador reativado = colaboradorUseCase.reativar(id, request.getNovaDataAdmissao());
+        return ResponseEntity.ok(mapper.toResponse(reativado));
+    }
+
+}

@@ -25,7 +25,7 @@ public class UsuarioKeycloakEventListener {
      * Quando um usuário Keycloak é criado, atualiza o colaborador com o keycloakUserId
      * 
      * NOTA: Este método espera receber um evento do tipo UsuarioKeycloakCriado
-     * do módulo access control. Por ora, vamos usar uma abordagem genérica com Object.
+     access     * do módulo  control. Por ora, vamos usar uma abordagem genérica com Object.
      */
     @EventListener
     public void handleUsuarioKeycloakCriado(Object event) {
@@ -46,15 +46,12 @@ public class UsuarioKeycloakEventListener {
             Long colaboradorId = (Long) colaboradorIdMethod.invoke(event);
             String email = (String) emailMethod.invoke(event);
             
-            log.info("🎧 Recebido evento UsuarioKeycloakCriado: colaboradorId={}, keycloakUserId={}", 
+            log.info("🎧 Recebido evento UsuarioKeycloakCriado: colaboradorId={}, keycloakUserId={}",
                     colaboradorId, keycloakUserId);
-            
-            // Buscar colaborador e vincular keycloakUserId
-            var colaborador = colaboradorUseCase.buscarPorId(colaboradorId);
-            var colaboradorAtualizado = colaborador.vincularUsuarioKeycloak(keycloakUserId);
-            colaboradorUseCase.atualizar(colaboradorId, colaboradorAtualizado);
-            
-            log.info("✅ Colaborador {} vinculado ao usuário Keycloak {}", 
+
+            colaboradorUseCase.vincularAcessoSistema(colaboradorId, keycloakUserId);
+
+            log.info("✅ Colaborador {} vinculado ao usuário Keycloak {}",
                     colaboradorId, keycloakUserId);
             
         } catch (NoSuchMethodException e) {

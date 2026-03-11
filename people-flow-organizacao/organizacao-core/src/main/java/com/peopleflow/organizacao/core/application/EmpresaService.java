@@ -48,8 +48,7 @@ public class EmpresaService implements EmpresaUseCase {
         Empresa empresaParaSalvar = Empresa.nova(
                 empresa.getNome(),
                 empresa.getCnpj().getValor(),
-                inscricaoEstadualString,
-                empresa.getStatus());
+                inscricaoEstadualString);
         Empresa empresaCriar = empresaRepository.salvar(empresaParaSalvar);
 
         log.info("Empresa criada com sucesso: nome={}, cnpj={}, id={}",

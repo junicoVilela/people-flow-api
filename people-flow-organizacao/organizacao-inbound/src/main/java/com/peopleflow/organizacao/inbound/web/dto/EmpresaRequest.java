@@ -20,10 +20,4 @@ public class EmpresaRequest {
     private String cnpj;
 
     private String inscricaoEstadual;
-
-    @Pattern(
-            regexp = "^(ativo|inativo|excluido)?$",
-            message = "Status deve ser: ativo, inativo ou excluido"
-    )
-    private String status;
 }

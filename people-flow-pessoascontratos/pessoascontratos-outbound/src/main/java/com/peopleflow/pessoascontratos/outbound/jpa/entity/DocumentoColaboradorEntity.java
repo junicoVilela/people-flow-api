@@ -37,6 +37,9 @@ public class DocumentoColaboradorEntity extends AuditableEntity {
     @Column(name = "TIPO", nullable = false)
     private String tipo;
 
+    @Column(name = "NOME_ARQUIVO", nullable = false)
+    private String nomeArquivo;
+
     @Column(name = "MIME_TYPE", nullable = false)
     private String mimeType;
 

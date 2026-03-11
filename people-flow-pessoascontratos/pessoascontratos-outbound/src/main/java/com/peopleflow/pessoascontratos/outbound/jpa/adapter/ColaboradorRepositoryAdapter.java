@@ -66,37 +66,37 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
 
     @Override
     public boolean existePorCpf(String cpf) {
-        return repository.existsByCpf(cpf);
+        return repository.existsByCpfAndStatusNot(cpf, "excluido");
     }
 
     @Override
     public boolean existePorEmail(String email) {
-        return repository.existsByEmail(email);
+        return repository.existsByEmailAndStatusNot(email, "excluido");
     }
 
     @Override
-    public boolean existePorMatricula(String matricula) {
-        if (matricula == null || matricula.trim().isEmpty()) {
+    public boolean existePorMatricula(String matricula, Long empresaId) {
+        if (matricula == null || matricula.trim().isEmpty() || empresaId == null) {
             return false;
         }
-        return repository.existsByMatricula(matricula);
+        return repository.existsByMatriculaAndEmpresaIdAndStatusNot(matricula, empresaId, "excluido");
     }
 
     @Override
     public boolean existePorCpfExcluindoId(String cpf, Long id) {
-        return repository.existsByCpfAndIdNot(cpf, id);
+        return repository.existsByCpfAndIdNotAndStatusNot(cpf, id, "excluido");
     }
 
     @Override
     public boolean existePorEmailExcluindoId(String email, Long id) {
-        return repository.existsByEmailAndIdNot(email, id);
+        return repository.existsByEmailAndIdNotAndStatusNot(email, id, "excluido");
     }
 
     @Override
-    public boolean existePorMatriculaExcluindoId(String matricula, Long id) {
-        if (matricula == null || matricula.trim().isEmpty()) {
+    public boolean existePorMatriculaExcluindoId(String matricula, Long empresaId, Long id) {
+        if (matricula == null || matricula.trim().isEmpty() || empresaId == null) {
             return false;
         }
-        return repository.existsByMatriculaAndIdNot(matricula, id);
+        return repository.existsByMatriculaAndEmpresaIdAndIdNotAndStatusNot(matricula, empresaId, id, "excluido");
     }
 } 

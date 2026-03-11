@@ -12,22 +12,23 @@ import com.peopleflow.pessoascontratos.inbound.web.dto.ColaboradorResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+
 @Mapper(componentModel = "spring")
 public interface ColaboradorWebMapper {
 
+    // status ignorado intencionalmente: POST sempre cria como ATIVO;
+    // PUT nunca altera status — use os endpoints PATCH dedicados.
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "empresaId", ignore = true)
-    @Mapping(target = "departamentoId", ignore = true)
-    @Mapping(target = "centroCustoId", ignore = true)
     @Mapping(target = "dataDemissao", ignore = true)
+    @Mapping(target = "status", ignore = true)
     @Mapping(target = "cpf", source = "cpf", qualifiedByName = "stringToCpf")
     @Mapping(target = "email", source = "email", qualifiedByName = "stringToEmail")
-    @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
     Colaborador toDomain(ColaboradorRequest request);
 
     @Mapping(target = "cpf", source = "cpf", qualifiedByName = "cpfToString")
     @Mapping(target = "email", source = "email", qualifiedByName = "emailToString")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
+    @Mapping(target = "acessoSistema", expression = "java(colaborador.temAcessoSistema())")
     ColaboradorResponse toResponse(Colaborador colaborador);
 
     ColaboradorFilter toDomain(ColaboradorFilterRequest request);
@@ -75,13 +76,5 @@ public interface ColaboradorWebMapper {
             return null;
         }
         return new Email(email);
-    }
-
-    @Named("stringToStatus")
-    default StatusColaborador stringToStatus(String status) {
-        if (status == null || status.trim().isEmpty()) {
-            return StatusColaborador.ATIVO;
-        }
-        return StatusColaborador.of(status);
     }
 }

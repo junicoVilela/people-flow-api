@@ -18,10 +18,10 @@ public class ColaboradorSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (filter == null) {
-                return criteriaBuilder.isNull(root.get("excluidoEm"));
+                return criteriaBuilder.notEqual(root.get("status"), "excluido");
             }
 
-            predicates.add(criteriaBuilder.isNull(root.get("excluidoEm")));
+            predicates.add(criteriaBuilder.notEqual(root.get("status"), "excluido"));
 
             if (filter.getNome() != null && !filter.getNome().trim().isEmpty()) {
                 predicates.add(
@@ -33,11 +33,19 @@ public class ColaboradorSpecification {
             }
 
             if (filter.getCpf() != null && !filter.getCpf().trim().isEmpty()) {
-                String cpfLimpo = filter.getCpf().replaceAll("[^0-9]", "");
+                // O banco armazena CPF formatado (999.999.999-99).
+                // Busca por substring no valor formatado, aceitando input com ou sem máscara.
+                String cpfDigitos = filter.getCpf().replaceAll("[^0-9]", "");
+                String cpfFiltro = cpfDigitos.length() == 11
+                        ? cpfDigitos.substring(0, 3) + "." +
+                          cpfDigitos.substring(3, 6) + "." +
+                          cpfDigitos.substring(6, 9) + "-" +
+                          cpfDigitos.substring(9, 11)
+                        : filter.getCpf().trim();
                 predicates.add(
                     criteriaBuilder.like(
                         root.get("cpf"),
-                        "%" + cpfLimpo + "%"
+                        "%" + cpfFiltro + "%"
                     )
                 );
             }

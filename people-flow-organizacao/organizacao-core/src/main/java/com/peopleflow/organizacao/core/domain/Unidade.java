@@ -59,14 +59,12 @@ public class Unidade {
     public static Unidade nova(
             String nome,
             String codigo,
-            Long empresaId,
-            StatusOrganizacao status) {
+            Long empresaId) {
 
         return Unidade.builder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
-                .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 

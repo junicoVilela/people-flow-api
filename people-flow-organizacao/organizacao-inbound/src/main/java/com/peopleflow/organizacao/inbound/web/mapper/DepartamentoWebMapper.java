@@ -15,7 +15,7 @@ import org.mapstruct.Named;
 public interface DepartamentoWebMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
+    @Mapping(target = "status", ignore = true)
     Departamento toDomain(DepartamentoRequest request);
 
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")

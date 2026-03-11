@@ -14,10 +14,10 @@ public interface ColaboradorRepositoryPort {
     
     boolean existePorCpf(String cpf);
     boolean existePorEmail(String email);
-    boolean existePorMatricula(String matricula);
+    boolean existePorMatricula(String matricula, Long empresaId);
     
     boolean existePorCpfExcluindoId(String cpf, Long id);
     boolean existePorEmailExcluindoId(String email, Long id);
-    boolean existePorMatriculaExcluindoId(String matricula, Long id);
+    boolean existePorMatriculaExcluindoId(String matricula, Long empresaId, Long id);
 }
 

@@ -15,7 +15,7 @@ import org.mapstruct.Named;
 public interface CentroCustoWebMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
+    @Mapping(target = "status", ignore = true)
     CentroCusto toDomain(CentroCustoRequest request);
 
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")

@@ -18,7 +18,7 @@ public interface EmpresaWebMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "stringToCnpj")
     @Mapping(target = "inscricaoEstadual", source = "inscricaoEstadual", qualifiedByName = "stringToInscricaoEstadual")
-    @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
+    @Mapping(target = "status", ignore = true)
     Empresa toDomain(EmpresaRequest request);
 
     @Mapping(target = "cnpj", source = "cnpj", qualifiedByName = "cnpjToString")

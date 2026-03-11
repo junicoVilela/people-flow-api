@@ -33,12 +33,11 @@ public class DepartamentoService implements DepartamentoUseCase {
 
     @Override
     public Departamento criar(Departamento departamento) {
-        log.info("Iniciando criação de Departamento: nome={}, codigo={}, empresaId={}, unidadeId={}, status={}",
+        log.info("Iniciando criação de Departamento: nome={}, codigo={}, empresaId={}, unidadeId={}",
                 departamento.getNome(),
                 departamento.getCodigo(),
                 departamento.getEmpresaId(),
-                departamento.getUnidadeId(),
-                departamento.getStatus());
+                departamento.getUnidadeId());
 
         validarEmpresaExiste(departamento.getEmpresaId());
         validarUnidadePertenceAEmpresa(departamento.getUnidadeId(), departamento.getEmpresaId());
@@ -48,17 +47,15 @@ public class DepartamentoService implements DepartamentoUseCase {
                 departamento.getNome(),
                 departamento.getCodigo(),
                 departamento.getEmpresaId(),
-                departamento.getUnidadeId(),
-                departamento.getStatus());
+                departamento.getUnidadeId());
 
         Departamento departamentoCriar = departamentoRepository.salvar(departamentoSalvar);
 
-        log.info("Departamento criado com sucesso: nome={}, codigo={}, empresaId={}, unidadeId={}, status={}, id={}",
+        log.info("Departamento criado com sucesso: nome={}, codigo={}, empresaId={}, unidadeId={}, id={}",
                 departamentoCriar.getNome(),
                 departamentoCriar.getCodigo(),
                 departamentoCriar.getEmpresaId(),
-                departamento.getUnidadeId(),
-                departamento.getStatus(),
+                departamentoCriar.getUnidadeId(),
                 departamentoCriar.getId());
 
         return departamentoCriar;
@@ -88,8 +85,7 @@ public class DepartamentoService implements DepartamentoUseCase {
                     departamento.getNome(),
                     departamento.getCodigo(),
                     departamento.getEmpresaId(),
-                    departamento.getUnidadeId(),
-                    departamento.getStatus()
+                    departamento.getUnidadeId()
                     ).toBuilder()
                     .id(id)
                     .build();
@@ -211,7 +207,6 @@ public class DepartamentoService implements DepartamentoUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
         ServiceUtils.compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
         ServiceUtils.compararEAdicionar(camposAlterados, "unidadeId", original.getUnidadeId(), atualizado.getUnidadeId());
-        ServiceUtils.compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }

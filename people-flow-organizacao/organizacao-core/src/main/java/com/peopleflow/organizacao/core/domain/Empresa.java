@@ -57,8 +57,7 @@ public class Empresa {
     public static Empresa nova(
             String nome,
             String cnpjString,
-            String inscricaoEstadualString,
-            StatusOrganizacao status) {
+            String inscricaoEstadualString) {
 
         Cnpj cnpj = new Cnpj(cnpjString);
         InscricaoEstadual inscricaoEstadual = InscricaoEstadual.of(inscricaoEstadualString);
@@ -67,7 +66,6 @@ public class Empresa {
                 .nome(nome)
                 .cnpj(cnpj)
                 .inscricaoEstadual(inscricaoEstadual)
-                .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 

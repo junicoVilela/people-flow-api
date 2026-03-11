@@ -30,11 +30,10 @@ public class CentroCustoService implements CentroCustoUseCase {
 
     @Override
     public CentroCusto criar(CentroCusto centroCusto) {
-        log.info("Iniciando criação de Centro de Custo: nome={}, codigo={}, empresaId={}, status={}",
+        log.info("Iniciando criação de Centro de Custo: nome={}, codigo={}, empresaId={}",
                 centroCusto.getNome(),
                 centroCusto.getCodigo(),
-                centroCusto.getEmpresaId(),
-                centroCusto.getStatus());
+                centroCusto.getEmpresaId());
 
         validarEmpresaExiste(centroCusto.getEmpresaId());
         validarUnicidadeCriacao(centroCusto);
@@ -42,8 +41,7 @@ public class CentroCustoService implements CentroCustoUseCase {
         CentroCusto centroCustoSalvar = CentroCusto.nova(
                 centroCusto.getNome(),
                 centroCusto.getCodigo(),
-                centroCusto.getEmpresaId(),
-                centroCusto.getStatus());
+                centroCusto.getEmpresaId());
 
         CentroCusto centroCustoCriar = centroCustoRepository.salvar(centroCustoSalvar);
 
@@ -79,8 +77,7 @@ public class CentroCustoService implements CentroCustoUseCase {
             CentroCusto centroCustoAtualizar = original.atualizar(
                     centroCusto.getNome(),
                     centroCusto.getCodigo(),
-                    centroCusto.getEmpresaId(),
-                    centroCusto.getStatus()
+                    centroCusto.getEmpresaId()
                     ).toBuilder()
                     .id(id)
                     .build();
@@ -91,8 +88,8 @@ public class CentroCustoService implements CentroCustoUseCase {
 
             List<String> camposAlterados = detectarCamposAlterados(original, centroCustoAtualizado);
 
-            log.info("Centro de Custo atualizado com sucesso: id={}, codigo={},nome={}, empresaId={}, status={} camposAlterados={}",
-                    id, centroCusto.getCodigo(), centroCusto.getNome(), centroCusto.getStatus(), camposAlterados);
+            log.info("Centro de Custo atualizado com sucesso: id={}, codigo={}, nome={}, empresaId={}, camposAlterados={}",
+                    id, centroCusto.getCodigo(), centroCusto.getNome(), centroCusto.getEmpresaId(), camposAlterados);
 
             return centroCustoAtualizado;
         } catch (BusinessException e) {
@@ -201,7 +198,6 @@ public class CentroCustoService implements CentroCustoUseCase {
         ServiceUtils.compararEAdicionar(camposAlterados, "codigo", original.getCodigo(), atualizado.getCodigo());
         ServiceUtils.compararEAdicionar(camposAlterados, "nome", original.getNome(), atualizado.getNome());
         ServiceUtils.compararEAdicionar(camposAlterados, "empresaId", original.getEmpresaId(), atualizado.getEmpresaId());
-        ServiceUtils.compararEAdicionar(camposAlterados, "status", original.getStatus(), atualizado.getStatus());
 
         return camposAlterados.isEmpty() ? List.of("nenhum") : camposAlterados;
     }

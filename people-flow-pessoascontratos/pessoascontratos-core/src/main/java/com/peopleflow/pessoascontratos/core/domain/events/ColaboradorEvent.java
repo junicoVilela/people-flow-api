@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
  * @see ColaboradorAtivado
  * @see ColaboradorInativado
  * @see ColaboradorExcluido
- * @see ColaboradorImportado
  * @see ColaboradorReativado
  * @see ColaboradorTransferido
  */
@@ -30,7 +29,6 @@ public sealed interface ColaboradorEvent permits
     ColaboradorAtivado,
     ColaboradorInativado,
     ColaboradorExcluido,
-    ColaboradorImportado,
     ColaboradorReativado,
     ColaboradorTransferido {
     

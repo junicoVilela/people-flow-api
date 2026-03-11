@@ -6,7 +6,6 @@ import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorCriado;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorDemitido;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorEvent;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorExcluido;
-import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorImportado;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorInativado;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorReativado;
 import com.peopleflow.pessoascontratos.core.domain.events.ColaboradorTransferido;
@@ -96,17 +95,6 @@ public class ColaboradorDomainEventListener {
                  event.empresaAnteriorId(),
                  event.novaEmpresaId(),
                  event.dataTransferencia());
-    }
-
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleColaboradorImportado(ColaboradorImportado event) {
-        log.info("📢 EVENTO: Colaborador importado - ID: {}, Nome: {}, Matrícula Legado: {}, Nova: {}, Status Original: {}",
-                 event.colaboradorId(),
-                 event.nomeColaborador(),
-                 event.matriculaLegado(),
-                 event.matriculaNova(),
-                 event.statusLegado());
     }
 
     @Async

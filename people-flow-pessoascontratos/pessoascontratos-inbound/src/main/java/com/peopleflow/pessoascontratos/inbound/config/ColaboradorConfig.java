@@ -42,6 +42,12 @@ public class ColaboradorConfig {
         public Colaborador criar(Colaborador colaborador) {
             return delegate.criar(colaborador);
         }
+
+        @Override
+        @Transactional
+        public Colaborador criar(Colaborador colaborador, boolean requerAcessoSistema) {
+            return delegate.criar(colaborador, requerAcessoSistema);
+        }
         
         @Override
         @Transactional(readOnly = true)
@@ -83,6 +89,25 @@ public class ColaboradorConfig {
         @Transactional
         public Colaborador excluir(Long id) {
             return delegate.excluir(id);
+        }
+
+        @Override
+        @Transactional
+        public Colaborador transferir(Long id, Long novaEmpresaId, Long novoDepartamentoId,
+                                       Long novoCentroCustoId, LocalDate dataTransferencia) {
+            return delegate.transferir(id, novaEmpresaId, novoDepartamentoId, novoCentroCustoId, dataTransferencia);
+        }
+
+        @Override
+        @Transactional
+        public Colaborador reativar(Long id, LocalDate novaDataAdmissao) {
+            return delegate.reativar(id, novaDataAdmissao);
+        }
+
+        @Override
+        @Transactional
+        public Colaborador vincularAcessoSistema(Long colaboradorId, String keycloakUserId) {
+            return delegate.vincularAcessoSistema(colaboradorId, keycloakUserId);
         }
     }
 }

@@ -33,26 +33,33 @@ public class ColaboradorService implements ColaboradorUseCase {
     public Colaborador criar(Colaborador colaborador) {
         return criar(colaborador, false);
     }
-    
-    /**
-     * Cria um novo colaborador com opção de criar acesso ao sistema
-     * @param colaborador Dados do colaborador
-     * @param requerAcessoSistema Se true, criará usuário no Keycloak automaticamente
-     * @return Colaborador criado
-     */
+
     public Colaborador criar(Colaborador colaborador, boolean requerAcessoSistema) {
-        log.info("Iniciando criação de colaborador: nome={}, empresaId={}, requerAcesso={}", 
+        log.info("Iniciando admissão de colaborador: nome={}, empresaId={}, requerAcesso={}",
                  colaborador.getNome(), colaborador.getEmpresaId(), requerAcessoSistema);
-        
+
         try {
-            // Valida acesso à empresa antes de criar
             if (colaborador.getEmpresaId() != null && !accessValidator.isAdmin()) {
                 accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
             }
-            
-            validarUnicidadeParaCriacao(colaborador);
-            
-            Colaborador colaboradorCriado = colaboradorRepository.salvar(colaborador);
+
+            // Usa o factory method de admissão: garante status ATIVO, dataAdmissao default e
+            // todas as regras de negócio do domínio, independente do que vier no request.
+            Colaborador admitido = Colaborador.novaAdmissao(
+                    colaborador.getNome(),
+                    colaborador.getCpf().getValor(),
+                    colaborador.getEmail().getValor(),
+                    colaborador.getMatricula(),
+                    colaborador.getDataAdmissao(),
+                    colaborador.getEmpresaId(),
+                    colaborador.getDepartamentoId(),
+                    colaborador.getCentroCustoId(),
+                    colaborador.getCargoId()
+            );
+
+            validarUnicidadeParaCriacao(admitido);
+
+            Colaborador colaboradorCriado = colaboradorRepository.salvar(admitido);
 
             eventPublisher.publish(
                 new ColaboradorCriado(
@@ -66,18 +73,18 @@ public class ColaboradorService implements ColaboradorUseCase {
                     requerAcessoSistema
                 )
             );
-            
-            log.info("Colaborador criado com sucesso: id={}, nome={}, cpf={}", 
-                     colaboradorCriado.getId(), 
-                     colaboradorCriado.getNome(), 
+
+            log.info("Colaborador admitido com sucesso: id={}, nome={}, cpf={}",
+                     colaboradorCriado.getId(),
+                     colaboradorCriado.getNome(),
                      colaboradorCriado.getCpf().getValor());
-            
+
             return colaboradorCriado;
         } catch (BusinessException e) {
-            log.warn("Erro ao criar colaborador: {} - {}", e.getCode(), e.getMessage());
+            log.warn("Erro ao admitir colaborador: {} - {}", e.getCode(), e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Erro inesperado ao criar colaborador: nome={}", colaborador.getNome(), e);
+            log.error("Erro inesperado ao admitir colaborador: nome={}", colaborador.getNome(), e);
             throw e;
         }
     }
@@ -90,12 +97,11 @@ public class ColaboradorService implements ColaboradorUseCase {
                     log.warn("Colaborador não encontrado: id={}", id);
                     return new ResourceNotFoundException("Colaborador", id);
                 });
-        
-        // Valida acesso à empresa do colaborador
+
         if (colaborador.getEmpresaId() != null && !accessValidator.isAdmin()) {
             accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
         }
-        
+
         return colaborador;
     }
 
@@ -103,42 +109,32 @@ public class ColaboradorService implements ColaboradorUseCase {
     public PagedResult<Colaborador> buscarPorFiltros(ColaboradorFilter filter, Pagination pagination) {
         log.debug("Buscando colaboradores com filtros: page={}, size={}", 
                   pagination.page(), pagination.size());
-        
-        // Aplica filtro automático de empresaId se não for admin
         ColaboradorFilter filterComSeguranca = aplicarFiltrosDeSeguranca(filter);
-        
         PagedResult<Colaborador> result = colaboradorRepository.buscarPorFiltros(filterComSeguranca, pagination);
         
         log.debug("Encontrados {} colaboradores", result.totalElements());
         return result;
     }
-    
-    /**
-     * Aplica filtros de segurança automaticamente baseado no contexto do usuário
-     */
+
     private ColaboradorFilter aplicarFiltrosDeSeguranca(ColaboradorFilter filter) {
         if (accessValidator.isAdmin()) {
-            // Admin vê tudo
             return filter;
         }
-        
+
         Long empresaIdUsuario = accessValidator.getEmpresaIdUsuario();
         if (empresaIdUsuario == null) {
             log.warn("Usuário sem empresaId - bloqueando acesso a todos os colaboradores");
-            // Retorna filtro que não retornará resultados
             return ColaboradorFilter.builder()
-                    .empresaId(-1L) // ID inválido que não retornará resultados
+                    .empresaId(-1L)
                     .build();
         }
-        
-        // Se o filtro já tem empresaId, valida se corresponde ao do usuário
+
         if (filter.getEmpresaId() != null && !filter.getEmpresaId().equals(empresaIdUsuario)) {
-            log.warn("Tentativa de filtrar por empresaId diferente do usuário: filtro={}, usuario={}", 
+            log.warn("Tentativa de filtrar por empresaId diferente do usuário: filtro={}, usuario={}",
                     filter.getEmpresaId(), empresaIdUsuario);
             accessValidator.validarAcessoEmpresa(filter.getEmpresaId());
         }
-        
-        // Aplica empresaId do usuário se não foi especificado
+
         if (filter.getEmpresaId() == null) {
             return ColaboradorFilter.builder()
                     .nome(filter.getNome())
@@ -155,7 +151,7 @@ public class ColaboradorService implements ColaboradorUseCase {
                     .dataDemissaoFim(filter.getDataDemissaoFim())
                     .build();
         }
-        
+
         return filter;
     }
 
@@ -171,24 +167,16 @@ public class ColaboradorService implements ColaboradorUseCase {
             }
 
             Colaborador original = buscarPorId(id);
-            
-            // Valida acesso à empresa antes de atualizar
-            if (colaborador.getEmpresaId() != null && !accessValidator.isAdmin()) {
-                accessValidator.validarAcessoEmpresa(colaborador.getEmpresaId());
-                // Garante que não está tentando mudar a empresa
-                if (!colaborador.getEmpresaId().equals(original.getEmpresaId())) {
-                    throw new BusinessException("EMPRESA_NAO_PODE_SER_ALTERADA",
-                            "Não é permitido alterar a empresa de um colaborador");
-                }
-            }
 
+            // empresaId é imutável: sempre preservamos o valor original independentemente
+            // do que vier no request, evitando migração acidental entre empresas.
             Colaborador colaboradorParaAtualizar = original.atualizar(
                     colaborador.getNome(),
                     colaborador.getCpf(),
                     colaborador.getEmail(),
                     colaborador.getMatricula(),
                     colaborador.getDataAdmissao(),
-                    colaborador.getEmpresaId(),
+                    original.getEmpresaId(),
                     colaborador.getDepartamentoId(),
                     colaborador.getCentroCustoId(),
                     colaborador.getCargoId()
@@ -321,10 +309,86 @@ public class ColaboradorService implements ColaboradorUseCase {
         return resultado;
     }
 
+    @Override
+    public Colaborador transferir(Long id, Long novaEmpresaId, Long novoDepartamentoId,
+                                   Long novoCentroCustoId, LocalDate dataTransferencia) {
+        log.info("Iniciando transferência de colaborador: id={}, novaEmpresaId={}", id, novaEmpresaId);
+
+        Colaborador original = buscarPorId(id);
+
+        if (novaEmpresaId != null && !accessValidator.isAdmin()) {
+            accessValidator.validarAcessoEmpresa(novaEmpresaId);
+        }
+
+        Colaborador transferido = Colaborador.porTransferencia(
+                original, novaEmpresaId, novoDepartamentoId, novoCentroCustoId, dataTransferencia);
+
+        Colaborador resultado = colaboradorRepository.salvar(transferido);
+
+        eventPublisher.publish(
+            new ColaboradorTransferido(
+                resultado.getId(),
+                resultado.getNome(),
+                original.getEmpresaId(),
+                resultado.getEmpresaId(),
+                original.getDepartamentoId(),
+                resultado.getDepartamentoId(),
+                dataTransferencia != null ? dataTransferencia : java.time.LocalDate.now()
+            )
+        );
+
+        log.info("Colaborador transferido com sucesso: id={}, empresaAnterior={}, novaEmpresa={}",
+                 id, original.getEmpresaId(), novaEmpresaId);
+
+        return resultado;
+    }
+
+    @Override
+    public Colaborador reativar(Long id, LocalDate novaDataAdmissao) {
+        log.info("Iniciando reativação de colaborador: id={}", id);
+
+        Colaborador original = buscarPorId(id);
+
+        Colaborador reativado = Colaborador.porReativacao(original, novaDataAdmissao);
+
+        validarUnicidadeParaCriacao(reativado);
+
+        Colaborador resultado = colaboradorRepository.salvar(reativado);
+
+        eventPublisher.publish(
+            new ColaboradorReativado(
+                resultado.getId(),
+                resultado.getNome(),
+                original.getDataAdmissao(),
+                resultado.getDataAdmissao()
+            )
+        );
+
+        log.info("Colaborador reativado com sucesso: id={}, novaDataAdmissao={}", id, resultado.getDataAdmissao());
+
+        return resultado;
+    }
+
+    @Override
+    public Colaborador vincularAcessoSistema(Long colaboradorId, String keycloakUserId) {
+        log.info("Vinculando acesso ao sistema: colaboradorId={}", colaboradorId);
+
+        Colaborador colaborador = colaboradorRepository.buscarPorId(colaboradorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Colaborador", colaboradorId));
+
+        Colaborador atualizado = colaborador.vincularUsuarioKeycloak(keycloakUserId);
+
+        Colaborador resultado = colaboradorRepository.salvar(atualizado);
+
+        log.info("Acesso ao sistema vinculado: colaboradorId={}, keycloakUserId={}", colaboradorId, keycloakUserId);
+
+        return resultado;
+    }
+
     private void validarUnicidadeParaCriacao(Colaborador colaborador) {
         ServiceUtils.validarUnicidadeCampo(
             "CPF",
-            colaborador.getCpf().getValorNumerico(),
+            colaborador.getCpf().getValor(),
             colaboradorRepository::existePorCpf
         );
         
@@ -338,7 +402,7 @@ public class ColaboradorService implements ColaboradorUseCase {
             ServiceUtils.validarUnicidadeCampo(
                 "Matrícula",
                 colaborador.getMatricula(),
-                colaboradorRepository::existePorMatricula
+                m -> colaboradorRepository.existePorMatricula(m, colaborador.getEmpresaId())
             );
         }
     }
@@ -346,7 +410,7 @@ public class ColaboradorService implements ColaboradorUseCase {
     private void validarUnicidadeParaAtualizacao(Colaborador colaborador, Long id) {
         ServiceUtils.validarUnicidadeCampoComExclusao(
             "CPF",
-            colaborador.getCpf().getValorNumerico(),
+            colaborador.getCpf().getValor(),
             id,
             colaboradorRepository::existePorCpfExcluindoId
         );
@@ -363,7 +427,7 @@ public class ColaboradorService implements ColaboradorUseCase {
                 "Matrícula",
                 colaborador.getMatricula(),
                 id,
-                colaboradorRepository::existePorMatriculaExcluindoId
+                (m, excludeId) -> colaboradorRepository.existePorMatriculaExcluindoId(m, colaborador.getEmpresaId(), excludeId)
             );
         }
     }

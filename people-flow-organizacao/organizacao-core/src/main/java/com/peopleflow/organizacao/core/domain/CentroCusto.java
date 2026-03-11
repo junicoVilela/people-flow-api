@@ -59,28 +59,24 @@ public class CentroCusto {
     public static CentroCusto nova(
             String nome,
             String codigo,
-            Long empresaId,
-            StatusOrganizacao status) {
+            Long empresaId) {
 
         return CentroCusto.builder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
-                .status(status != null ? status : StatusOrganizacao.ATIVO)
                 .build();
     }
 
     public CentroCusto atualizar(
             String nome,
             String codigo,
-            Long empresaId,
-            StatusOrganizacao status) {
+            Long empresaId) {
 
         return this.toBuilder()
                 .nome(nome)
                 .codigo(codigo)
                 .empresaId(empresaId)
-                .status(status)
                 .build();
     }
 

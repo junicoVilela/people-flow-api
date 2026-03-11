@@ -16,6 +16,7 @@ public class ColaboradorResponse {
     private Long empresaId;
     private Long departamentoId;
     private Long centroCustoId;
+    private Long cargoId;
     private String nome;
     private String cpf;
     private String matricula;
@@ -23,4 +24,5 @@ public class ColaboradorResponse {
     private LocalDate dataAdmissao;
     private LocalDate dataDemissao;
     private String status;
+    private boolean acessoSistema;
 }

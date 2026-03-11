@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 public interface ColaboradorJpaRepository extends JpaRepository<ColaboradorEntity, Long>, 
                                                    JpaSpecificationExecutor<ColaboradorEntity> {
     
-    boolean existsByCpf(String cpf);
-    boolean existsByEmail(String email);
-    boolean existsByMatricula(String matricula);
+    boolean existsByCpfAndStatusNot(String cpf, String status);
+    boolean existsByEmailAndStatusNot(String email, String status);
+    boolean existsByMatriculaAndEmpresaIdAndStatusNot(String matricula, Long empresaId, String status);
     
-    boolean existsByCpfAndIdNot(String cpf, Long id);
-    boolean existsByEmailAndIdNot(String email, Long id);
-    boolean existsByMatriculaAndIdNot(String matricula, Long id);
+    boolean existsByCpfAndIdNotAndStatusNot(String cpf, Long id, String status);
+    boolean existsByEmailAndIdNotAndStatusNot(String email, Long id, String status);
+    boolean existsByMatriculaAndEmpresaIdAndIdNotAndStatusNot(String matricula, Long empresaId, Long id, String status);
 } 

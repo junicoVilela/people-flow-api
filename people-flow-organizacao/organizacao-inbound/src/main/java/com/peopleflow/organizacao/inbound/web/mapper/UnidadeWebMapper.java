@@ -15,7 +15,7 @@ import org.mapstruct.Named;
 public interface UnidadeWebMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
+    @Mapping(target = "status", ignore = true)
     Unidade toDomain(UnidadeRequest request);
 
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
