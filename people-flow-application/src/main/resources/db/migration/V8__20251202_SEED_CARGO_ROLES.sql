@@ -34,16 +34,47 @@ INSERT INTO people_flow_rh.departamento (id, empresa_id, unidade_id, nome, codig
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================
+-- SEED DATA: Áreas
+-- ============================
+INSERT INTO people_flow_rh.area (id, codigo, nome, descricao) VALUES
+(1, 'RH',  'Recursos Humanos',        'Gestão de pessoas e processos de RH'),
+(2, 'TI',  'Tecnologia da Informação','Desenvolvimento, infraestrutura e suporte de TI'),
+(3, 'FIN', 'Financeiro',              'Controladoria, contabilidade e financeiro'),
+(4, 'COM', 'Comercial',               'Vendas, marketing e relacionamento com clientes')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
+-- SEED DATA: Níveis Hierárquicos
+-- ============================
+INSERT INTO people_flow_rh.nivel_hierarquico (id, nome, descricao, ordem) VALUES
+(1, 'Júnior',      'Profissional em início de carreira',               1),
+(2, 'Pleno',       'Profissional com experiência intermediária',        2),
+(3, 'Sênior',      'Profissional com ampla experiência e autonomia',   3),
+(4, 'Especialista','Profissional com expertise técnica aprofundada',   4),
+(5, 'Coordenador', 'Liderança de equipes operacionais',                5),
+(6, 'Gerente',     'Gestão estratégica de área ou departamento',       6)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
+-- SEED DATA: Famílias de Cargo
+-- ============================
+INSERT INTO people_flow_rh.familia_cargo (id, nome, descricao) VALUES
+(1, 'Gestão de Pessoas',   'Cargos relacionados a RH, recrutamento e desenvolvimento'),
+(2, 'Gestão e Liderança',  'Cargos de gestão e coordenação de equipes'),
+(3, 'Tecnologia',          'Cargos de desenvolvimento, dados e infraestrutura'),
+(4, 'Administração',       'Cargos administrativos e de suporte operacional')
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
 -- SEED DATA: Cargos de exemplo (necessários para cargo_role)
 -- ============================
--- Insere cargos 1 a 6 para que os mapeamentos cargo_role tenham FK válida.
-INSERT INTO people_flow_rh.cargo (id, nome, descricao, nivel) VALUES
-(1, 'Gerente de RH', 'Gerente da área de Recursos Humanos', 'senior'),
-(2, 'Analista de RH', 'Analista de Recursos Humanos', 'pleno'),
-(3, 'Assistente de RH', 'Assistente administrativo de RH', 'junior'),
-(4, 'Gestor de Área', 'Gestor de equipe/departamento', 'senior'),
-(5, 'Colaborador Padrão', 'Colaborador operacional', 'junior'),
-(6, 'Administrador de Sistema', 'Acesso administrativo completo', 'senior')
+INSERT INTO people_flow_rh.cargo (id, codigo, nome, descricao, nivel_hierarquico_id, familia_cargo_id, departamento_id) VALUES
+(1, 'GER-RH-SR',  'Gerente de RH',              'Gerente da área de Recursos Humanos',      6, 1, 1),
+(2, 'ANA-RH-PL',  'Analista de RH',             'Analista de Recursos Humanos',             2, 1, 1),
+(3, 'ASS-RH-JR',  'Assistente de RH',           'Assistente administrativo de RH',          1, 1, 1),
+(4, 'GES-ARE-SR', 'Gestor de Área',             'Gestor de equipe/departamento',            5, 2, NULL),
+(5, 'COL-PAD-JR', 'Colaborador Padrão',         'Colaborador operacional',                  1, 4, NULL),
+(6, 'ADM-SIS-SR', 'Administrador de Sistema',   'Acesso administrativo completo ao sistema',3, 3, 2)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================
@@ -175,11 +206,15 @@ INSERT INTO people_flow_rh.colaborador (id, empresa_id, departamento_id, centro_
 ON CONFLICT (id) DO NOTHING;
 
 -- Ajusta sequences para o próximo ID após os seeds (evita conflito em novas inserções)
-SELECT setval('people_flow_rh.empresa_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.empresa));
-SELECT setval('people_flow_rh.unidade_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.unidade));
-SELECT setval('people_flow_rh.centro_custo_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.centro_custo));
-SELECT setval('people_flow_rh.departamento_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.departamento));
-SELECT setval('people_flow_rh.colaborador_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.colaborador));
+SELECT setval('people_flow_rh.empresa_id_seq',           (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.empresa));
+SELECT setval('people_flow_rh.unidade_id_seq',           (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.unidade));
+SELECT setval('people_flow_rh.centro_custo_id_seq',      (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.centro_custo));
+SELECT setval('people_flow_rh.departamento_id_seq',      (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.departamento));
+SELECT setval('people_flow_rh.colaborador_id_seq',       (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.colaborador));
+SELECT setval('people_flow_rh.area_id_seq',              (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.area));
+SELECT setval('people_flow_rh.nivel_hierarquico_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.nivel_hierarquico));
+SELECT setval('people_flow_rh.familia_cargo_id_seq',     (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.familia_cargo));
+SELECT setval('people_flow_rh.cargo_id_seq',             (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.cargo));
 
 -- ============================
 -- SEED DATA: Mapeamento Departamento → Grupo Keycloak

@@ -23,9 +23,11 @@ COMMENT ON COLUMN PEOPLE_FLOW_RH.UNIDADE.CODIGO IS 'Código interno da unidade';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.UNIDADE.STATUS IS 'Status: ativo, inativo, excluido';
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.DEPARTAMENTO IS 
-'Departamentos organizacionais. Podem estar vinculados a uma unidade específica ou serem corporativos.';
+'Departamentos organizacionais. Usados tanto para lotação de colaboradores (via Empresa/Unidade) quanto para classificação de cargos (via Área).';
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.UNIDADE_ID IS 'Unidade à qual o departamento pertence (NULL = departamento corporativo)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.AREA_ID IS 'Área de classificação de cargos à qual o departamento pertence (NULL = sem classificação)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.DESCRICAO IS 'Descrição do departamento';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.DEPARTAMENTO.STATUS IS 'Status: ativo, inativo, excluido';
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.CENTRO_CUSTO IS 
@@ -74,10 +76,26 @@ COMMENT ON TABLE PEOPLE_FLOW_RH.JORNADA_TRABALHO IS
 
 COMMENT ON COLUMN PEOPLE_FLOW_RH.JORNADA_TRABALHO.CARGA_SEMANAL_HORAS IS 'Carga horária semanal em horas';
 
-COMMENT ON TABLE PEOPLE_FLOW_RH.CARGO IS 
-'Cargos disponíveis na organização.';
+COMMENT ON TABLE PEOPLE_FLOW_RH.AREA IS
+'Áreas de classificação de cargos. Agrupam departamentos por grandes eixos de atuação (ex: Tecnologia, Comercial, Operações).';
 
-COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO.NIVEL IS 'Nível hierárquico do cargo (ex: junior, pleno, senior)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.AREA.CODIGO IS 'Código único da área (ex: TI, COM, OPS)';
+
+COMMENT ON TABLE PEOPLE_FLOW_RH.NIVEL_HIERARQUICO IS
+'Níveis hierárquicos dos cargos. Define a senioridade/posição na estrutura (ex: Júnior, Pleno, Sênior, Coordenador, Gerente).';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.NIVEL_HIERARQUICO.ORDEM IS 'Ordem de senioridade crescente. Menor valor = menor senioridade';
+
+COMMENT ON TABLE PEOPLE_FLOW_RH.FAMILIA_CARGO IS
+'Família de cargos. Agrupa cargos com competências similares (ex: Família Engenharia, Família Comercial, Família RH).';
+
+COMMENT ON TABLE PEOPLE_FLOW_RH.CARGO IS
+'Cargos disponíveis na organização. Cada cargo pertence a uma família e possui um nível hierárquico.';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO.CODIGO IS 'Código único do cargo (ex: ANA-TI-PL)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO.NIVEL_HIERARQUICO_ID IS 'Nível hierárquico do cargo (Júnior, Pleno, Sênior, etc.)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO.FAMILIA_CARGO_ID IS 'Família de cargos à qual pertence';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.CARGO.DEPARTAMENTO_ID IS 'Departamento principal onde o cargo é exercido (opcional)';
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.FAIXA_SALARIAL IS 
 'Faixas salariais definidas para cada cargo.';
@@ -327,12 +345,6 @@ COMMENT ON COLUMN PEOPLE_FLOW_RH.TAREFA_WORKFLOW.STATUS IS 'Status: aberta, em_a
 
 COMMENT ON TABLE PEOPLE_FLOW_RH.LOG_WORKFLOW IS 
 'Log de execução dos workflows. Alto volume de dados.';
-
--- ============================
--- AUDITORIA
--- ============================
--- Tabela AUDITORIA substitui EVENTO_AUDITORIA
--- Mantém separação de dados antigos/novos, IP, User-Agent e controle de acesso completo
 
 -- ============================
 -- NOTIFICAÇÕES
