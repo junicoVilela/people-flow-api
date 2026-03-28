@@ -1,5 +1,6 @@
 package com.peopleflow.organizacao.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Departamento;
@@ -15,10 +16,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,6 +41,7 @@ public class DepartamentoController {
     private final AccessValidatorPort accessValidator;
 
     @PostMapping
+    @PreAuthorize("hasRole('organizacao:criar')")
     @Operation(summary = "Criar novo departamento", description = "Cadastra um novo departamento")
     public ResponseEntity<DepartamentoResponse> criar(@Valid @RequestBody DepartamentoRequest request) {
         Departamento departamento = mapper.toDomain(request);
@@ -49,6 +51,7 @@ public class DepartamentoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Atualizar departamento", description = "Atualiza os dados de um departamento existente")
     public ResponseEntity<DepartamentoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody DepartamentoRequest request) {
         Departamento departamento = mapper.toDomain(request);
@@ -58,6 +61,7 @@ public class DepartamentoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(summary = "Buscar departamento por ID", description = "Retorna os dados de um departamento específico")
     public ResponseEntity<DepartamentoResponse> buscarPorId(@PathVariable Long id) {
         Departamento departamento = departamentoUseCase.buscarPorId(id);
@@ -66,6 +70,7 @@ public class DepartamentoController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
             summary = "Listar departamentos com filtros e paginação",
             description = "Lista departamentos com filtros opcionais (empresaId, unidadeId, nome, codigo, status) e paginação. " +
@@ -81,25 +86,13 @@ public class DepartamentoController {
         }
         DepartamentoFilter filtros = mapper.toDomain(filtrosRequest);
 
-        Pagination pagination = Pagination.of( pageable.getPageNumber(),
-                pageable.getPageSize(),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(Sort.Order::getProperty)
-                        .orElse(null),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(order -> order.getDirection() == Sort.Direction.ASC ? Pagination.SortDirection.ASC : Pagination.SortDirection.DESC)
-                        .orElse(Pagination.SortDirection.ASC)
-        );
-
+        Pagination pagination = PageablePagination.from(pageable);
         PagedResult<Departamento> resultado = departamentoUseCase.buscarPorFiltros(filtros, pagination);
-        PagedResult<DepartamentoResponse> response = mapper.toPagedResponse(resultado);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @PatchMapping("/{id}/ativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Ativar departamento", description = "Altera o status do departamento para ATIVO")
     public ResponseEntity<DepartamentoResponse> ativar(@PathVariable Long id) {
         Departamento ativado = departamentoUseCase.ativar(id);
@@ -107,6 +100,7 @@ public class DepartamentoController {
     }
 
     @PatchMapping("/{id}/inativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Inativar departamento", description = "Altera o status do departamento para INATIVO")
     public ResponseEntity<DepartamentoResponse> inativar(@PathVariable Long id) {
         Departamento inativado = departamentoUseCase.inativar(id);
@@ -115,6 +109,7 @@ public class DepartamentoController {
 
 
     @PatchMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('organizacao:deletar')")
     @Operation(summary = "Excluir departamento", description = "Marca o departamento como excluído (soft delete)")
     public ResponseEntity<DepartamentoResponse> excluir(@PathVariable Long id) {
         Departamento excluido = departamentoUseCase.excluir(id);

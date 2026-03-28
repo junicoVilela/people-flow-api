@@ -1,6 +1,5 @@
 package com.peopleflow.organizacao.inbound.web.mapper;
 
-import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.organizacao.core.domain.CentroCusto;
 import com.peopleflow.organizacao.core.query.CentroCustoFilter;
 import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
@@ -22,10 +21,6 @@ public interface CentroCustoWebMapper {
     CentroCustoResponse toResponse(CentroCusto centroCusto);
 
     CentroCustoFilter toDomain(CentroCustoFilterRequest request);
-
-    default PagedResult<CentroCustoResponse> toPagedResponse(PagedResult<CentroCusto> pagedResult) {
-        return PagedResult.map(pagedResult, this::toResponse);
-    }
 
     @Named("stringToStatus")
     default StatusOrganizacao stringToStatus(String status) {

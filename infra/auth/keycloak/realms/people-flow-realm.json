@@ -40,8 +40,18 @@
         { "name": "admin", "description": "Administrador do sistema" },
         { "name": "colaborador:criar", "description": "Criar colaboradores" },
         { "name": "colaborador:ler", "description": "Visualizar colaboradores" },
-        { "name": "colaborador:atualizar", "description": "Atualizar colaboradores" },
-        { "name": "colaborador:demitir", "description": "Demitir colaboradores" }
+        { "name": "colaborador:editar", "description": "Editar colaboradores e vínculos (contrato, documentos, etc.)" },
+        { "name": "colaborador:deletar", "description": "Excluir colaboradores e documentos (soft delete)" },
+        { "name": "colaborador:demitir", "description": "Registrar demissão" },
+        { "name": "colaborador:aprovar", "description": "Aprovar cadastros e alterações" },
+        { "name": "organizacao:criar", "description": "Criar estrutura organizacional" },
+        { "name": "organizacao:ler", "description": "Consultar estrutura organizacional" },
+        { "name": "organizacao:editar", "description": "Editar estrutura organizacional" },
+        { "name": "organizacao:deletar", "description": "Soft delete na estrutura organizacional" },
+        { "name": "nivel_hierarquico:criar", "description": "Criar níveis hierárquicos" },
+        { "name": "nivel_hierarquico:ler", "description": "Consultar níveis hierárquicos" },
+        { "name": "nivel_hierarquico:editar", "description": "Editar níveis hierárquicos" },
+        { "name": "nivel_hierarquico:deletar", "description": "Excluir níveis hierárquicos" }
       ]
     }
   },
@@ -57,7 +67,23 @@
         { "type": "password", "value": "admin123", "temporary": false }
       ],
       "clientRoles": {
-        "people-flow-api": ["admin", "colaborador:criar", "colaborador:ler", "colaborador:atualizar", "colaborador:demitir"]
+        "people-flow-api": [
+          "admin",
+          "colaborador:criar",
+          "colaborador:ler",
+          "colaborador:editar",
+          "colaborador:deletar",
+          "colaborador:demitir",
+          "colaborador:aprovar",
+          "organizacao:criar",
+          "organizacao:ler",
+          "organizacao:editar",
+          "organizacao:deletar",
+          "nivel_hierarquico:criar",
+          "nivel_hierarquico:ler",
+          "nivel_hierarquico:editar",
+          "nivel_hierarquico:deletar"
+        ]
       }
     },
     {
@@ -71,7 +97,21 @@
         { "type": "password", "value": "gestor123", "temporary": false }
       ],
       "clientRoles": {
-        "people-flow-api": ["colaborador:criar", "colaborador:ler", "colaborador:atualizar", "colaborador:demitir"]
+        "people-flow-api": [
+          "colaborador:criar",
+          "colaborador:ler",
+          "colaborador:editar",
+          "colaborador:deletar",
+          "colaborador:demitir",
+          "organizacao:criar",
+          "organizacao:ler",
+          "organizacao:editar",
+          "organizacao:deletar",
+          "nivel_hierarquico:criar",
+          "nivel_hierarquico:ler",
+          "nivel_hierarquico:editar",
+          "nivel_hierarquico:deletar"
+        ]
       }
     },
     {
@@ -85,7 +125,7 @@
         { "type": "password", "value": "leitor123", "temporary": false }
       ],
       "clientRoles": {
-        "people-flow-api": ["colaborador:ler"]
+        "people-flow-api": ["colaborador:ler", "organizacao:ler"]
       }
     }
   ]

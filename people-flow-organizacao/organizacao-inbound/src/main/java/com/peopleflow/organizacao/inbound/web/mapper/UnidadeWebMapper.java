@@ -1,6 +1,5 @@
 package com.peopleflow.organizacao.inbound.web.mapper;
 
-import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.organizacao.core.domain.Unidade;
 import com.peopleflow.organizacao.core.query.UnidadeFilter;
 import com.peopleflow.organizacao.core.valueobjects.StatusOrganizacao;
@@ -22,10 +21,6 @@ public interface UnidadeWebMapper {
     UnidadeResponse toResponse(Unidade unidade);
 
     UnidadeFilter toDomain(UnidadeFilterRequest request);
-
-    default PagedResult<UnidadeResponse> toPagedResponse(PagedResult<Unidade> pagedResult) {
-        return PagedResult.map(pagedResult, this::toResponse);
-    }
 
     @Named("stringToStatus")
     default StatusOrganizacao stringToStatus(String status) {

@@ -1,6 +1,5 @@
 package com.peopleflow.organizacao.inbound.web.mapper;
 
-import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.valueobject.Cnpj;
 import com.peopleflow.common.valueobject.InscricaoEstadual;
 import com.peopleflow.organizacao.core.domain.Empresa;
@@ -27,10 +26,6 @@ public interface EmpresaWebMapper {
     EmpresaResponse toResponse(Empresa empresa);
 
     EmpresaFilter toDomain(EmpresaFilterRequest request);
-
-    default PagedResult<EmpresaResponse> toPagedResponse(PagedResult<Empresa> pagedResult) {
-        return PagedResult.map(pagedResult, this::toResponse);
-    }
 
     @Named("stringToCnpj")
     default Cnpj stringToCnpj(String cnpj) {

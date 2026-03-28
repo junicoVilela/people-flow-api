@@ -1,5 +1,6 @@
 package com.peopleflow.organizacao.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Unidade;
@@ -15,10 +16,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,6 +41,7 @@ public class UnidadeController {
     private final AccessValidatorPort accessValidator;
 
     @PostMapping
+    @PreAuthorize("hasRole('organizacao:criar')")
     @Operation(summary = "Criar nova unidade", description = "Cadastra uma nova unidade")
     public ResponseEntity<UnidadeResponse> criar(@Valid @RequestBody UnidadeRequest request) {
         Unidade unidade = mapper.toDomain(request);
@@ -49,6 +51,7 @@ public class UnidadeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Atualizar unidade", description = "Atualiza os dados de uma unidade existente")
     public ResponseEntity<UnidadeResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UnidadeRequest request) {
         Unidade unidade = mapper.toDomain(request);
@@ -58,6 +61,7 @@ public class UnidadeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(summary = "Buscar unidade por ID", description = "Retorna os dados de uma unidade específica")
     public ResponseEntity<UnidadeResponse> buscarPorId(@PathVariable Long id) {
         Unidade unidade = unidadeUseCase.buscarPorId(id);
@@ -66,6 +70,7 @@ public class UnidadeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
             summary = "Listar unidades com filtros e paginação",
             description = "Lista unidades com filtros opcionais (empresaId, nome, codigo, status) e paginação. " +
@@ -81,25 +86,13 @@ public class UnidadeController {
         }
         UnidadeFilter filtros = mapper.toDomain(filtrosRequest);
 
-        Pagination pagination = Pagination.of( pageable.getPageNumber(),
-                pageable.getPageSize(),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(Sort.Order::getProperty)
-                        .orElse(null),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(order -> order.getDirection() == Sort.Direction.ASC ? Pagination.SortDirection.ASC : Pagination.SortDirection.DESC)
-                        .orElse(Pagination.SortDirection.ASC)
-        );
-
+        Pagination pagination = PageablePagination.from(pageable);
         PagedResult<Unidade> resultado = unidadeUseCase.buscarPorFiltros(filtros, pagination);
-        PagedResult<UnidadeResponse> response = mapper.toPagedResponse(resultado);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @PatchMapping("/{id}/ativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Ativar unidade", description = "Altera o status da unidade para ATIVO")
     public ResponseEntity<UnidadeResponse> ativar(@PathVariable Long id) {
         Unidade ativado = unidadeUseCase.ativar(id);
@@ -107,6 +100,7 @@ public class UnidadeController {
     }
 
     @PatchMapping("/{id}/inativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Inativar unidade", description = "Altera o status da unidade para INATIVO")
     public ResponseEntity<UnidadeResponse> inativar(@PathVariable Long id) {
         Unidade inativado = unidadeUseCase.inativar(id);
@@ -115,6 +109,7 @@ public class UnidadeController {
 
 
     @PatchMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('organizacao:deletar')")
     @Operation(summary = "Excluir unidade", description = "Marca a unidade como excluída (soft delete)")
     public ResponseEntity<UnidadeResponse> excluir(@PathVariable Long id) {
         Unidade excluido = unidadeUseCase.excluir(id);

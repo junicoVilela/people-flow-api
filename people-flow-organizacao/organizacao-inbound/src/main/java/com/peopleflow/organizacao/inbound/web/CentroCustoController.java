@@ -1,5 +1,6 @@
 package com.peopleflow.organizacao.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.CentroCusto;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,6 +42,7 @@ public class CentroCustoController {
     private final AccessValidatorPort accessValidator;
 
     @PostMapping
+    @PreAuthorize("hasRole('organizacao:criar')")
     @Operation(summary = "Criar novo centro de custo", description = "Cadastra um novo centro de custo")
     public ResponseEntity<CentroCustoResponse> criar(@Valid @RequestBody CentroCustoRequest request) {
         CentroCusto centroCusto = mapper.toDomain(request);
@@ -49,6 +52,7 @@ public class CentroCustoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Atualizar centro de custo", description = "Atualiza os dados de um centro de custo existente")
     public ResponseEntity<CentroCustoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody CentroCustoRequest request) {
         CentroCusto centroCusto = mapper.toDomain(request);
@@ -58,6 +62,7 @@ public class CentroCustoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(summary = "Buscar centro de custo por ID", description = "Retorna os dados de um centro de custo específico")
     public ResponseEntity<CentroCustoResponse> buscarPorId(@PathVariable Long id) {
         CentroCusto centroCusto = centroCustoUseCase.buscarPorId(id);
@@ -66,6 +71,7 @@ public class CentroCustoController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
             summary = "Listar centros de custo com filtros e paginação",
             description = "Lista centros de custo com filtros opcionais (empresaId, nome, codigo, status) e paginação. " +
@@ -81,25 +87,13 @@ public class CentroCustoController {
         }
         CentroCustoFilter filtros = mapper.toDomain(filtrosRequest);
 
-        Pagination pagination = Pagination.of( pageable.getPageNumber(),
-                pageable.getPageSize(),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(Sort.Order::getProperty)
-                        .orElse(null),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(order -> order.getDirection() == Sort.Direction.ASC ? Pagination.SortDirection.ASC : Pagination.SortDirection.DESC)
-                        .orElse(Pagination.SortDirection.ASC)
-        );
-
+        Pagination pagination = PageablePagination.from(pageable);
         PagedResult<CentroCusto> resultado = centroCustoUseCase.buscarPorFiltros(filtros, pagination);
-        PagedResult<CentroCustoResponse> response = mapper.toPagedResponse(resultado);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @PatchMapping("/{id}/ativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Ativar centro de custo", description = "Altera o status do centro de custo para ATIVO")
     public ResponseEntity<CentroCustoResponse> ativar(@PathVariable Long id) {
         CentroCusto ativado = centroCustoUseCase.ativar(id);
@@ -107,6 +101,7 @@ public class CentroCustoController {
     }
 
     @PatchMapping("/{id}/inativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Inativar centro de custo", description = "Altera o status do centro de custo para INATIVO")
     public ResponseEntity<CentroCustoResponse> inativar(@PathVariable Long id) {
         CentroCusto inativado = centroCustoUseCase.inativar(id);
@@ -115,6 +110,7 @@ public class CentroCustoController {
 
 
     @PatchMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('organizacao:deletar')")
     @Operation(summary = "Excluir centro de custo", description = "Marca o centro de custo como excluído (soft delete)")
     public ResponseEntity<CentroCustoResponse> excluir(@PathVariable Long id) {
         CentroCusto excluido = centroCustoUseCase.excluir(id);

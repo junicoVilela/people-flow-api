@@ -99,9 +99,13 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (1, 'colaborador:editar', 'Editar dados de colaboradores'),
 (1, 'colaborador:deletar', 'Deletar colaboradores'),
 (1, 'colaborador:aprovar', 'Aprovar cadastros e alterações'),
-(1, 'colaborador:atualizar', 'Atualizar dados de colaboradores (endpoints dedicados)'),
 (1, 'colaborador:demitir', 'Registrar demissão de colaboradores'),
-(1, 'colaborador:excluir', 'Excluir documentos digitais de colaborador ou contrato'),
+
+-- Estrutura organizacional (empresa, unidade, departamento, centro de custo, área)
+(1, 'organizacao:criar', 'Criar registros da estrutura organizacional'),
+(1, 'organizacao:ler', 'Consultar estrutura organizacional'),
+(1, 'organizacao:editar', 'Editar estrutura organizacional'),
+(1, 'organizacao:deletar', 'Excluir (soft delete) registros da estrutura organizacional'),
 
 -- Permissões de gestão de benefícios
 (1, 'beneficio:criar', 'Criar planos de benefícios'),
@@ -128,7 +132,7 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (1, 'nivel_hierarquico:criar', 'Criar níveis hierárquicos de cargo'),
 (1, 'nivel_hierarquico:ler', 'Consultar níveis hierárquicos de cargo'),
 (1, 'nivel_hierarquico:editar', 'Editar níveis hierárquicos de cargo'),
-(1, 'nivel_hierarquico:excluir', 'Excluir níveis hierárquicos de cargo'),
+(1, 'nivel_hierarquico:deletar', 'Excluir níveis hierárquicos de cargo'),
 
 -- Permissões administrativas
 (1, 'admin', 'Acesso administrativo completo')
@@ -141,9 +145,18 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (2, 'colaborador:criar', 'Criar novos colaboradores'),
 (2, 'colaborador:ler', 'Visualizar dados de colaboradores'),
 (2, 'colaborador:editar', 'Editar dados de colaboradores'),
-(2, 'colaborador:atualizar', 'Atualizar dados de colaboradores'),
 (2, 'colaborador:demitir', 'Registrar demissão de colaboradores'),
-(2, 'colaborador:excluir', 'Excluir documentos digitais de colaborador ou contrato'),
+(2, 'colaborador:deletar', 'Deletar colaboradores e anexos'),
+
+(2, 'organizacao:criar', 'Criar registros da estrutura organizacional'),
+(2, 'organizacao:ler', 'Consultar estrutura organizacional'),
+(2, 'organizacao:editar', 'Editar estrutura organizacional'),
+(2, 'organizacao:deletar', 'Excluir (soft delete) registros da estrutura organizacional'),
+
+(2, 'nivel_hierarquico:criar', 'Criar níveis hierárquicos de cargo'),
+(2, 'nivel_hierarquico:ler', 'Consultar níveis hierárquicos de cargo'),
+(2, 'nivel_hierarquico:editar', 'Editar níveis hierárquicos de cargo'),
+(2, 'nivel_hierarquico:deletar', 'Excluir níveis hierárquicos de cargo'),
 
 (2, 'beneficio:ler', 'Visualizar benefícios'),
 (2, 'beneficio:editar', 'Gerenciar adesões de benefícios'),
@@ -162,6 +175,8 @@ ON CONFLICT (cargo_id, role_name) DO NOTHING;
 INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (3, 'colaborador:ler', 'Visualizar dados de colaboradores'),
 
+(3, 'organizacao:ler', 'Consultar estrutura organizacional'),
+
 (3, 'beneficio:ler', 'Visualizar benefícios'),
 
 (3, 'ferias:ler', 'Visualizar férias'),
@@ -174,6 +189,8 @@ ON CONFLICT (cargo_id, role_name) DO NOTHING;
 -- ============================
 INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (4, 'colaborador:ler', 'Visualizar colaboradores da sua equipe'),
+
+(4, 'organizacao:ler', 'Consultar estrutura organizacional'),
 
 (4, 'ferias:ler', 'Visualizar férias da equipe'),
 (4, 'ferias:aprovar', 'Aprovar férias da equipe'),
@@ -191,6 +208,8 @@ ON CONFLICT (cargo_id, role_name) DO NOTHING;
 -- ============================
 INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (5, 'colaborador:ler', 'Visualizar próprios dados'),
+
+(5, 'organizacao:ler', 'Consultar dados organizacionais básicos'),
 
 (5, 'ferias:ler', 'Visualizar próprias férias'),
 (5, 'ferias:criar', 'Solicitar férias'),
@@ -214,11 +233,18 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (6, 'nivel_hierarquico:criar', 'Criar níveis hierárquicos de cargo'),
 (6, 'nivel_hierarquico:ler', 'Consultar níveis hierárquicos de cargo'),
 (6, 'nivel_hierarquico:editar', 'Editar níveis hierárquicos de cargo'),
-(6, 'nivel_hierarquico:excluir', 'Excluir níveis hierárquicos de cargo'),
+(6, 'nivel_hierarquico:deletar', 'Excluir níveis hierárquicos de cargo'),
 
-(6, 'colaborador:atualizar', 'Atualizar dados de colaboradores'),
-(6, 'colaborador:demitir', 'Registrar demissão de colaboradores'),
-(6, 'colaborador:excluir', 'Excluir documentos digitais')
+(6, 'organizacao:criar', 'Criar registros da estrutura organizacional'),
+(6, 'organizacao:ler', 'Consultar estrutura organizacional'),
+(6, 'organizacao:editar', 'Editar estrutura organizacional'),
+(6, 'organizacao:deletar', 'Excluir (soft delete) registros da estrutura organizacional'),
+
+(6, 'colaborador:criar', 'Criar novos colaboradores'),
+(6, 'colaborador:ler', 'Visualizar dados de colaboradores'),
+(6, 'colaborador:editar', 'Editar dados de colaboradores'),
+(6, 'colaborador:deletar', 'Deletar colaboradores e anexos'),
+(6, 'colaborador:demitir', 'Registrar demissão de colaboradores')
 ON CONFLICT (cargo_id, role_name) DO NOTHING;
 
 -- ============================
@@ -299,7 +325,8 @@ SELECT setval('people_flow_rh.contrato_id_seq',          (SELECT COALESCE(MAX(id
 -- 
 -- 1. Ajustar os cargo_id conforme seus cargos reais
 -- 2. Definir suas próprias roles baseadas nos recursos do sistema
--- 3. Considerar usar um padrão de nomenclatura consistente (recurso:acao)
+-- 3. Padrão de nomenclatura: recurso:acao com ações criar | ler | editar | deletar
+--    (e demitir/aprovar/processar onde fizer sentido de domínio). Evite sinônimos como excluir/atualizar.
 -- 4. Mapear as roles do banco com as roles configuradas no Keycloak
 -- 
 -- Para adicionar novos mapeamentos:

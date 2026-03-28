@@ -1,7 +1,6 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.Colaborador;
-import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.valueobject.Cpf;
 import com.peopleflow.common.valueobject.Email;
 import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
@@ -33,10 +32,6 @@ public interface ColaboradorWebMapper {
 
     ColaboradorFilter toDomain(ColaboradorFilterRequest request);
 
-    default PagedResult<ColaboradorResponse> toPagedResponse(PagedResult<Colaborador> pagedResult) {
-        return PagedResult.map(pagedResult, this::toResponse);
-    }
-    
     @Named("cpfToString")
     default String cpfToString(Cpf cpf) {
         return cpf != null ? cpf.getValor() : null;

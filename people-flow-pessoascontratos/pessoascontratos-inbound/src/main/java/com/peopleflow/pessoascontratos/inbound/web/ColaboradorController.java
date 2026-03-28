@@ -1,5 +1,6 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.common.security.SecurityContextHelper;
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,27 +89,14 @@ public class ColaboradorController {
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
         ColaboradorFilter filtros = mapper.toDomain(filtrosRequest);
-        
-        Pagination pagination = Pagination.of( pageable.getPageNumber(),
-            pageable.getPageSize(),
-            pageable.getSort().stream()
-                .findFirst()
-                .map(Sort.Order::getProperty)
-                .orElse(null),
-            pageable.getSort().stream()
-                .findFirst()
-                .map(order -> order.getDirection() == Sort.Direction.ASC ? Pagination.SortDirection.ASC : Pagination.SortDirection.DESC)
-                .orElse(Pagination.SortDirection.ASC)
-        );
-        
+
+        Pagination pagination = PageablePagination.from(pageable);
         PagedResult<Colaborador> resultado = colaboradorUseCase.buscarPorFiltros(filtros, pagination);
-        
-        PagedResult<ColaboradorResponse> response = mapper.toPagedResponse(resultado);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(
         summary = "Atualizar colaborador",
         description = "Atualiza os dados cadastrais do colaborador. " +
@@ -141,7 +128,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/ativar")
-    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(summary = "Ativar colaborador", description = "Altera o status do colaborador para ATIVO")
     public ResponseEntity<ColaboradorResponse> ativar(@PathVariable Long id) {
         Colaborador ativado = colaboradorUseCase.ativar(id);
@@ -149,7 +136,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/inativar")
-    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(summary = "Inativar colaborador", description = "Altera o status do colaborador para INATIVO")
     public ResponseEntity<ColaboradorResponse> inativar(@PathVariable Long id) {
         Colaborador inativado = colaboradorUseCase.inativar(id);
@@ -157,7 +144,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/excluir")
-    @PreAuthorize("hasRole('colaborador:demitir')")
+    @PreAuthorize("hasRole('colaborador:deletar')")
     @Operation(summary = "Excluir colaborador", description = "Marca o colaborador como excluído (soft delete)")
     public ResponseEntity<ColaboradorResponse> excluir(@PathVariable Long id) {
         Colaborador excluido = colaboradorUseCase.excluir(id);
@@ -165,7 +152,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/transferir")
-    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(
         summary = "Transferir colaborador",
         description = "Transfere o colaborador para outra empresa ou departamento. " +
@@ -185,7 +172,7 @@ public class ColaboradorController {
     }
 
     @PatchMapping("/{id}/reativar")
-    @PreAuthorize("hasRole('colaborador:atualizar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(
         summary = "Reativar colaborador excluído",
         description = "Reativa um colaborador com status EXCLUIDO, registrando nova data de admissão. " +

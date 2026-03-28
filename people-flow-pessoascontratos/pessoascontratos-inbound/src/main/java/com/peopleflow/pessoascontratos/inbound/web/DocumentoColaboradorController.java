@@ -34,7 +34,7 @@ public class DocumentoColaboradorController {
     private final DocumentoColaboradorWebMapper mapper;
 
     @PostMapping
-    @PreAuthorize("hasRole('colaborador:criar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(
         summary = "Registrar documento",
         description = "Registra um novo documento para o colaborador. " +
@@ -74,7 +74,7 @@ public class DocumentoColaboradorController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('colaborador:excluir')")
+    @PreAuthorize("hasRole('colaborador:deletar')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir documento", description = "Exclui (soft delete) um documento do colaborador")
     public ResponseEntity<Void> excluir(

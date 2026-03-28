@@ -71,7 +71,7 @@ public class NivelHierarquicoController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('nivel_hierarquico:excluir')")
+    @PreAuthorize("hasRole('nivel_hierarquico:deletar')")
     @Operation(
             summary = "Excluir nível hierárquico",
             description = "Soft delete. Não permitido se existirem cargos ativos utilizando este nível."

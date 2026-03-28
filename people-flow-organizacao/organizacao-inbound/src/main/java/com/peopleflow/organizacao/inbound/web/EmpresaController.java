@@ -1,5 +1,6 @@
 package com.peopleflow.organizacao.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.domain.Empresa;
@@ -14,10 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,6 +39,7 @@ public class EmpresaController {
     private final EmpresaWebMapper mapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('organizacao:criar')")
     @Operation(summary = "Criar nova empresa", description = "Cadastra uma nova empresa")
     public ResponseEntity<EmpresaResponse> criar(@Valid @RequestBody EmpresaRequest request) {
         Empresa empresa = mapper.toDomain(request);
@@ -47,6 +49,7 @@ public class EmpresaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Atualizar empresa", description = "Atualiza os dados de uma empresa existente")
     public ResponseEntity<EmpresaResponse> atualizar(@PathVariable Long id, @Valid @RequestBody EmpresaRequest request) {
         Empresa empresa = mapper.toDomain(request);
@@ -56,6 +59,7 @@ public class EmpresaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(summary = "Buscar empresa por ID", description = "Retorna os dados de uma empresa específica")
     public ResponseEntity<EmpresaResponse> buscarPorId(@PathVariable Long id) {
         Empresa empresa = empresaUseCase.buscarPorId(id);
@@ -64,6 +68,7 @@ public class EmpresaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
             summary = "Listar empresas com filtros e paginação",
             description = "Lista empresas com filtros opcionais (nome, status) e paginação. " +
@@ -75,25 +80,13 @@ public class EmpresaController {
 
         EmpresaFilter filtros = mapper.toDomain(filtrosRequest);
 
-        Pagination pagination = Pagination.of( pageable.getPageNumber(),
-                pageable.getPageSize(),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(Sort.Order::getProperty)
-                        .orElse(null),
-                pageable.getSort().stream()
-                        .findFirst()
-                        .map(order -> order.getDirection() == Sort.Direction.ASC ? Pagination.SortDirection.ASC : Pagination.SortDirection.DESC)
-                        .orElse(Pagination.SortDirection.ASC)
-        );
-
+        Pagination pagination = PageablePagination.from(pageable);
         PagedResult<Empresa> resultado = empresaUseCase.buscarPorFiltros(filtros, pagination);
-        PagedResult<EmpresaResponse> response = mapper.toPagedResponse(resultado);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @PatchMapping("/{id}/ativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Ativar empresa", description = "Altera o status da empresa para ATIVO")
     public ResponseEntity<EmpresaResponse> ativar(@PathVariable Long id) {
         Empresa ativado = empresaUseCase.ativar(id);
@@ -101,6 +94,7 @@ public class EmpresaController {
     }
 
     @PatchMapping("/{id}/inativar")
+    @PreAuthorize("hasRole('organizacao:editar')")
     @Operation(summary = "Inativar empresa", description = "Altera o status da empresa para INATIVO")
     public ResponseEntity<EmpresaResponse> inativar(@PathVariable Long id) {
         Empresa inativado = empresaUseCase.inativar(id);
@@ -109,6 +103,7 @@ public class EmpresaController {
 
 
     @PatchMapping("/{id}/excluir")
+    @PreAuthorize("hasRole('organizacao:deletar')")
     @Operation(summary = "Excluir empresa", description = "Marca a empresa como excluída (soft delete). Em cascata, exclui também Departamentos, Unidades e Centros de Custo da empresa.")
     public ResponseEntity<EmpresaResponse> excluir(@PathVariable Long id) {
         Empresa excluido = empresaUseCase.excluir(id);

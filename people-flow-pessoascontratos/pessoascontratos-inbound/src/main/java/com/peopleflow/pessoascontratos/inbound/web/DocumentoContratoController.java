@@ -34,7 +34,7 @@ public class DocumentoContratoController {
     private final DocumentoContratoWebMapper mapper;
 
     @PostMapping
-    @PreAuthorize("hasRole('colaborador:criar')")
+    @PreAuthorize("hasRole('colaborador:editar')")
     @Operation(
             summary = "Registrar documento do contrato",
             description = "Registra um novo documento para o contrato. O arquivo deve ser enviado ao storage e a storageKey informada aqui."
@@ -73,7 +73,7 @@ public class DocumentoContratoController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('colaborador:excluir')")
+    @PreAuthorize("hasRole('colaborador:deletar')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Excluir documento do contrato", description = "Exclui (soft delete) o documento")
     public ResponseEntity<Void> excluir(
