@@ -73,7 +73,7 @@ public class ContratoController {
     public ResponseEntity<PagedResult<ContratoResponse>> listar(
             @PathVariable Long colaboradorId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
 
         Pagination pagination = Pagination.of(page, size);
         PagedResult<Contrato> resultado = contratoUseCase.listarPorColaborador(colaboradorId, pagination);

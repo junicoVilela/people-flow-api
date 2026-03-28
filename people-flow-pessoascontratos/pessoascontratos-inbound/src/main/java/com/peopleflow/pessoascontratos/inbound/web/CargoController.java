@@ -60,7 +60,7 @@ public class CargoController {
     @Operation(summary = "Listar cargos ativos (paginado)")
     public ResponseEntity<PagedResult<CargoResponse>> listar(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
         Pagination pagination = Pagination.of(page, size, "nome", Pagination.SortDirection.ASC);
         PagedResult<Cargo> resultado = useCase.listar(pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));

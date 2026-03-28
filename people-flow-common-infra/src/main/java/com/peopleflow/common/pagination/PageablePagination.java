@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 
 /**
  * Converte {@link Pageable} do Spring Data em {@link Pagination} do domínio.
+ * <p>Apenas o <strong>primeiro</strong> critério de {@link Sort} é considerado; demais são ignorados.
  */
 public final class PageablePagination {
 
@@ -13,7 +14,7 @@ public final class PageablePagination {
 
     public static Pagination from(Pageable pageable) {
         if (pageable == null) {
-            return Pagination.of(0, 20);
+            return Pagination.of(0, Pagination.DEFAULT_PAGE_SIZE);
         }
         return pageable.getSort().stream()
                 .findFirst()

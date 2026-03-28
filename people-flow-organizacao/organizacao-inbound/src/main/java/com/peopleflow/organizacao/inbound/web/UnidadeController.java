@@ -79,7 +79,7 @@ public class UnidadeController {
     )
     public ResponseEntity<PagedResult<UnidadeResponse>> buscarPorFiltros(
             @ModelAttribute UnidadeFilterRequest filtrosRequest,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
         if (!accessValidator.isAdmin() && filtrosRequest.getEmpresaId() == null && accessValidator.getEmpresaIdUsuario() != null) {
             filtrosRequest.setEmpresaId(accessValidator.getEmpresaIdUsuario());

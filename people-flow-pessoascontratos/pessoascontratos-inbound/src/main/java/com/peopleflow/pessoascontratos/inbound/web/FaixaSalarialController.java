@@ -68,7 +68,7 @@ public class FaixaSalarialController {
     public ResponseEntity<PagedResult<FaixaSalarialResponse>> listar(
             @PathVariable Long cargoId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
         Pagination pagination = Pagination.of(page, size);
         PagedResult<FaixaSalarial> resultado = useCase.listarPorCargo(cargoId, pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));

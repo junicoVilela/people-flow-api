@@ -86,7 +86,7 @@ public class ColaboradorController {
     )
     public ResponseEntity<PagedResult<ColaboradorResponse>> buscarPorFiltros(
             @ModelAttribute ColaboradorFilterRequest filtrosRequest,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
         ColaboradorFilter filtros = mapper.toDomain(filtrosRequest);
 

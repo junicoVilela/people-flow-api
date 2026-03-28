@@ -76,7 +76,7 @@ public class EmpresaController {
     )
     public ResponseEntity<PagedResult<EmpresaResponse>> buscarPorFiltros(
             @ModelAttribute EmpresaFilterRequest filtrosRequest,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
         EmpresaFilter filtros = mapper.toDomain(filtrosRequest);
 

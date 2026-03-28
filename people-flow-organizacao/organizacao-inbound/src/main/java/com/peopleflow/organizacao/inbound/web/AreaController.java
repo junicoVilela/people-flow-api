@@ -72,7 +72,7 @@ public class AreaController {
     )
     public ResponseEntity<PagedResult<AreaResponse>> buscarPorFiltros(
             @ModelAttribute AreaFilterRequest filtrosRequest,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
         AreaFilter filtros = mapper.toDomain(filtrosRequest);
 
