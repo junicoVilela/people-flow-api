@@ -4,6 +4,7 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Cargo;
+import com.peopleflow.pessoascontratos.core.query.CargoFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.CargoEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.CargoJpaMapper;
@@ -12,9 +13,11 @@ import com.peopleflow.pessoascontratos.outbound.jpa.repository.ColaboradorJpaRep
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.FaixaSalarialJpaRepository;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.FamiliaCargoJpaRepository;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.NivelHierarquicoJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.CargoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -75,14 +78,15 @@ public class CargoRepositoryAdapter implements CargoRepositoryPort {
     }
 
     @Override
-    public PagedResult<Cargo> listarAtivos(Pagination pagination) {
+    public PagedResult<Cargo> buscarPorFiltros(CargoFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC, pagination.sortBy())
                 : Sort.by(Sort.Direction.ASC, "nome");
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-        Page<CargoEntity> page = cargoJpaRepository.findAllByExcluidoEmIsNull(pageRequest);
+        Specification<CargoEntity> spec = CargoSpecification.filter(filtros);
+        Page<CargoEntity> page = cargoJpaRepository.findAll(spec, pageRequest);
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),
                 page.getTotalElements(),

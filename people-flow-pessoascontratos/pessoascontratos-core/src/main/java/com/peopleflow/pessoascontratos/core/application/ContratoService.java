@@ -5,6 +5,7 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
+import com.peopleflow.pessoascontratos.core.query.ContratoFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.ContratoUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
@@ -75,9 +76,9 @@ public class ContratoService implements ContratoUseCase {
     }
 
     @Override
-    public PagedResult<Contrato> listarPorColaborador(Long colaboradorId, Pagination pagination) {
+    public PagedResult<Contrato> buscarPorFiltros(Long colaboradorId, ContratoFilter filtros, Pagination pagination) {
         colaboradorUseCase.buscarPorId(colaboradorId);
-        return contratoRepository.listarPorColaboradorId(colaboradorId, pagination);
+        return contratoRepository.buscarPorFiltros(colaboradorId, filtros, pagination);
     }
 
     @Override

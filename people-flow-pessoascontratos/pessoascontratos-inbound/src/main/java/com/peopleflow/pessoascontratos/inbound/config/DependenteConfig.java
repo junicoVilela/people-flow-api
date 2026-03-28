@@ -4,6 +4,7 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.application.DependenteService;
 import com.peopleflow.pessoascontratos.core.domain.Dependente;
+import com.peopleflow.pessoascontratos.core.query.DependenteFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.DependenteUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.DependenteRepositoryPort;
@@ -50,8 +51,8 @@ public class DependenteConfig {
 
         @Override
         @Transactional(readOnly = true)
-        public PagedResult<Dependente> listarPorColaborador(Long colaboradorId, Pagination pagination) {
-            return delegate.listarPorColaborador(colaboradorId, pagination);
+        public PagedResult<Dependente> buscarPorFiltros(Long colaboradorId, DependenteFilter filtros, Pagination pagination) {
+            return delegate.buscarPorFiltros(colaboradorId, filtros, pagination);
         }
 
         @Override

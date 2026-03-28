@@ -1,9 +1,11 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
 import com.peopleflow.pessoascontratos.core.ports.input.ContratoUseCase;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ContratoFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContratoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContratoResponse;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ContratoWebMapper;
@@ -11,23 +13,29 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/colaboradores/{colaboradorId}/contratos")
 @RequiredArgsConstructor
-@Tag(name = "Contratos", description = "Contratos de trabalho dos colaboradores")
+@Tag(
+        name = "Contratos",
+        description = "Contratos de trabalho dos colaboradores. Listagens: `page`, `size` e `sort` (Spring Data)."
+)
 public class ContratoController {
 
     private final ContratoUseCase contratoUseCase;
@@ -69,14 +77,19 @@ public class ContratoController {
 
     @GetMapping
     @PreAuthorize("hasRole('colaborador:ler')")
-    @Operation(summary = "Listar contratos do colaborador", description = "Lista contratos ativos, paginados")
-    public ResponseEntity<PagedResult<ContratoResponse>> listar(
+    @Operation(
+            summary = "Buscar contratos com filtros opcionais e paginação",
+            description = "Filtros opcionais: tipo, regime. Paginação Spring Data; padrão sem sort: inicio descendente."
+    )
+    public ResponseEntity<PagedResult<ContratoResponse>> buscarPorFiltros(
             @PathVariable Long colaboradorId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
+            @ModelAttribute ContratoFilterRequest filtrosRequest,
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "inicio", direction = Sort.Direction.DESC)
+            Pageable pageable) {
 
-        Pagination pagination = Pagination.of(page, size);
-        PagedResult<Contrato> resultado = contratoUseCase.listarPorColaborador(colaboradorId, pagination);
+        Pagination pagination = PageablePagination.from(pageable);
+        PagedResult<Contrato> resultado =
+                contratoUseCase.buscarPorFiltros(colaboradorId, mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

@@ -4,13 +4,16 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.ContaBancaria;
+import com.peopleflow.pessoascontratos.core.query.ContaBancariaFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.ContaBancariaRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ContaBancariaEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.ContaBancariaJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.ContaBancariaJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.ContaBancariaSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -48,14 +51,15 @@ public class ContaBancariaRepositoryAdapter implements ContaBancariaRepositoryPo
     }
 
     @Override
-    public PagedResult<ContaBancaria> listarPorColaboradorId(Long colaboradorId, Pagination pagination) {
+    public PagedResult<ContaBancaria> buscarPorFiltros(Long colaboradorId, ContaBancariaFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC, pagination.sortBy())
                 : Sort.by(Sort.Direction.ASC, "banco");
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-        Page<ContaBancariaEntity> page = repository.findAllByColaboradorIdAndExcluidoEmIsNull(colaboradorId, pageRequest);
+        Specification<ContaBancariaEntity> spec = ContaBancariaSpecification.filter(colaboradorId, filtros);
+        Page<ContaBancariaEntity> page = repository.findAll(spec, pageRequest);
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),
                 page.getTotalElements(),

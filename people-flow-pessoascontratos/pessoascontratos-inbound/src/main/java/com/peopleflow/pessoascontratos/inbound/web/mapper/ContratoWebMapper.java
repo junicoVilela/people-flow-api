@@ -1,6 +1,8 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
+import com.peopleflow.pessoascontratos.core.query.ContratoFilter;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ContratoFilterRequest;
 import com.peopleflow.pessoascontratos.core.valueobject.RegimeContrato;
 import com.peopleflow.pessoascontratos.core.valueobject.TipoContrato;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContratoRequest;
@@ -21,6 +23,8 @@ public interface ContratoWebMapper {
     @Mapping(target = "tipo", source = "tipo", qualifiedByName = "tipoToResponseString")
     @Mapping(target = "regime", source = "regime", qualifiedByName = "regimeToResponseString")
     ContratoResponse toResponse(Contrato contrato);
+
+    ContratoFilter toDomain(ContratoFilterRequest request);
 
     @Named("requestTipoToEnum")
     default TipoContrato requestTipoToEnum(String tipo) {

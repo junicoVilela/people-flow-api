@@ -4,6 +4,7 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.application.FaixaSalarialService;
 import com.peopleflow.pessoascontratos.core.domain.FaixaSalarial;
+import com.peopleflow.pessoascontratos.core.query.FaixaSalarialFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.FaixaSalarialUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.FaixaSalarialRepositoryPort;
@@ -50,8 +51,8 @@ public class FaixaSalarialConfig {
 
         @Override
         @Transactional(readOnly = true)
-        public PagedResult<FaixaSalarial> listarPorCargo(Long cargoId, Pagination pagination) {
-            return delegate.listarPorCargo(cargoId, pagination);
+        public PagedResult<FaixaSalarial> buscarPorFiltros(Long cargoId, FaixaSalarialFilter filtros, Pagination pagination) {
+            return delegate.buscarPorFiltros(cargoId, filtros, pagination);
         }
 
         @Override

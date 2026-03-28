@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.input;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoColaborador;
+import com.peopleflow.pessoascontratos.core.query.DocumentoColaboradorFilter;
 
 public interface DocumentoColaboradorUseCase {
 
@@ -10,7 +11,7 @@ public interface DocumentoColaboradorUseCase {
 
     DocumentoColaborador buscarPorId(Long colaboradorId, Long id);
 
-    PagedResult<DocumentoColaborador> listarPorColaborador(Long colaboradorId, Pagination pagination);
+    PagedResult<DocumentoColaborador> buscarPorFiltros(Long colaboradorId, DocumentoColaboradorFilter filtros, Pagination pagination);
 
     void excluir(Long colaboradorId, Long id);
 }

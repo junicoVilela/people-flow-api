@@ -1,9 +1,11 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoContrato;
 import com.peopleflow.pessoascontratos.core.ports.input.DocumentoContratoUseCase;
+import com.peopleflow.pessoascontratos.inbound.web.dto.DocumentoContratoFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DocumentoContratoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DocumentoContratoResponse;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.DocumentoContratoWebMapper;
@@ -11,16 +13,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,14 +55,20 @@ public class DocumentoContratoController {
 
     @GetMapping
     @PreAuthorize("hasRole('colaborador:ler')")
-    @Operation(summary = "Listar documentos do contrato", description = "Lista documentos ativos do contrato (paginado)")
-    public ResponseEntity<PagedResult<DocumentoContratoResponse>> listar(
+    @Operation(
+            summary = "Buscar documentos com filtros opcionais e paginação",
+            description = "Filtros opcionais: tipo (exato, case-insensitive), nomeArquivo (contém). "
+                    + "Spring Data: `page`, `size`, `sort`. Padrão sem `sort`: criadoEm descendente."
+    )
+    public ResponseEntity<PagedResult<DocumentoContratoResponse>> buscarPorFiltros(
             @PathVariable Long contratoId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
+            @ModelAttribute DocumentoContratoFilterRequest filtrosRequest,
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "criadoEm", direction = Sort.Direction.DESC)
+            Pageable pageable) {
 
-        Pagination pagination = Pagination.of(page, size);
-        PagedResult<DocumentoContrato> resultado = documentoContratoUseCase.listarPorContrato(contratoId, pagination);
+        Pagination pagination = PageablePagination.from(pageable);
+        PagedResult<DocumentoContrato> resultado =
+                documentoContratoUseCase.buscarPorFiltros(contratoId, mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

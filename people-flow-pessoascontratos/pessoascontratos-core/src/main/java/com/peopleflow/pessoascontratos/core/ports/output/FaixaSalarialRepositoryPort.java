@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.output;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.FaixaSalarial;
+import com.peopleflow.pessoascontratos.core.query.FaixaSalarialFilter;
 
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ public interface FaixaSalarialRepositoryPort {
 
     Optional<FaixaSalarial> buscarAtivoPorId(Long id);
 
-    PagedResult<FaixaSalarial> listarPorCargoId(Long cargoId, Pagination pagination);
+    PagedResult<FaixaSalarial> buscarPorFiltros(Long cargoId, FaixaSalarialFilter filtros, Pagination pagination);
 
     void excluir(Long id);
 }

@@ -4,6 +4,7 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.FaixaSalarial;
+import com.peopleflow.pessoascontratos.core.query.FaixaSalarialFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.FaixaSalarialUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.FaixaSalarialRepositoryPort;
@@ -41,9 +42,9 @@ public class FaixaSalarialService implements FaixaSalarialUseCase {
     }
 
     @Override
-    public PagedResult<FaixaSalarial> listarPorCargo(Long cargoId, Pagination pagination) {
+    public PagedResult<FaixaSalarial> buscarPorFiltros(Long cargoId, FaixaSalarialFilter filtros, Pagination pagination) {
         validarCargo(cargoId);
-        return faixaRepository.listarPorCargoId(cargoId, pagination);
+        return faixaRepository.buscarPorFiltros(cargoId, filtros, pagination);
     }
 
     @Override

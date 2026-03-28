@@ -1,6 +1,8 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.Cargo;
+import com.peopleflow.pessoascontratos.core.query.CargoFilter;
+import com.peopleflow.pessoascontratos.inbound.web.dto.CargoFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.CargoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.CargoResponse;
 import org.mapstruct.Mapper;
@@ -13,4 +15,6 @@ public interface CargoWebMapper {
     Cargo toDomain(CargoRequest request);
 
     CargoResponse toResponse(Cargo cargo);
+
+    CargoFilter toDomain(CargoFilterRequest request);
 }

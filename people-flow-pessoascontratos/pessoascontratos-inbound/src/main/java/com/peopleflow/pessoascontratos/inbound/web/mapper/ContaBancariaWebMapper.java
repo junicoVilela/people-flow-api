@@ -1,6 +1,8 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.ContaBancaria;
+import com.peopleflow.pessoascontratos.core.query.ContaBancariaFilter;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ContaBancariaFilterRequest;
 import com.peopleflow.pessoascontratos.core.valueobject.TipoContaBancaria;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContaBancariaRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContaBancariaResponse;
@@ -18,6 +20,8 @@ public interface ContaBancariaWebMapper {
 
     @Mapping(target = "tipo", source = "tipo", qualifiedByName = "tipoToStr")
     ContaBancariaResponse toResponse(ContaBancaria conta);
+
+    ContaBancariaFilter toDomain(ContaBancariaFilterRequest request);
 
     @Named("strToTipo")
     default TipoContaBancaria strToTipo(String valor) {

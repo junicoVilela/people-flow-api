@@ -4,13 +4,16 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
+import com.peopleflow.pessoascontratos.core.query.ContratoFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.ContratoRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.ContratoEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.ContratoJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.ContratoJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.ContratoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -52,7 +55,7 @@ public class ContratoRepositoryAdapter implements ContratoRepositoryPort {
     }
 
     @Override
-    public PagedResult<Contrato> listarPorColaboradorId(Long colaboradorId, Pagination pagination) {
+    public PagedResult<Contrato> buscarPorFiltros(Long colaboradorId, ContratoFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
@@ -60,9 +63,8 @@ public class ContratoRepositoryAdapter implements ContratoRepositoryPort {
                 : Sort.by(Sort.Direction.DESC, "inicio");
 
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-
-        Page<ContratoEntity> page =
-                repository.findAllByColaboradorIdAndExcluidoEmIsNull(colaboradorId, pageRequest);
+        Specification<ContratoEntity> spec = ContratoSpecification.filter(colaboradorId, filtros);
+        Page<ContratoEntity> page = repository.findAll(spec, pageRequest);
 
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),

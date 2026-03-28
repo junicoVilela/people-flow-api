@@ -5,6 +5,7 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoContrato;
+import com.peopleflow.pessoascontratos.core.query.DocumentoContratoFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.DocumentoContratoUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.ContratoRepositoryPort;
@@ -63,13 +64,14 @@ public class DocumentoContratoService implements DocumentoContratoUseCase {
     }
 
     @Override
-    public PagedResult<DocumentoContrato> listarPorContrato(Long contratoId, Pagination pagination) {
-        log.debug("Listando documentos do contrato: contratoId={}", contratoId);
+    public PagedResult<DocumentoContrato> buscarPorFiltros(
+            Long contratoId, DocumentoContratoFilter filtros, Pagination pagination) {
+        log.debug("Buscando documentos do contrato: contratoId={}", contratoId);
 
         Contrato contrato = resolverContratoAtivo(contratoId);
         colaboradorUseCase.buscarPorId(contrato.getColaboradorId());
 
-        return documentoRepository.buscarPorContratoId(contratoId, pagination);
+        return documentoRepository.buscarPorFiltros(contratoId, filtros, pagination);
     }
 
     @Override

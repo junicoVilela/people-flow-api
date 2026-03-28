@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.input;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.ContaBancaria;
+import com.peopleflow.pessoascontratos.core.query.ContaBancariaFilter;
 
 public interface ContaBancariaUseCase {
 
@@ -12,7 +13,7 @@ public interface ContaBancariaUseCase {
 
     ContaBancaria buscarPorId(Long colaboradorId, Long contaId);
 
-    PagedResult<ContaBancaria> listarPorColaborador(Long colaboradorId, Pagination pagination);
+    PagedResult<ContaBancaria> buscarPorFiltros(Long colaboradorId, ContaBancariaFilter filtros, Pagination pagination);
 
     void excluir(Long colaboradorId, Long contaId);
 }

@@ -5,6 +5,7 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Cargo;
+import com.peopleflow.pessoascontratos.core.query.CargoFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.CargoUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.FamiliaCargoRepositoryPort;
@@ -60,8 +61,8 @@ public class CargoService implements CargoUseCase {
     }
 
     @Override
-    public PagedResult<Cargo> listar(Pagination pagination) {
-        return cargoRepository.listarAtivos(pagination);
+    public PagedResult<Cargo> buscarPorFiltros(CargoFilter filtros, Pagination pagination) {
+        return cargoRepository.buscarPorFiltros(filtros, pagination);
     }
 
     @Override

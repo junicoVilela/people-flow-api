@@ -1,6 +1,8 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.Dependente;
+import com.peopleflow.pessoascontratos.core.query.DependenteFilter;
+import com.peopleflow.pessoascontratos.inbound.web.dto.DependenteFilterRequest;
 import com.peopleflow.pessoascontratos.core.valueobject.ParentescoDependente;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DependenteRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DependenteResponse;
@@ -18,6 +20,8 @@ public interface DependenteWebMapper {
 
     @Mapping(target = "parentesco", source = "parentesco", qualifiedByName = "parentescoToStr")
     DependenteResponse toResponse(Dependente dependente);
+
+    DependenteFilter toDomain(DependenteFilterRequest request);
 
     @Named("strToParentesco")
     default ParentescoDependente strToParentesco(String valor) {

@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.input;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.FaixaSalarial;
+import com.peopleflow.pessoascontratos.core.query.FaixaSalarialFilter;
 
 public interface FaixaSalarialUseCase {
 
@@ -12,7 +13,7 @@ public interface FaixaSalarialUseCase {
 
     FaixaSalarial buscarPorId(Long cargoId, Long faixaId);
 
-    PagedResult<FaixaSalarial> listarPorCargo(Long cargoId, Pagination pagination);
+    PagedResult<FaixaSalarial> buscarPorFiltros(Long cargoId, FaixaSalarialFilter filtros, Pagination pagination);
 
     void excluir(Long cargoId, Long faixaId);
 }

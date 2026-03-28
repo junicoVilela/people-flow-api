@@ -4,13 +4,16 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoContrato;
+import com.peopleflow.pessoascontratos.core.query.DocumentoContratoFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.DocumentoContratoRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.DocumentoContratoEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.DocumentoContratoJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.DocumentoContratoJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.DocumentoContratoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -42,7 +45,8 @@ public class DocumentoContratoRepositoryAdapter implements DocumentoContratoRepo
     }
 
     @Override
-    public PagedResult<DocumentoContrato> buscarPorContratoId(Long contratoId, Pagination pagination) {
+    public PagedResult<DocumentoContrato> buscarPorFiltros(
+            Long contratoId, DocumentoContratoFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
@@ -50,9 +54,8 @@ public class DocumentoContratoRepositoryAdapter implements DocumentoContratoRepo
                 : Sort.by(Sort.Direction.DESC, "criadoEm");
 
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-
-        Page<DocumentoContratoEntity> page =
-                repository.findAllByContratoIdAndExcluidoEmIsNull(contratoId, pageRequest);
+        Specification<DocumentoContratoEntity> spec = DocumentoContratoSpecification.filter(contratoId, filtros);
+        Page<DocumentoContratoEntity> page = repository.findAll(spec, pageRequest);
 
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),

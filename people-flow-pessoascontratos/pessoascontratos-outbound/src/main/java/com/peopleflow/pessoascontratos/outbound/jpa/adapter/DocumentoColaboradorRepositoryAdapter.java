@@ -4,13 +4,16 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoColaborador;
+import com.peopleflow.pessoascontratos.core.query.DocumentoColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.DocumentoColaboradorRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.DocumentoColaboradorEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.DocumentoColaboradorJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.DocumentoColaboradorJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.DocumentoColaboradorSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -43,7 +46,8 @@ public class DocumentoColaboradorRepositoryAdapter implements DocumentoColaborad
     }
 
     @Override
-    public PagedResult<DocumentoColaborador> buscarPorColaboradorId(Long colaboradorId, Pagination pagination) {
+    public PagedResult<DocumentoColaborador> buscarPorFiltros(
+            Long colaboradorId, DocumentoColaboradorFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
@@ -51,9 +55,8 @@ public class DocumentoColaboradorRepositoryAdapter implements DocumentoColaborad
                 : Sort.by(Sort.Direction.DESC, "criadoEm");
 
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-
-        Page<DocumentoColaboradorEntity> page =
-                repository.findAllByColaboradorIdAndExcluidoEmIsNull(colaboradorId, pageRequest);
+        Specification<DocumentoColaboradorEntity> spec = DocumentoColaboradorSpecification.filter(colaboradorId, filtros);
+        Page<DocumentoColaboradorEntity> page = repository.findAll(spec, pageRequest);
 
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),

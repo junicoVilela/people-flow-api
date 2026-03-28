@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.input;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Dependente;
+import com.peopleflow.pessoascontratos.core.query.DependenteFilter;
 
 public interface DependenteUseCase {
 
@@ -12,7 +13,7 @@ public interface DependenteUseCase {
 
     Dependente buscarPorId(Long colaboradorId, Long dependenteId);
 
-    PagedResult<Dependente> listarPorColaborador(Long colaboradorId, Pagination pagination);
+    PagedResult<Dependente> buscarPorFiltros(Long colaboradorId, DependenteFilter filtros, Pagination pagination);
 
     void excluir(Long colaboradorId, Long dependenteId);
 }

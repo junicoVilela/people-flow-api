@@ -4,13 +4,16 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.FaixaSalarial;
+import com.peopleflow.pessoascontratos.core.query.FaixaSalarialFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.FaixaSalarialRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.FaixaSalarialEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.FaixaSalarialJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.FaixaSalarialJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.FaixaSalarialSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -46,14 +49,15 @@ public class FaixaSalarialRepositoryAdapter implements FaixaSalarialRepositoryPo
     }
 
     @Override
-    public PagedResult<FaixaSalarial> listarPorCargoId(Long cargoId, Pagination pagination) {
+    public PagedResult<FaixaSalarial> buscarPorFiltros(Long cargoId, FaixaSalarialFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC, pagination.sortBy())
                 : Sort.by(Sort.Direction.ASC, "faixaMin");
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-        Page<FaixaSalarialEntity> page = repository.findAllByCargoIdAndExcluidoEmIsNull(cargoId, pageRequest);
+        Specification<FaixaSalarialEntity> spec = FaixaSalarialSpecification.filter(cargoId, filtros);
+        Page<FaixaSalarialEntity> page = repository.findAll(spec, pageRequest);
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),
                 page.getTotalElements(),

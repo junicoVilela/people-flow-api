@@ -4,6 +4,7 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.application.DocumentoContratoService;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoContrato;
+import com.peopleflow.pessoascontratos.core.query.DocumentoContratoFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.DocumentoContratoUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.ContratoRepositoryPort;
@@ -47,8 +48,9 @@ public class DocumentoContratoConfig {
 
         @Override
         @Transactional(readOnly = true)
-        public PagedResult<DocumentoContrato> listarPorContrato(Long contratoId, Pagination pagination) {
-            return delegate.listarPorContrato(contratoId, pagination);
+        public PagedResult<DocumentoContrato> buscarPorFiltros(
+                Long contratoId, DocumentoContratoFilter filtros, Pagination pagination) {
+            return delegate.buscarPorFiltros(contratoId, filtros, pagination);
         }
 
         @Override

@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.output;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Cargo;
+import com.peopleflow.pessoascontratos.core.query.CargoFilter;
 
 import java.util.Optional;
 
@@ -14,7 +15,7 @@ public interface CargoRepositoryPort {
 
     Optional<Cargo> buscarAtivoPorId(Long id);
 
-    PagedResult<Cargo> listarAtivos(Pagination pagination);
+    PagedResult<Cargo> buscarPorFiltros(CargoFilter filtros, Pagination pagination);
 
     boolean existeCodigoIgnorandoMaiusculas(String codigo, Long excluirId);
 

@@ -1,9 +1,11 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Cargo;
 import com.peopleflow.pessoascontratos.core.ports.input.CargoUseCase;
+import com.peopleflow.pessoascontratos.inbound.web.dto.CargoFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.CargoRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.CargoResponse;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.CargoWebMapper;
@@ -16,18 +18,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/cargos")
 @RequiredArgsConstructor
-@Tag(name = "Cargos", description = "Cadastro de cargos")
+@Tag(name = "Cargos", description = "Cadastro de cargos. Listagem paginada com `page`, `size` e `sort` (Spring Data).")
 public class CargoController {
 
     private final CargoUseCase useCase;
@@ -57,12 +61,16 @@ public class CargoController {
 
     @GetMapping
     @PreAuthorize("hasRole('colaborador:ler')")
-    @Operation(summary = "Listar cargos ativos (paginado)")
-    public ResponseEntity<PagedResult<CargoResponse>> listar(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
-        Pagination pagination = Pagination.of(page, size, "nome", Pagination.SortDirection.ASC);
-        PagedResult<Cargo> resultado = useCase.listar(pagination);
+    @Operation(
+            summary = "Buscar cargos com filtros opcionais e paginação",
+            description = "Filtros opcionais na query (nome, codigo, nivelHierarquicoId, familiaCargoId, departamentoId). "
+                    + "Paginação Spring Data: `page`, `size` e `sort` (padrão: nome ascendente)."
+    )
+    public ResponseEntity<PagedResult<CargoResponse>> buscarPorFiltros(
+            @ModelAttribute CargoFilterRequest filtrosRequest,
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
+        Pagination pagination = PageablePagination.from(pageable);
+        PagedResult<Cargo> resultado = useCase.buscarPorFiltros(mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

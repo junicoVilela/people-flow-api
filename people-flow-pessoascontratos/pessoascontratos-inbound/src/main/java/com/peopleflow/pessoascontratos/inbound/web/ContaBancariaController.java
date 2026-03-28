@@ -1,9 +1,11 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.ContaBancaria;
 import com.peopleflow.pessoascontratos.core.ports.input.ContaBancariaUseCase;
+import com.peopleflow.pessoascontratos.inbound.web.dto.ContaBancariaFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContaBancariaRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.ContaBancariaResponse;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.ContaBancariaWebMapper;
@@ -11,11 +13,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,13 +69,16 @@ public class ContaBancariaController {
 
     @GetMapping
     @PreAuthorize("hasRole('colaborador:ler')")
-    @Operation(summary = "Listar contas do colaborador")
-    public ResponseEntity<PagedResult<ContaBancariaResponse>> listar(
+    @Operation(
+            summary = "Buscar contas com filtros opcionais e paginação",
+            description = "Filtros opcionais: banco, agencia, conta. Paginação Spring Data; padrão: banco ascendente."
+    )
+    public ResponseEntity<PagedResult<ContaBancariaResponse>> buscarPorFiltros(
             @PathVariable Long colaboradorId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
-        Pagination pagination = Pagination.of(page, size);
-        PagedResult<ContaBancaria> resultado = useCase.listarPorColaborador(colaboradorId, pagination);
+            @ModelAttribute ContaBancariaFilterRequest filtrosRequest,
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "banco") Pageable pageable) {
+        Pagination pagination = PageablePagination.from(pageable);
+        PagedResult<ContaBancaria> resultado = useCase.buscarPorFiltros(colaboradorId, mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

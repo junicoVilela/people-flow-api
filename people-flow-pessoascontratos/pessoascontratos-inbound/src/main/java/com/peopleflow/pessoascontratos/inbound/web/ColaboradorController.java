@@ -36,7 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/colaboradores")
 @RequiredArgsConstructor
-@Tag(name = "Colaboradores", description = "Gerenciamento de colaboradores")
+@Tag(
+        name = "Colaboradores",
+        description = "Gerenciamento de colaboradores. Todas as listagens paginadas usam os parâmetros Spring Data "
+                + "(`page`, `size`, `sort`); o front pode enviar `sort` em todas elas."
+)
 public class ColaboradorController {
 
     private final ColaboradorUseCase colaboradorUseCase;
@@ -80,9 +84,9 @@ public class ColaboradorController {
     @PreAuthorize("hasRole('colaborador:ler')")
     @Operation(
         summary = "Listar colaboradores com filtros e paginação", 
-        description = "Busca colaboradores aplicando filtros opcionais e paginação. " +
-                      "Sempre retorna resultados paginados para garantir performance. " +
-                      "Use parâmetros de query para filtrar e ordenar os resultados."
+        description = "Busca colaboradores aplicando filtros opcionais (modelo de query) e paginação Spring Data "
+                      + "(`page`, `size`, `sort`). Apenas o primeiro critério de ordenação é aplicado no domínio. "
+                      + "Padrão sem `sort`: nome ascendente."
     )
     public ResponseEntity<PagedResult<ColaboradorResponse>> buscarPorFiltros(
             @ModelAttribute ColaboradorFilterRequest filtrosRequest,

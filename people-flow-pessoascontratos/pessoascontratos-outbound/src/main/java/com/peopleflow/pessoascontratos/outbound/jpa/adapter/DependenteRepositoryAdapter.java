@@ -4,13 +4,16 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Dependente;
+import com.peopleflow.pessoascontratos.core.query.DependenteFilter;
 import com.peopleflow.pessoascontratos.core.ports.output.DependenteRepositoryPort;
 import com.peopleflow.pessoascontratos.outbound.jpa.entity.DependenteEntity;
 import com.peopleflow.pessoascontratos.outbound.jpa.mapper.DependenteJpaMapper;
 import com.peopleflow.pessoascontratos.outbound.jpa.repository.DependenteJpaRepository;
+import com.peopleflow.pessoascontratos.outbound.jpa.specification.DependenteSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -47,14 +50,15 @@ public class DependenteRepositoryAdapter implements DependenteRepositoryPort {
     }
 
     @Override
-    public PagedResult<Dependente> listarPorColaboradorId(Long colaboradorId, Pagination pagination) {
+    public PagedResult<Dependente> buscarPorFiltros(Long colaboradorId, DependenteFilter filtros, Pagination pagination) {
         Sort sort = pagination.sortBy() != null
                 ? Sort.by(pagination.direction() == Pagination.SortDirection.ASC
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC, pagination.sortBy())
                 : Sort.by(Sort.Direction.ASC, "nome");
         PageRequest pageRequest = PageRequest.of(pagination.page(), pagination.size(), sort);
-        Page<DependenteEntity> page = repository.findAllByColaboradorIdAndExcluidoEmIsNull(colaboradorId, pageRequest);
+        Specification<DependenteEntity> spec = DependenteSpecification.filter(colaboradorId, filtros);
+        Page<DependenteEntity> page = repository.findAll(spec, pageRequest);
         return new PagedResult<>(
                 page.map(mapper::toDomain).getContent(),
                 page.getTotalElements(),

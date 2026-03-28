@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.input;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Cargo;
+import com.peopleflow.pessoascontratos.core.query.CargoFilter;
 
 public interface CargoUseCase {
 
@@ -12,7 +13,7 @@ public interface CargoUseCase {
 
     Cargo buscarPorId(Long id);
 
-    PagedResult<Cargo> listar(Pagination pagination);
+    PagedResult<Cargo> buscarPorFiltros(CargoFilter filtros, Pagination pagination);
 
     void excluir(Long id);
 }

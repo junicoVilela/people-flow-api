@@ -4,6 +4,7 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.application.ContaBancariaService;
 import com.peopleflow.pessoascontratos.core.domain.ContaBancaria;
+import com.peopleflow.pessoascontratos.core.query.ContaBancariaFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.ContaBancariaUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.ContaBancariaRepositoryPort;
@@ -50,8 +51,8 @@ public class ContaBancariaConfig {
 
         @Override
         @Transactional(readOnly = true)
-        public PagedResult<ContaBancaria> listarPorColaborador(Long colaboradorId, Pagination pagination) {
-            return delegate.listarPorColaborador(colaboradorId, pagination);
+        public PagedResult<ContaBancaria> buscarPorFiltros(Long colaboradorId, ContaBancariaFilter filtros, Pagination pagination) {
+            return delegate.buscarPorFiltros(colaboradorId, filtros, pagination);
         }
 
         @Override

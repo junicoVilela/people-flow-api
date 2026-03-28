@@ -1,7 +1,9 @@
 package com.peopleflow.pessoascontratos.inbound.web.mapper;
 
 import com.peopleflow.pessoascontratos.core.domain.DocumentoColaborador;
+import com.peopleflow.pessoascontratos.core.query.DocumentoColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.valueobject.TipoDocumento;
+import com.peopleflow.pessoascontratos.inbound.web.dto.DocumentoColaboradorFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DocumentoColaboradorRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.DocumentoColaboradorResponse;
 import org.mapstruct.Mapper;
@@ -19,6 +21,8 @@ public interface DocumentoColaboradorWebMapper {
 
     @Mapping(target = "tipo", source = "tipo", qualifiedByName = "tipoToString")
     DocumentoColaboradorResponse toResponse(DocumentoColaborador documento);
+
+    DocumentoColaboradorFilter toDomain(DocumentoColaboradorFilterRequest request);
 
     @Named("stringToTipo")
     default TipoDocumento stringToTipo(String tipo) {

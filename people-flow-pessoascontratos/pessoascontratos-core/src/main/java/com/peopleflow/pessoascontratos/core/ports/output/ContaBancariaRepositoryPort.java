@@ -3,6 +3,7 @@ package com.peopleflow.pessoascontratos.core.ports.output;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.ContaBancaria;
+import com.peopleflow.pessoascontratos.core.query.ContaBancariaFilter;
 
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ public interface ContaBancariaRepositoryPort {
 
     Optional<ContaBancaria> buscarAtivoPorId(Long id);
 
-    PagedResult<ContaBancaria> listarPorColaboradorId(Long colaboradorId, Pagination pagination);
+    PagedResult<ContaBancaria> buscarPorFiltros(Long colaboradorId, ContaBancariaFilter filtros, Pagination pagination);
 
     void excluir(Long id);
 }

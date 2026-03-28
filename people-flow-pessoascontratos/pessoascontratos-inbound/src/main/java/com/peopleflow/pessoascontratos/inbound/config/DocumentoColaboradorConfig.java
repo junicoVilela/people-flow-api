@@ -4,6 +4,7 @@ import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.application.DocumentoColaboradorService;
 import com.peopleflow.pessoascontratos.core.domain.DocumentoColaborador;
+import com.peopleflow.pessoascontratos.core.query.DocumentoColaboradorFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.DocumentoColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.DocumentoColaboradorRepositoryPort;
@@ -44,8 +45,9 @@ public class DocumentoColaboradorConfig {
 
         @Override
         @Transactional(readOnly = true)
-        public PagedResult<DocumentoColaborador> listarPorColaborador(Long colaboradorId, Pagination pagination) {
-            return delegate.listarPorColaborador(colaboradorId, pagination);
+        public PagedResult<DocumentoColaborador> buscarPorFiltros(
+                Long colaboradorId, DocumentoColaboradorFilter filtros, Pagination pagination) {
+            return delegate.buscarPorFiltros(colaboradorId, filtros, pagination);
         }
 
         @Override

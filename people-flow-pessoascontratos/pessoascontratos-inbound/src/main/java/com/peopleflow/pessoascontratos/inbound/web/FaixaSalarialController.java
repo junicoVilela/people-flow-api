@@ -1,9 +1,11 @@
 package com.peopleflow.pessoascontratos.inbound.web;
 
+import com.peopleflow.common.pagination.PageablePagination;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.FaixaSalarial;
 import com.peopleflow.pessoascontratos.core.ports.input.FaixaSalarialUseCase;
+import com.peopleflow.pessoascontratos.inbound.web.dto.FaixaSalarialFilterRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.FaixaSalarialRequest;
 import com.peopleflow.pessoascontratos.inbound.web.dto.FaixaSalarialResponse;
 import com.peopleflow.pessoascontratos.inbound.web.mapper.FaixaSalarialWebMapper;
@@ -11,17 +13,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -64,13 +68,16 @@ public class FaixaSalarialController {
 
     @GetMapping
     @PreAuthorize("hasRole('colaborador:ler')")
-    @Operation(summary = "Listar faixas do cargo")
-    public ResponseEntity<PagedResult<FaixaSalarialResponse>> listar(
+    @Operation(
+            summary = "Buscar faixas com filtros opcionais e paginação",
+            description = "Filtro opcional: moeda (código, ex.: BRL). Paginação Spring Data; padrão: faixaMin ascendente."
+    )
+    public ResponseEntity<PagedResult<FaixaSalarialResponse>> buscarPorFiltros(
             @PathVariable Long cargoId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Pagination.DEFAULT_PAGE_SIZE_PARAM) int size) {
-        Pagination pagination = Pagination.of(page, size);
-        PagedResult<FaixaSalarial> resultado = useCase.listarPorCargo(cargoId, pagination);
+            @ModelAttribute FaixaSalarialFilterRequest filtrosRequest,
+            @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "faixaMin") Pageable pageable) {
+        Pagination pagination = PageablePagination.from(pageable);
+        PagedResult<FaixaSalarial> resultado = useCase.buscarPorFiltros(cargoId, mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

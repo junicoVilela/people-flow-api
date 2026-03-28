@@ -4,6 +4,7 @@ import com.peopleflow.common.exception.ResourceNotFoundException;
 import com.peopleflow.common.pagination.PagedResult;
 import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Dependente;
+import com.peopleflow.pessoascontratos.core.query.DependenteFilter;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.DependenteUseCase;
 import com.peopleflow.pessoascontratos.core.ports.output.DependenteRepositoryPort;
@@ -50,9 +51,9 @@ public class DependenteService implements DependenteUseCase {
     }
 
     @Override
-    public PagedResult<Dependente> listarPorColaborador(Long colaboradorId, Pagination pagination) {
+    public PagedResult<Dependente> buscarPorFiltros(Long colaboradorId, DependenteFilter filtros, Pagination pagination) {
         colaboradorUseCase.buscarPorId(colaboradorId);
-        return repository.listarPorColaboradorId(colaboradorId, pagination);
+        return repository.buscarPorFiltros(colaboradorId, filtros, pagination);
     }
 
     @Override

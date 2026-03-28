@@ -4,10 +4,12 @@ import com.peopleflow.pessoascontratos.outbound.jpa.entity.FaixaSalarialEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface FaixaSalarialJpaRepository extends JpaRepository<FaixaSalarialEntity, Long> {
+public interface FaixaSalarialJpaRepository extends JpaRepository<FaixaSalarialEntity, Long>,
+        JpaSpecificationExecutor<FaixaSalarialEntity> {
 
     Optional<FaixaSalarialEntity> findByIdAndExcluidoEmIsNull(Long id);
 
