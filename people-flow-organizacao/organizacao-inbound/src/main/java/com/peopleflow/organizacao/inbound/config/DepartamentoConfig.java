@@ -29,7 +29,6 @@ public class DepartamentoConfig {
         return new TransactionalDepartamentoUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalDepartamentoUseCase implements DepartamentoUseCase {
         private final DepartamentoService delegate;
 

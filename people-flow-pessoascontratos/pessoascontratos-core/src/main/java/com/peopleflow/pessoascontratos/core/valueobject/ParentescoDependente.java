@@ -1,5 +1,7 @@
 package com.peopleflow.pessoascontratos.core.valueobject;
 
+import com.peopleflow.common.exception.BusinessException;
+
 public enum ParentescoDependente {
 
     CONJUGE("conjuge"),
@@ -21,7 +23,7 @@ public enum ParentescoDependente {
 
     public static ParentescoDependente of(String valor) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("Parentesco é obrigatório");
+            throw new BusinessException("PARENTESCO_OBRIGATORIO", "Parentesco é obrigatório");
         }
         String v = valor.trim().toLowerCase();
         for (ParentescoDependente p : values()) {
@@ -29,7 +31,8 @@ public enum ParentescoDependente {
                 return p;
             }
         }
-        throw new IllegalArgumentException(
+        throw new BusinessException(
+                "PARENTESCO_INVALIDO",
                 "Parentesco inválido. Valores: conjuge, filho, filha, pai, mae, outro");
     }
 }

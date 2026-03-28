@@ -1,5 +1,7 @@
 package com.peopleflow.pessoascontratos.core.valueobject;
 
+import com.peopleflow.common.exception.BusinessException;
+
 public enum MoedaFaixa {
 
     BRL("BRL"),
@@ -26,6 +28,6 @@ public enum MoedaFaixa {
                 return m;
             }
         }
-        throw new IllegalArgumentException("Moeda inválida. Valores: BRL, USD, EUR");
+        throw new BusinessException("MOEDA_INVALIDA", "Moeda inválida. Valores: BRL, USD, EUR");
     }
 }

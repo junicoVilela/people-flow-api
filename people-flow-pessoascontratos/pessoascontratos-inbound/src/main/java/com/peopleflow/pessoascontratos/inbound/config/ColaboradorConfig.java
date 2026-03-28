@@ -29,7 +29,6 @@ public class ColaboradorConfig {
         return new TransactionalColaboradorUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalColaboradorUseCase implements ColaboradorUseCase {
         private final ColaboradorService delegate;
         

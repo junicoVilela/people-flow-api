@@ -99,6 +99,9 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (1, 'colaborador:editar', 'Editar dados de colaboradores'),
 (1, 'colaborador:deletar', 'Deletar colaboradores'),
 (1, 'colaborador:aprovar', 'Aprovar cadastros e alterações'),
+(1, 'colaborador:atualizar', 'Atualizar dados de colaboradores (endpoints dedicados)'),
+(1, 'colaborador:demitir', 'Registrar demissão de colaboradores'),
+(1, 'colaborador:excluir', 'Excluir documentos digitais de colaborador ou contrato'),
 
 -- Permissões de gestão de benefícios
 (1, 'beneficio:criar', 'Criar planos de benefícios'),
@@ -138,6 +141,9 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (2, 'colaborador:criar', 'Criar novos colaboradores'),
 (2, 'colaborador:ler', 'Visualizar dados de colaboradores'),
 (2, 'colaborador:editar', 'Editar dados de colaboradores'),
+(2, 'colaborador:atualizar', 'Atualizar dados de colaboradores'),
+(2, 'colaborador:demitir', 'Registrar demissão de colaboradores'),
+(2, 'colaborador:excluir', 'Excluir documentos digitais de colaborador ou contrato'),
 
 (2, 'beneficio:ler', 'Visualizar benefícios'),
 (2, 'beneficio:editar', 'Gerenciar adesões de benefícios'),
@@ -208,7 +214,11 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (6, 'nivel_hierarquico:criar', 'Criar níveis hierárquicos de cargo'),
 (6, 'nivel_hierarquico:ler', 'Consultar níveis hierárquicos de cargo'),
 (6, 'nivel_hierarquico:editar', 'Editar níveis hierárquicos de cargo'),
-(6, 'nivel_hierarquico:excluir', 'Excluir níveis hierárquicos de cargo')
+(6, 'nivel_hierarquico:excluir', 'Excluir níveis hierárquicos de cargo'),
+
+(6, 'colaborador:atualizar', 'Atualizar dados de colaboradores'),
+(6, 'colaborador:demitir', 'Registrar demissão de colaboradores'),
+(6, 'colaborador:excluir', 'Excluir documentos digitais')
 ON CONFLICT (cargo_id, role_name) DO NOTHING;
 
 -- ============================

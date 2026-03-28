@@ -1,5 +1,7 @@
 package com.peopleflow.pessoascontratos.core.valueobject;
 
+import com.peopleflow.common.exception.BusinessException;
+
 /**
  * Valores persistidos em {@code CONTRATO.TIPO} (alinhado ao {@code CHK_CONTRATO_TIPO}).
  */
@@ -23,7 +25,7 @@ public enum TipoContrato {
 
     public static TipoContrato of(String valor) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("Tipo de contrato não pode ser nulo ou vazio");
+            throw new BusinessException("TIPO_CONTRATO_OBRIGATORIO", "Tipo de contrato não pode ser nulo ou vazio");
         }
         String t = valor.trim();
         for (TipoContrato tipo : values()) {
@@ -31,7 +33,8 @@ public enum TipoContrato {
                 return tipo;
             }
         }
-        throw new IllegalArgumentException(
+        throw new BusinessException(
+                "TIPO_CONTRATO_INVALIDO",
                 "Tipo de contrato inválido: '" + valor + "'. Valores aceitos: CLT, PJ, estagio, temporario, intermitente");
     }
 

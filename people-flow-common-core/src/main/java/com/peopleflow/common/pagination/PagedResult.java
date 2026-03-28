@@ -1,6 +1,7 @@
 package com.peopleflow.common.pagination;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Resultado paginado de uma consulta
@@ -46,6 +47,25 @@ public record PagedResult<T>(
      */
     public boolean isEmpty() {
         return content.isEmpty();
+    }
+
+    /**
+     * Mapeia os itens da página preservando metadados de paginação.
+     */
+    public <R> PagedResult<R> map(Function<T, R> mapper) {
+        return new PagedResult<>(
+                content.stream().map(mapper).toList(),
+                totalElements,
+                totalPages,
+                page,
+                size);
+    }
+
+    public static <T, R> PagedResult<R> map(PagedResult<T> source, Function<T, R> mapper) {
+        if (source == null) {
+            return null;
+        }
+        return source.map(mapper);
     }
 }
 

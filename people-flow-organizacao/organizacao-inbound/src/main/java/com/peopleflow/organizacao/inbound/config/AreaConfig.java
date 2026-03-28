@@ -22,7 +22,6 @@ public class AreaConfig {
         return new TransactionalAreaUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalAreaUseCase implements AreaUseCase {
         private final AreaService delegate;
 

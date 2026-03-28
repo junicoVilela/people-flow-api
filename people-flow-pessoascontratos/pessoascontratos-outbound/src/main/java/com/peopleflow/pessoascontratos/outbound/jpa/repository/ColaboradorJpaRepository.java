@@ -21,4 +21,6 @@ public interface ColaboradorJpaRepository extends JpaRepository<ColaboradorEntit
 
     @Query("SELECT COUNT(c) FROM ColaboradorEntity c WHERE c.cargoId = :cargoId AND c.excluidoEm IS NULL AND c.status <> 'excluido'")
     long countAtivosPorCargoId(@Param("cargoId") Long cargoId);
+
+    boolean existsByEmpresaIdAndExcluidoEmIsNullAndStatusNot(Long empresaId, String status);
 }

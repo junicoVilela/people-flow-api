@@ -56,18 +56,9 @@ public class DocumentoContratoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Pagination pagination = new Pagination(page, size, null, null);
+        Pagination pagination = Pagination.of(page, size);
         PagedResult<DocumentoContrato> resultado = documentoContratoUseCase.listarPorContrato(contratoId, pagination);
-
-        PagedResult<DocumentoContratoResponse> response = new PagedResult<>(
-                resultado.content().stream().map(mapper::toResponse).toList(),
-                resultado.totalElements(),
-                resultado.totalPages(),
-                resultado.page(),
-                resultado.size()
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @GetMapping("/{id}")

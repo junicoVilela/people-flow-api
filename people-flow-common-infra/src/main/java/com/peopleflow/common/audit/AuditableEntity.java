@@ -15,23 +15,23 @@ import java.time.Instant;
 public abstract class AuditableEntity {
 
     @CreatedBy
-    @Column(name = "CRIADO_POR")
-    private Long criadoPor;
+    @Column(name = "CRIADO_POR", length = 100)
+    private String criadoPor;
 
     @CreatedDate
     @Column(name = "CRIADO_EM", nullable = false, updatable = false)
     private Instant criadoEm;
 
     @LastModifiedBy
-    @Column(name = "ATUALIZADO_POR")
-    private Long atualizadoPor;
+    @Column(name = "ATUALIZADO_POR", length = 100)
+    private String atualizadoPor;
 
     @LastModifiedDate
     @Column(name = "ATUALIZADO_EM", nullable = false)
     private Instant atualizadoEm;
 
-    @Column(name = "EXCLUIDO_POR")
-    private Long excluidoPor;
+    @Column(name = "EXCLUIDO_POR", length = 100)
+    private String excluidoPor;
 
     @Column(name = "EXCLUIDO_EM")
     private Instant excluidoEm;

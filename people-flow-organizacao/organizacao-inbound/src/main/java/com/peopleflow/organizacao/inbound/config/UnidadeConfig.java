@@ -27,7 +27,6 @@ public class UnidadeConfig {
         return new TransactionalUnidadeUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalUnidadeUseCase implements UnidadeUseCase {
         private final UnidadeService delegate;
 

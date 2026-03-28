@@ -33,7 +33,6 @@ public class EmpresaConfig {
         return new TransactionalEmpresaUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalEmpresaUseCase implements EmpresaUseCase {
         private final EmpresaService delegate;
         

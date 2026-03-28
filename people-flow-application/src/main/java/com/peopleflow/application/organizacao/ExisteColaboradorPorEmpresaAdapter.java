@@ -1,9 +1,7 @@
 package com.peopleflow.application.organizacao;
 
-import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.organizacao.core.ports.output.ExisteColaboradorPorEmpresaPort;
 import com.peopleflow.pessoascontratos.core.ports.output.ColaboradorRepositoryPort;
-import com.peopleflow.pessoascontratos.core.query.ColaboradorFilter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,7 +19,6 @@ public class ExisteColaboradorPorEmpresaAdapter implements ExisteColaboradorPorE
 
     @Override
     public boolean existePorEmpresaId(Long empresaId) {
-        ColaboradorFilter filter = ColaboradorFilter.builder().empresaId(empresaId).build();
-        return colaboradorRepository.buscarPorFiltros(filter, Pagination.of(0, 1)).totalElements() > 0;
+        return colaboradorRepository.existeNaoExcluidoPorEmpresaId(empresaId);
     }
 }

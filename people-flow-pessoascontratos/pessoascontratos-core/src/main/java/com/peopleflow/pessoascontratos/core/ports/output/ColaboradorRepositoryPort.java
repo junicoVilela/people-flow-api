@@ -19,5 +19,8 @@ public interface ColaboradorRepositoryPort {
     boolean existePorCpfExcluindoId(String cpf, Long id);
     boolean existePorEmailExcluindoId(String email, Long id);
     boolean existePorMatriculaExcluindoId(String matricula, Long empresaId, Long id);
+
+    /** Colaborador não excluído logicamente nem soft-delete por excluidoEm. */
+    boolean existeNaoExcluidoPorEmpresaId(Long empresaId);
 }
 

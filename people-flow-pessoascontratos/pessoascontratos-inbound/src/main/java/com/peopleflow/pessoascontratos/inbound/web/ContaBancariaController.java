@@ -71,12 +71,7 @@ public class ContaBancariaController {
             @RequestParam(defaultValue = "20") int size) {
         Pagination pagination = Pagination.of(page, size);
         PagedResult<ContaBancaria> resultado = useCase.listarPorColaborador(colaboradorId, pagination);
-        return ResponseEntity.ok(new PagedResult<>(
-                resultado.content().stream().map(mapper::toResponse).toList(),
-                resultado.totalElements(),
-                resultado.totalPages(),
-                resultado.page(),
-                resultado.size()));
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @DeleteMapping("/{contaId}")

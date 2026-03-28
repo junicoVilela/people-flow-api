@@ -22,7 +22,6 @@ public class DocumentoColaboradorConfig {
         return new TransactionalDocumentoColaboradorUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalDocumentoColaboradorUseCase implements DocumentoColaboradorUseCase {
 
         private final DocumentoColaboradorService delegate;

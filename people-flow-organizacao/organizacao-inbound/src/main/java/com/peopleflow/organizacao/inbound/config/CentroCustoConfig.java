@@ -27,7 +27,6 @@ public class CentroCustoConfig {
         return new TransactionalCentroCustoUseCase(service);
     }
 
-    @Transactional
     private static class TransactionalCentroCustoUseCase implements CentroCustoUseCase {
         private final CentroCustoService delegate;
 

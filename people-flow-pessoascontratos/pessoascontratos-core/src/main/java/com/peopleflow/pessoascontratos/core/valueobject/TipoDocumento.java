@@ -1,5 +1,7 @@
 package com.peopleflow.pessoascontratos.core.valueobject;
 
+import com.peopleflow.common.exception.BusinessException;
+
 public enum TipoDocumento {
 
     CONTRATO("contrato"),
@@ -22,14 +24,15 @@ public enum TipoDocumento {
 
     public static TipoDocumento of(String valor) {
         if (valor == null) {
-            throw new IllegalArgumentException("Tipo de documento não pode ser nulo");
+            throw new BusinessException("TIPO_DOCUMENTO_OBRIGATORIO", "Tipo de documento não pode ser nulo");
         }
         for (TipoDocumento tipo : values()) {
             if (tipo.valor.equalsIgnoreCase(valor.trim())) {
                 return tipo;
             }
         }
-        throw new IllegalArgumentException("Tipo de documento inválido: '" + valor + "'. " +
-                "Valores aceitos: contrato, atestado, exame, certidao, comprovante, documento, outro");
+        throw new BusinessException(
+                "TIPO_DOCUMENTO_INVALIDO",
+                "Tipo de documento inválido: '" + valor + "'. Valores aceitos: contrato, atestado, exame, certidao, comprovante, documento, outro");
     }
 }

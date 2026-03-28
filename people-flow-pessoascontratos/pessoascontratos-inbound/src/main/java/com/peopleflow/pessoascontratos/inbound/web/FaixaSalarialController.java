@@ -71,12 +71,7 @@ public class FaixaSalarialController {
             @RequestParam(defaultValue = "20") int size) {
         Pagination pagination = Pagination.of(page, size);
         PagedResult<FaixaSalarial> resultado = useCase.listarPorCargo(cargoId, pagination);
-        return ResponseEntity.ok(new PagedResult<>(
-                resultado.content().stream().map(mapper::toResponse).toList(),
-                resultado.totalElements(),
-                resultado.totalPages(),
-                resultado.page(),
-                resultado.size()));
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @DeleteMapping("/{faixaId}")

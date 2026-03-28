@@ -34,17 +34,7 @@ public interface ColaboradorWebMapper {
     ColaboradorFilter toDomain(ColaboradorFilterRequest request);
 
     default PagedResult<ColaboradorResponse> toPagedResponse(PagedResult<Colaborador> pagedResult) {
-        if (pagedResult == null) return null;
-        
-        return new PagedResult<>(
-            pagedResult.content().stream()
-                .map(this::toResponse)
-                .toList(),
-            pagedResult.totalElements(),
-            pagedResult.totalPages(),
-            pagedResult.page(),
-            pagedResult.size()
-        );
+        return PagedResult.map(pagedResult, this::toResponse);
     }
     
     @Named("cpfToString")

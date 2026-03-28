@@ -63,13 +63,7 @@ public class CargoController {
             @RequestParam(defaultValue = "20") int size) {
         Pagination pagination = new Pagination(page, size, "nome", Pagination.SortDirection.ASC);
         PagedResult<Cargo> resultado = useCase.listar(pagination);
-        PagedResult<CargoResponse> response = new PagedResult<>(
-                resultado.content().stream().map(mapper::toResponse).toList(),
-                resultado.totalElements(),
-                resultado.totalPages(),
-                resultado.page(),
-                resultado.size());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @DeleteMapping("/{id}")

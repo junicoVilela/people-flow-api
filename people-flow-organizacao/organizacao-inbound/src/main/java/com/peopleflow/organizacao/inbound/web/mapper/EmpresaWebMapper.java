@@ -29,17 +29,7 @@ public interface EmpresaWebMapper {
     EmpresaFilter toDomain(EmpresaFilterRequest request);
 
     default PagedResult<EmpresaResponse> toPagedResponse(PagedResult<Empresa> pagedResult) {
-        if (pagedResult == null) return null;
-
-        return new PagedResult<>(
-                pagedResult.content().stream()
-                        .map(this::toResponse)
-                        .toList(),
-                pagedResult.totalElements(),
-                pagedResult.totalPages(),
-                pagedResult.page(),
-                pagedResult.size()
-        );
+        return PagedResult.map(pagedResult, this::toResponse);
     }
 
     @Named("stringToCnpj")

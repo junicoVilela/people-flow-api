@@ -1,5 +1,7 @@
 package com.peopleflow.pessoascontratos.core.valueobject;
 
+import com.peopleflow.common.exception.BusinessException;
+
 /**
  * Valores persistidos em {@code CONTRATO.REGIME} (alinhado ao {@code CHK_CONTRATO_REGIME}).
  */
@@ -21,7 +23,7 @@ public enum RegimeContrato {
 
     public static RegimeContrato of(String valor) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("Regime de contrato não pode ser nulo ou vazio");
+            throw new BusinessException("REGIME_CONTRATO_OBRIGATORIO", "Regime de contrato não pode ser nulo ou vazio");
         }
         String r = valor.trim().toLowerCase();
         for (RegimeContrato regime : values()) {
@@ -29,7 +31,8 @@ public enum RegimeContrato {
                 return regime;
             }
         }
-        throw new IllegalArgumentException(
+        throw new BusinessException(
+                "REGIME_CONTRATO_INVALIDO",
                 "Regime inválido: '" + valor + "'. Valores aceitos: integral, parcial, horista");
     }
 

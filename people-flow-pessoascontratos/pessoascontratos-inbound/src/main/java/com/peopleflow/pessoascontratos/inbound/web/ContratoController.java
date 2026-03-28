@@ -75,16 +75,9 @@ public class ContratoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Pagination pagination = new Pagination(page, size, null, null);
+        Pagination pagination = Pagination.of(page, size);
         PagedResult<Contrato> resultado = contratoUseCase.listarPorColaborador(colaboradorId, pagination);
-        PagedResult<ContratoResponse> response = new PagedResult<>(
-                resultado.content().stream().map(mapper::toResponse).toList(),
-                resultado.totalElements(),
-                resultado.totalPages(),
-                resultado.page(),
-                resultado.size()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
     @DeleteMapping("/{contratoId}")

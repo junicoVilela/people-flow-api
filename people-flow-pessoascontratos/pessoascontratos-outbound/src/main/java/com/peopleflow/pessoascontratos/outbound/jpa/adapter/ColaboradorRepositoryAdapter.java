@@ -99,4 +99,12 @@ public class ColaboradorRepositoryAdapter implements ColaboradorRepositoryPort {
         }
         return repository.existsByMatriculaAndEmpresaIdAndIdNotAndStatusNot(matricula, empresaId, id, "excluido");
     }
+
+    @Override
+    public boolean existeNaoExcluidoPorEmpresaId(Long empresaId) {
+        if (empresaId == null) {
+            return false;
+        }
+        return repository.existsByEmpresaIdAndExcluidoEmIsNullAndStatusNot(empresaId, "excluido");
+    }
 } 
