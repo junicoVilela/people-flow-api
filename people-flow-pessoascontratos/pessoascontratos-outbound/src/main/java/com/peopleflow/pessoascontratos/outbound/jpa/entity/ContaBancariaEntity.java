@@ -43,10 +43,10 @@ public class ContaBancariaEntity extends AuditableEntity {
     @Column(name = "CONTA", nullable = false)
     private String conta;
 
-    @Column(name = "TIPO", nullable = false)
+    @Column(name = "TIPO")
     private String tipo;
 
-    @Column(name = "PIX", nullable = false)
+    @Column(name = "PIX")
     private String pix;
 
     @Column(name = "COLABORADOR_ID", nullable = false)

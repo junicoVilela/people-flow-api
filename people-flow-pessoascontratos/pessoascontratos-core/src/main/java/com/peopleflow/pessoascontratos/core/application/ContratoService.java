@@ -7,7 +7,7 @@ import com.peopleflow.common.pagination.Pagination;
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.ContratoUseCase;
-import com.peopleflow.pessoascontratos.core.ports.output.CargoCatalogoRepositoryPort;
+import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.ContratoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.DocumentoContratoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.JornadaTrabalhoRepositoryPort;
@@ -23,7 +23,7 @@ public class ContratoService implements ContratoUseCase {
     private final ContratoRepositoryPort contratoRepository;
     private final ColaboradorUseCase colaboradorUseCase;
     private final JornadaTrabalhoRepositoryPort jornadaTrabalhoRepository;
-    private final CargoCatalogoRepositoryPort cargoCatalogoRepository;
+    private final CargoRepositoryPort cargoRepository;
     private final DocumentoContratoRepositoryPort documentoContratoRepository;
 
     @Override
@@ -111,7 +111,7 @@ public class ContratoService implements ContratoUseCase {
         if (!jornadaTrabalhoRepository.existeAtivaPorId(jornadaId)) {
             throw new BusinessException("JORNADA_NAO_ENCONTRADA", "Jornada de trabalho não encontrada ou inativa.");
         }
-        if (!cargoCatalogoRepository.existeAtivoPorId(cargoId)) {
+        if (!cargoRepository.existeAtivoPorId(cargoId)) {
             throw new BusinessException("CARGO_NAO_ENCONTRADO", "Cargo não encontrado ou inativo.");
         }
     }

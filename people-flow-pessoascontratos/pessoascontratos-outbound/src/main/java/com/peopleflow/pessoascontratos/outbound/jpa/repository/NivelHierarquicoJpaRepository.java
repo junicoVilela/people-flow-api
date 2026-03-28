@@ -15,4 +15,6 @@ public interface NivelHierarquicoJpaRepository extends JpaRepository<NivelHierar
     boolean existsByNomeIgnoreCaseAndExcluidoEmIsNull(String nome);
 
     boolean existsByNomeIgnoreCaseAndExcluidoEmIsNullAndIdNot(String nome, Long id);
+
+    boolean existsByIdAndExcluidoEmIsNull(Long id);
 }

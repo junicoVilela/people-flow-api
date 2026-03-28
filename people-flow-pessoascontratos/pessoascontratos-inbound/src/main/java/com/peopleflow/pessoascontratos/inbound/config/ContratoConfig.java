@@ -6,7 +6,7 @@ import com.peopleflow.pessoascontratos.core.application.ContratoService;
 import com.peopleflow.pessoascontratos.core.domain.Contrato;
 import com.peopleflow.pessoascontratos.core.ports.input.ColaboradorUseCase;
 import com.peopleflow.pessoascontratos.core.ports.input.ContratoUseCase;
-import com.peopleflow.pessoascontratos.core.ports.output.CargoCatalogoRepositoryPort;
+import com.peopleflow.pessoascontratos.core.ports.output.CargoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.ContratoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.DocumentoContratoRepositoryPort;
 import com.peopleflow.pessoascontratos.core.ports.output.JornadaTrabalhoRepositoryPort;
@@ -22,13 +22,13 @@ public class ContratoConfig {
             ContratoRepositoryPort contratoRepository,
             ColaboradorUseCase colaboradorUseCase,
             JornadaTrabalhoRepositoryPort jornadaTrabalhoRepository,
-            CargoCatalogoRepositoryPort cargoCatalogoRepository,
+            CargoRepositoryPort cargoRepository,
             DocumentoContratoRepositoryPort documentoContratoRepository) {
         ContratoService service = new ContratoService(
                 contratoRepository,
                 colaboradorUseCase,
                 jornadaTrabalhoRepository,
-                cargoCatalogoRepository,
+                cargoRepository,
                 documentoContratoRepository);
         return new TransactionalContratoUseCase(service);
     }

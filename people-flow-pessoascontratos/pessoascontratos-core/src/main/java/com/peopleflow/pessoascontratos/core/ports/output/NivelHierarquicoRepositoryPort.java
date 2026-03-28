@@ -18,4 +18,6 @@ public interface NivelHierarquicoRepositoryPort {
     long contarCargosAtivosVinculados(Long nivelHierarquicoId);
 
     void excluir(Long id);
+
+    boolean existeAtivoPorId(Long id);
 }

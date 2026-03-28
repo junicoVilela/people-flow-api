@@ -76,4 +76,9 @@ public class NivelHierarquicoRepositoryAdapter implements NivelHierarquicoReposi
         entity.setExcluidoEm(Instant.now());
         jpaRepository.save(entity);
     }
+
+    @Override
+    public boolean existeAtivoPorId(Long id) {
+        return jpaRepository.existsByIdAndExcluidoEmIsNull(id);
+    }
 }
