@@ -113,6 +113,12 @@ INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 -- Permissões de relatórios
 (1, 'relatorio:gerar', 'Gerar relatórios gerenciais'),
 
+-- Permissões de níveis hierárquicos de cargo
+(1, 'nivel_hierarquico:criar', 'Criar níveis hierárquicos de cargo'),
+(1, 'nivel_hierarquico:ler', 'Consultar níveis hierárquicos de cargo'),
+(1, 'nivel_hierarquico:editar', 'Editar níveis hierárquicos de cargo'),
+(1, 'nivel_hierarquico:excluir', 'Excluir níveis hierárquicos de cargo'),
+
 -- Permissões administrativas
 (1, 'admin', 'Acesso administrativo completo')
 ON CONFLICT (cargo_id, role_name) DO NOTHING;
@@ -189,7 +195,12 @@ ON CONFLICT (cargo_id, role_name) DO NOTHING;
 -- ============================
 INSERT INTO people_flow_rh.cargo_role (cargo_id, role_name, descricao) VALUES
 (6, 'admin', 'Acesso administrativo completo ao sistema'),
-(6, '*:*', 'Todas as permissões')
+(6, '*:*', 'Todas as permissões'),
+
+(6, 'nivel_hierarquico:criar', 'Criar níveis hierárquicos de cargo'),
+(6, 'nivel_hierarquico:ler', 'Consultar níveis hierárquicos de cargo'),
+(6, 'nivel_hierarquico:editar', 'Editar níveis hierárquicos de cargo'),
+(6, 'nivel_hierarquico:excluir', 'Excluir níveis hierárquicos de cargo')
 ON CONFLICT (cargo_id, role_name) DO NOTHING;
 
 -- ============================
