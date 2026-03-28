@@ -10,7 +10,10 @@ public class CentroCustoFilterRequest {
     private String status;
     private Long empresaId;
 
-    public boolean hasFilters() {
-        return empresaId != null || nome != null || codigo != null || status != null;
+    public boolean hasAnyCriteria() {
+        return empresaId != null
+                || (nome != null && !nome.isBlank())
+                || (codigo != null && !codigo.isBlank())
+                || (status != null && !status.isBlank());
     }
 }

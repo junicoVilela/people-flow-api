@@ -73,10 +73,10 @@ public class CentroCustoController {
     @GetMapping
     @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
-            summary = "Listar centros de custo com filtros e paginação",
-            description = "Lista centros de custo com filtros opcionais (empresaId, nome, codigo, status) e paginação. " +
-                    "Parâmetros de query: empresaId, nome, codigo, status (ativo/inativo/excluido). " +
-                    "Para usuário não-admin, recomenda-se enviar empresaId do escopo permitido."
+            summary = "Buscar centros de custo com filtros opcionais e paginação",
+            description = "Filtros opcionais (empresaId, nome, codigo, status) e paginação. "
+                    + "Query: empresaId, nome, codigo, status (ativo/inativo/excluido). "
+                    + "Para usuário não-admin, recomenda-se enviar empresaId do escopo permitido."
     )
     public ResponseEntity<PagedResult<CentroCustoResponse>> buscarPorFiltros(
             @ModelAttribute CentroCustoFilterRequest filtrosRequest,
@@ -85,10 +85,9 @@ public class CentroCustoController {
         if (!accessValidator.isAdmin() && filtrosRequest.getEmpresaId() == null && accessValidator.getEmpresaIdUsuario() != null) {
             filtrosRequest.setEmpresaId(accessValidator.getEmpresaIdUsuario());
         }
-        CentroCustoFilter filtros = mapper.toDomain(filtrosRequest);
-
         Pagination pagination = PageablePagination.from(pageable);
-        PagedResult<CentroCusto> resultado = centroCustoUseCase.buscarPorFiltros(filtros, pagination);
+        PagedResult<CentroCusto> resultado =
+                centroCustoUseCase.buscarPorFiltros(mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

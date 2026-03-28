@@ -9,7 +9,9 @@ public class AreaFilterRequest {
     private String codigo;
     private String status;
 
-    public boolean hasFilters() {
-        return nome != null || codigo != null || status != null;
+    public boolean hasAnyCriteria() {
+        return (nome != null && !nome.isBlank())
+                || (codigo != null && !codigo.isBlank())
+                || (status != null && !status.isBlank());
     }
 }

@@ -67,17 +67,15 @@ public class AreaController {
     @GetMapping
     @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
-            summary = "Listar áreas com filtros e paginação",
-            description = "Lista áreas com filtros opcionais (nome, codigo, status) e paginação."
+            summary = "Buscar áreas com filtros opcionais e paginação",
+            description = "Filtros opcionais (nome, codigo, status) e paginação Spring Data."
     )
     public ResponseEntity<PagedResult<AreaResponse>> buscarPorFiltros(
             @ModelAttribute AreaFilterRequest filtrosRequest,
             @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
-        AreaFilter filtros = mapper.toDomain(filtrosRequest);
-
         Pagination pagination = PageablePagination.from(pageable);
-        PagedResult<Area> resultado = areaUseCase.buscarPorFiltros(filtros, pagination);
+        PagedResult<Area> resultado = areaUseCase.buscarPorFiltros(mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

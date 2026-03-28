@@ -72,10 +72,10 @@ public class UnidadeController {
     @GetMapping
     @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
-            summary = "Listar unidades com filtros e paginação",
-            description = "Lista unidades com filtros opcionais (empresaId, nome, codigo, status) e paginação. " +
-                    "Parâmetros de query: empresaId, nome, codigo, status (ativo/inativo/excluido). " +
-                    "Para usuário não-admin, recomenda-se enviar empresaId do escopo permitido."
+            summary = "Buscar unidades com filtros opcionais e paginação",
+            description = "Filtros opcionais (empresaId, nome, codigo, status) e paginação. "
+                    + "Query: empresaId, nome, codigo, status (ativo/inativo/excluido). "
+                    + "Para usuário não-admin, recomenda-se enviar empresaId do escopo permitido."
     )
     public ResponseEntity<PagedResult<UnidadeResponse>> buscarPorFiltros(
             @ModelAttribute UnidadeFilterRequest filtrosRequest,
@@ -84,10 +84,8 @@ public class UnidadeController {
         if (!accessValidator.isAdmin() && filtrosRequest.getEmpresaId() == null && accessValidator.getEmpresaIdUsuario() != null) {
             filtrosRequest.setEmpresaId(accessValidator.getEmpresaIdUsuario());
         }
-        UnidadeFilter filtros = mapper.toDomain(filtrosRequest);
-
         Pagination pagination = PageablePagination.from(pageable);
-        PagedResult<Unidade> resultado = unidadeUseCase.buscarPorFiltros(filtros, pagination);
+        PagedResult<Unidade> resultado = unidadeUseCase.buscarPorFiltros(mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

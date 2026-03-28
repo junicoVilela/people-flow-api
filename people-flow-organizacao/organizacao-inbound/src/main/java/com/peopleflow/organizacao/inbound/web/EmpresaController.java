@@ -70,18 +70,15 @@ public class EmpresaController {
     @GetMapping
     @PreAuthorize("hasRole('organizacao:ler')")
     @Operation(
-            summary = "Listar empresas com filtros e paginação",
-            description = "Lista empresas com filtros opcionais (nome, status) e paginação. " +
-                    "Parâmetros de query: nome, status (ativo/inativo/excluido)."
+            summary = "Buscar empresas com filtros opcionais e paginação",
+            description = "Filtros opcionais (nome, status) e paginação. Query: nome, status (ativo/inativo/excluido)."
     )
     public ResponseEntity<PagedResult<EmpresaResponse>> buscarPorFiltros(
             @ModelAttribute EmpresaFilterRequest filtrosRequest,
             @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
-        EmpresaFilter filtros = mapper.toDomain(filtrosRequest);
-
         Pagination pagination = PageablePagination.from(pageable);
-        PagedResult<Empresa> resultado = empresaUseCase.buscarPorFiltros(filtros, pagination);
+        PagedResult<Empresa> resultado = empresaUseCase.buscarPorFiltros(mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 

@@ -11,7 +11,11 @@ public class DepartamentoFilterRequest {
     private String codigo;
     private String status;
 
-    public boolean hasFilters() {
-        return empresaId != null || unidadeId != null || nome != null || codigo != null || status != null;
+    public boolean hasAnyCriteria() {
+        return empresaId != null
+                || unidadeId != null
+                || (nome != null && !nome.isBlank())
+                || (codigo != null && !codigo.isBlank())
+                || (status != null && !status.isBlank());
     }
 }

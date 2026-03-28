@@ -83,19 +83,17 @@ public class ColaboradorController {
     @GetMapping
     @PreAuthorize("hasRole('colaborador:ler')")
     @Operation(
-        summary = "Listar colaboradores com filtros e paginação", 
-        description = "Busca colaboradores aplicando filtros opcionais (modelo de query) e paginação Spring Data "
-                      + "(`page`, `size`, `sort`). Apenas o primeiro critério de ordenação é aplicado no domínio. "
-                      + "Padrão sem `sort`: nome ascendente."
+        summary = "Buscar colaboradores com filtros opcionais e paginação",
+        description = "Filtros opcionais via query params; paginação Spring Data (`page`, `size`, `sort`). "
+                      + "Apenas o primeiro critério de ordenação é aplicado no domínio. Padrão sem `sort`: nome ascendente."
     )
     public ResponseEntity<PagedResult<ColaboradorResponse>> buscarPorFiltros(
             @ModelAttribute ColaboradorFilterRequest filtrosRequest,
             @PageableDefault(size = Pagination.DEFAULT_PAGE_SIZE, sort = "nome") Pageable pageable) {
 
-        ColaboradorFilter filtros = mapper.toDomain(filtrosRequest);
-
         Pagination pagination = PageablePagination.from(pageable);
-        PagedResult<Colaborador> resultado = colaboradorUseCase.buscarPorFiltros(filtros, pagination);
+        PagedResult<Colaborador> resultado =
+                colaboradorUseCase.buscarPorFiltros(mapper.toDomain(filtrosRequest), pagination);
         return ResponseEntity.ok(PagedResult.map(resultado, mapper::toResponse));
     }
 
