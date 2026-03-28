@@ -78,6 +78,14 @@ INSERT INTO people_flow_rh.cargo (id, codigo, nome, descricao, nivel_hierarquico
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================
+-- SEED DATA: Jornadas de trabalho
+-- ============================
+INSERT INTO people_flow_rh.jornada_trabalho (id, descricao, carga_semanal_horas) VALUES
+(1, 'Integral padrão 44h semanais', 44.00),
+(2, 'Parcial 30h semanais', 30.00)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================
 -- SEED DATA: Mapeamento Cargo → Roles
 -- ============================
 
@@ -216,6 +224,19 @@ INSERT INTO people_flow_rh.colaborador (id, empresa_id, departamento_id, centro_
 (7, 1, 4, 1, 'Fernanda Souza', '371.498.283-37', '007', 'fernanda.souza@peopleflow.com', '2024-01-08', 'ativo', 5)
 ON CONFLICT (id) DO NOTHING;
 
+-- ============================
+-- SEED DATA: Contratos (colaborador, jornada, cargo)
+-- ============================
+INSERT INTO people_flow_rh.contrato (id, colaborador_id, jornada_id, cargo_id, tipo, regime, salario_base, inicio, fim) VALUES
+(1, 1, 1, 1, 'CLT', 'integral', 15000.00, '2023-01-15', NULL),
+(2, 2, 1, 2, 'CLT', 'integral', 9800.00, '2023-03-01', NULL),
+(3, 3, 2, 3, 'CLT', 'parcial', 5500.00, '2023-06-10', NULL),
+(4, 4, 1, 4, 'CLT', 'integral', 8800.00, '2023-02-20', NULL),
+(5, 5, 1, 5, 'CLT', 'integral', 4200.00, '2023-04-01', NULL),
+(6, 6, 1, 6, 'CLT', 'integral', 18000.00, '2022-11-01', NULL),
+(7, 7, 1, 5, 'CLT', 'integral', 4100.00, '2024-01-08', NULL)
+ON CONFLICT (id) DO NOTHING;
+
 -- Ajusta sequences para o próximo ID após os seeds (evita conflito em novas inserções)
 SELECT setval('people_flow_rh.empresa_id_seq',           (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.empresa));
 SELECT setval('people_flow_rh.unidade_id_seq',           (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.unidade));
@@ -226,6 +247,8 @@ SELECT setval('people_flow_rh.area_id_seq',              (SELECT COALESCE(MAX(id
 SELECT setval('people_flow_rh.nivel_hierarquico_id_seq', (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.nivel_hierarquico));
 SELECT setval('people_flow_rh.familia_cargo_id_seq',     (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.familia_cargo));
 SELECT setval('people_flow_rh.cargo_id_seq',             (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.cargo));
+SELECT setval('people_flow_rh.jornada_trabalho_id_seq',  (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.jornada_trabalho));
+SELECT setval('people_flow_rh.contrato_id_seq',          (SELECT COALESCE(MAX(id), 1) FROM people_flow_rh.contrato));
 
 -- ============================
 -- SEED DATA: Mapeamento Departamento → Grupo Keycloak

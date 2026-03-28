@@ -121,6 +121,13 @@ COMMENT ON COLUMN PEOPLE_FLOW_RH.CONTRATO.TIPO IS 'Tipo: CLT, PJ, estagio, tempo
 COMMENT ON COLUMN PEOPLE_FLOW_RH.CONTRATO.REGIME IS 'Regime: integral, parcial, horista';
 COMMENT ON COLUMN PEOPLE_FLOW_RH.CONTRATO.SALARIO_BASE IS 'Salário base do contrato';
 
+COMMENT ON TABLE PEOPLE_FLOW_RH.DOCUMENTO_CONTRATO IS
+'Documentos digitais anexados ao contrato de trabalho (cópias assinadas, aditivos, etc.).';
+
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DOCUMENTO_CONTRATO.TIPO IS 'Tipo: contrato, atestado, exame, certidao, comprovante, documento, outro';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DOCUMENTO_CONTRATO.STORAGE_KEY IS 'Chave no storage (S3, etc)';
+COMMENT ON COLUMN PEOPLE_FLOW_RH.DOCUMENTO_CONTRATO.VERSAO IS 'Versão do documento';
+
 -- ============================
 -- PONTO
 -- ============================

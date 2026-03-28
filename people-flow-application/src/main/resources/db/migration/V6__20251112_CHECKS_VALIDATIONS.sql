@@ -96,6 +96,9 @@ ALTER TABLE PEOPLE_FLOW_RH.CONTRATO
 ALTER TABLE PEOPLE_FLOW_RH.CONTRATO
     ADD CONSTRAINT CHK_CONTRATO_DATAS CHECK (FIM IS NULL OR FIM >= INICIO);
 
+ALTER TABLE PEOPLE_FLOW_RH.DOCUMENTO_CONTRATO
+    ADD CONSTRAINT CHK_DOCUMENTO_CONTRATO_TIPO CHECK (TIPO IN ('contrato', 'atestado', 'exame', 'certidao', 'comprovante', 'documento', 'outro'));
+
 -- ============================
 -- PONTO
 -- ============================
